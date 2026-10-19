@@ -155,3 +155,18 @@ PostGIS/HTTP/합성 어댑터와 사용 예제는 [공공데이터 가이드](pu
 | 3종 POI 조회 / 타입 / 기한·취소 | 공통 core | 공통 core | Node 단위·독립 core·실제 로컬 DB/HTTP 통과 |
 | 합성/운영자 transport Provider | 동일 구현 | 동일 구현 | 단위 및 로컬 HTTP 통합 |
 | 조회 결과 지도·카드 연결 | 위치 확인 후 변환 | 위치 확인 후 변환 | 이번 단계의 신규 UI/Native 실화면 미검증 |
+
+## 한국 POI 검색 확장
+
+`KoreanSearchProvider extends SearchProvider`: searchPage/autocomplete/reverseNearby와
+`SearchHit`/`SearchPage`/`KoreanSearchQuery`/`ReversePoiResult`를 추가했다. 기존 search는 Place[]를 유지한다.
+`focusSearchHit(MapController, SearchHit)`는 Web/Native 공통 카메라 선택 도우미다.
+정확한 주소 변환은 별도 GeocodingProvider로 유지한다. [검색 가이드](search.md) 참조.
+
+| 기능 | Web | React Native |
+| --- | --- | --- |
+| 검색·자동완성·bounds/거리/카테고리·페이지·취소 계약 | 단위/실제 DB 검증 | 동일 순수 계약, 타입 검증 |
+| 선택→지도 카메라 | Chromium 실제 렌더러 검증 대상 | 동일 MapController 연결, 기기 미검증 |
+| 검색 UI·IME·키보드/출처 | Next `/search/` 예제 | 소비 앱 구현 필요 |
+| 역지오코딩 | 가까운 POI 주소만 구현 | 동일 계약, 기기 미검증 |
+| 전국 도로명주소 geocoder | 운영자 별도 구현 필요 | 운영자 별도 구현 필요 |

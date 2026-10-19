@@ -1,9 +1,16 @@
-# search service
+# Korea Map Kit PostGIS search service
 
-Private workspace boundary; not an npm SDK package or a running service.
-`src/index.ts` exports an explicit `not-implemented` descriptor only.
-No HTTP port, database, downloader, cloud resource or fallback is started.
-The SDK packages must never import this directory.
+Private operator service; not an npm SDK package. Importing it starts no connection or listener.
+Explicit PostgreSQL connection and migrations are required. Uses the existing geo-data POI table,
+pg_trgm GIN/prefix indexes, geography filters/distances and read-only transactions.
 
-Implementation is deferred to the roadmap: geo-data pipelines M3/M6, search/routing engines M5.
-Operators will supply licensed input and their own infrastructure and pay its operating costs.
+From the repository root: `pnpm build:sdk`, `pnpm geo:local start`, `pnpm geo:migrate`,
+`pnpm geo:fixture`, `pnpm search:migrate`, then `pnpm search:serve`.
+The loopback server accepts POST /search with search/autocomplete/reverse requests.
+`GEO_DATABASE_URL` is server-only; `KMK_SEARCH_PORT` defaults to 8100.
+No public Nominatim, publisher endpoint, secret, remote fallback or automatic data collection.
+
+Reverse lookup returns a nearby POI's address, not an exact road-address determination.
+A separate GeocodingProvider is required for nationwide address geocoding.
+Deploy behind an operator-owned authenticated/rate-limited gateway; do not expose the sample directly.
+See [search guide](../../docs/search.md) and [validation](../../docs/research/search-validation.md).

@@ -37,3 +37,4 @@ export function createFixtureSearchProvider(): SearchProvider {
   };
 }
 export * from './places.js';
+export * from './search.js';

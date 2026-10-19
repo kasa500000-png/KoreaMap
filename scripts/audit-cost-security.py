@@ -37,6 +37,7 @@ OFFLINE_REFERENCE_URLS = {
     "scripts/audit-cost-security.py": {"https://registry.npmjs.org/"},
 }
 DOCUMENTATION_HOSTS = {
+    "www.postgresql.org",  # Reviewed SQL documentation, not a runtime endpoint.
     "csv.js.org",  # Reviewed parser documentation only; never a runtime provider.
     "raw.githubusercontent.com", "openfontlicense.org",  # Reviewed Noto/OFL documentation only.
     "github.com", "docs.github.com", "maplibre.org", "docs.expo.dev", "nextjs.org",

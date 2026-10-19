@@ -228,3 +228,27 @@ Web `/api/`는 직접 작성한 합성 데이터만 inline으로 사용한다. �
 전체 check·실제 tarball·staged 최종 결과와 원격 CI 상태는 [진행 기록](progress.md) 및 PR을 따른다. Supabase 프로젝트 접근/생성/배포, main 병합, npm 발행은 수행하지 않았다.
 
 로컬 최종 `pack:check`에서 SDK 5개 실제 tarball의 출처/파일 allowlist/빌드 바이트 일치와 키·endpoint 검사가 통과했다(발행 아님). core SHA-256 `1dc1236adf46d061f126218f497297297e3b40af02901cac8efed7de686791ba`, data-adapters `a37409fadd336e3e9f76fff1fe61e43517d34692861ddf960d68c82ab2975fe2`. 기존 Web Playwright 6개도 외부 HTTP 차단 아래 통과했다. 실제 공공 원천 다운로드 성공/운영 계정 과금/Native 네트워크까지 검증했다는 뜻은 아니다.
+
+## 한국 POI 검색 / 2026-10-19
+
+- core/data-adapters에 pg·fetch·URL·키를 추가하지 않았다. 검색은 명시적 합성 provider 또는 운영자 transport다.
+  Next `/search/`는 자체 MIT 자료 7건으로만 실행한다. 외부 Nominatim/지오코더/검색 API 호출 경로 없음.
+- pg8.23.1은 private search 서비스에서 기존 exact 버전을 재사용한다. DB 연결은 서버 전용 명시 설정,
+  reader 역할·파라미터 SQL·statement/lock/요청 기한·동시성/body 제한·loopback·Origin 거부를 적용한다.
+  검색어/좌표/원문 응답/DB 암호는 로그하지 않고 HTTP 응답은 no-store다. 공개 운영은 사용자 인증 gateway가 필요하다.
+- 검색 이용자가 늘어도 제작자 endpoint를 호출하는 경로가 없으며, 운영자가 자신의 DB/프록시/트래픽 비용을 부담한다.
+  브라우저/모바일에 DB 비밀을 넣지 않는다. 별도 전국 주소 provider에도 같은 비용·권리 gate를 적용한다.
+- 기존 Linux 임시 Docker CI 테스트에 검색 검사를 추가했다. 유료 runner/cache/artifact/클라우드 서비스/cron 추가 없음.
+  기본 check는 DB 없이 가능하다. 실제 통합 검사 시 공개 registry의 Docker 이미지 다운로드가 필요하다.
+- 검색 코드·SQL·합성 fixture·Web source 12개를 개별 검토해 출처 해시를 추가/갱신한다. 제3자 payload 허용 없음.
+  PostgreSQL 문서 URL은 문서 allowlist에만 추가하고 runtime URL 차단 회귀 검사를 추가했다.
+- 기존 high2(node-forge/braces) 미해결 상태 유지. 이번 변경은 새 전이 버전을 도입하지 않았으며 advisory 재조회는 하지 않았다.
+  서비스/DB 컨테이너 OS CVE, 실제 Native 네트워크와 운영 계정 과금 설정은 미검증이다.
+
+최종 전체 check/pack·staged·Chromium 외부 요청 검사와 화면 결과는 [검색 검증](research/search-validation.md),
+[진행 기록](progress.md)을 따른다. main 병합·배포·npm 발행은 수행하지 않는다.
+
+로컬 최종 check/SDK5개 pack/Chromium7개/실제 Docker19개 통과. 정적 findings0, 데모 외부 HTTP 시도0.
+SDK core/data-adapters 실제 tarball SHA는 [검색 검증](research/search-validation.md)에 기록했다.
+로컬 CLI 가이드를 실행해 pnpm 내장 search 충돌을 제거했고, DB migration·서버 조회·정상 종료까지 확인했다.
+공식 문서와 의존성 registry/Docker 다운로드는 SDK 런타임 provider 요청과 구분한다.

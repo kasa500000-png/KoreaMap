@@ -11,3 +11,9 @@ implicit endpoint, key, fetch call or database dependency. Wrap either provider 
 core `createPlacesClient()` for nearby/bounds/category queries, cancellation and deadlines.
 See the repository's `docs/public-data-etl.md` for the HTTP contract and PostGIS service.
 Actual public-source data and native device QA remain unverified.
+
+`createFixtureKoreanSearchProvider(scheduler)` supplies seven original Korean test POIs.
+`createRemoteKoreanSearchProvider(request, scheduler)` accepts an operator transport and validates
+paginated search, prefix autocomplete and nearby-POI reverse results with portable cancellation.
+No fetch/default URL or public Nominatim is embedded. Full geocoding is a separate contract.
+See `docs/search.md` in the repository for PostGIS setup and working consumer examples.
