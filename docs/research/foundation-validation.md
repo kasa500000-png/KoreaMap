@@ -36,3 +36,5 @@ Web screenshot SHA256: `28e31f40b9a679bccbe488746e5431148ffcba1c28fdeacd736bf44e
 [최초 실행](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205075633)의 Windows는 통과했고 Linux/macOS는 기능 검사 후 Changesets의 로컬 main 참조 부재로 실패했다. status 비교를 origin/main으로 바꾸고 로컬 main이 없는 detached clone에서 재검증했다. PR #3의 후속 checks를 최종 실행 결과로 사용한다.
 
 별도 소비 검증: 실제 core tarball을 새 임시 프로젝트에 offline/ignore-scripts로 설치하고 Node ESM import·좌표 검증·설정 누락 오류를 확인했다. SDK tarball 발행은 수행하지 않았다.
+
+재실행 확정: [b538e95의 CI](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239)에서 ubuntu-24.04/windows-2025/macos-15 전체 success. Linux Chromium E2E 포함. Native compiler/QA는 이 workflow에 없으며 미검증이다. 이후 문서 커밋의 checks는 PR에 추가로 표시된다.

@@ -333,3 +333,9 @@
 - changeset:status에 `--since=origin/main`을 명시해 detached checkout에서도 비교할 수 있게 수정했다. 로컬 main이 없는 임시 clone의 detached HEAD에서 실제 재현 검사 통과. 수정 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: resolve Changesets base in detached CI checkouts$'`. 원격 재실행 결과는 PR #3 checks와 사용자 보고로 확인한다.
 - 실제 core tarball을 새 임시 소비 프로젝트에 `npm install --offline --ignore-scripts --no-audit --no-fund`로 설치하고 Node에서 import·좌표 검사·CONFIG_REQUIRED 실패를 확인했다.
 - GitHub Actions 권한 설정 조회는 연동 API 권한 부족 HTTP403이었다. 실제 workflow 실행 조회는 가능하며 과금/권한 설정을 변경하지 않았다.
+
+### 원격 CI 재실행 결과
+
+- [https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239): 코드/CI 수정 커밋 `b538e9506fb6e238f60421a6751100c822fc3320`에서 Linux·Windows·macOS **모두 success**. 각 OS의 pnpm check와 pack 검사, Linux Chromium E2E까지 통과했다.
+- 이 결과는 3 OS에서 JavaScript/TypeScript 개발 경로를 검증한 것이다. macOS runner 사용 자체를 iOS 앱 컴파일·시뮬레이터 QA로 해석하지 않는다. Native 실빌드/기기 QA와 high2 출시 차단은 그대로 남는다.
+- 최종 문서 기록 커밋 식별: `git log -1 --format='%H %s' --grep='^docs: record foundation CI verification$'`. 문서 갱신 후 문서/감사/format/diff 검사를 통과한 뒤 커밋한다.

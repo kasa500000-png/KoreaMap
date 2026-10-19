@@ -126,9 +126,9 @@ python3 scripts/audit-cost-security.py --artifact /path/to/package.tgz
 | SDK tarball 5개 | 정적 검사 통과 | 실제 pack 내용에 JS/d.ts/MIT 고지/manifest/README만 포함; 발행 없음 |
 | Git 작업 트리/index/이력 | 정적 검사 통과 | heuristic rule 범위; 배포물 전체의 임의 secret 부재를 증명하지 않음 |
 | Python 감사 회귀 | 11개 통과 | 이력/index/합성 token/tar/CI 규칙 |
-| Native 실빌드·실화면·네트워크 | 미검증 | Android SDK/ADB와 macOS/Xcode 실행 환경 없음 |
+| Native 실빌드·실화면·네트워크 | 미검증 | 로컬 SDK/기기 환경 미구비; CI는 JS export만 구성 |
 | 초기 온라인 설치 전체 packet inventory | 미수집 | registry 조회 및 scripts 차단 확인과 캐시 오프라인 재설치 증거로 구분 |
-| 원격 CI | PR checks를 근거로 별도 확인 | workflow 작성만으로 3 OS 실행 성공을 주장하지 않음 |
+| 원격 CI | [3 OS 재실행 통과](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239), `b538e95` | check/pack 및 Linux browser E2E; Native compiler 미포함 |
 | 결제 계정/운영 데모 | 변경·배포 없음 | 실제 무료 한도/과금 설정 검증 전 운영 배포 금지 |
 
 브라우저 QA는 context 요청 계측/차단과 화면 관찰이며 OS/Native 모든 전송 경로의 완전한 증거는 아니다. service worker는 차단하며 로컬 MapLibre worker를 사용했다. Linux syscall 추적은 작업 환경에 한정한다. `unshare -n` 네트워크 namespace 격리는 권한 부족으로 실행 불가였으므로 격리 환경 검증으로 보고하지 않는다.
