@@ -19,6 +19,7 @@ P1은 공개 출시 차단, P2는 지원 범위/기능·검증 결함, P3는 개
 | QA-02 | P2 | 루트 license inventory만 실행하면 설치 그래프 199개 이름만 관찰 | **수정·회귀 통과**. recursive + include-workspace-root, Linux 645개 설치 버전의 정책 검사. 신규/알 수 없는 조건 실패 처리 |
 | QA-03 | P2 | 배포 tarball을 독립 소비 앱에서 컴파일·실행하는 검증 부재 | **수정·회귀 통과**. 4개 Web 계열 tarball의 오프라인 설치, strict 선언, SSR import, 실제 Chromium 표시/선택/종료를 CI에 추가 |
 | QA-04 | P3 | 768px 명시 검사 및 성능 수치/카메라 중 마커 DOM 갱신 근거 부족 | **보강·통과**. 390/768/1440 matrix, 503 복구, 4종 테마, 요청/시간/DOM mutation 측정 |
+| QA-05 | P2 | 최초 Linux CI에서 독립 소비 앱의 registry metadata 캐시가 없어 ERR_PNPM_NO_OFFLINE_META 발생 | **수정**. 빈 전용 metadata 캐시에서 공개 registry로 소비 앱 lock을 명시적으로 준비한 뒤 frozen/offline 설치. 설치된 제3자 버전이 기존 검토 그래프에 있는지도 검사. 원격 재검증 결과는 PR checks를 따름 |
 
 보안 근거는 [node-forge 공지](https://github.com/advisories/GHSA-86w9-cpqp-85rv),
 [braces 공지](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm),
@@ -102,7 +103,9 @@ tarball 바이트를 비교한다. 운영자 artifacts/DB/graph는 지우지 않
 
 독립 임시 디렉터리에 core/web/styles/data-adapters tarball4개와 MapLibre6.14.0을 설치했다.
 SDK 내부 의존성도 로컬 tarball override로 해석해 workspace 소스를 참조하지 않는다.
-오프라인·install hook 차단, strict Bundler/전체 declaration 검사, Node SSR import,
+최초 소비 앱 lock 해석은 공개 npm registry metadata 접속이 필요하며 빈 전용 캐시에서 수행한다.
+이후 frozen/offline·install hook 차단으로 설치하고, 모든 제3자 설치 버전이 기존 검토 그래프에 있는지 확인한다.
+strict Bundler/전체 declaration 검사, Node SSR import,
 Vite+Chromium에서 지도/마커 선택/종료와 외부 요청0을 확인했다. Native 독립 소비 앱 설치/개발 빌드는 이번에 미실행이다.
 최소 소비 앱과 동일하게 Web은 `module: ESNext`, `moduleResolution: Bundler`, `strict:true`를 사용한다.
 core는 `module: NodeNext`, `lib:[ES2022]`, `types:[]`, `skipLibCheck:false`로도 통과했다.
@@ -145,3 +148,11 @@ CI는 기능/정책 회귀의 상태이며 취약점·실기기 출시 승인 �
 다음 우선순위는 P1 공식 패치 검증, 가속/실제 Android와 macOS/iOS 기기 QA,
 Web NodeNext upstream 타입 수정 확인, 운영자 tile/POI·실GPS·장시간 성능/네트워크 감사다.
 각 항목의 실제 증거가 생기기 전까지 전체 플랫폼 품질 감사와 공개 출시를 완료 처리하지 않는다.
+
+
+최초 [원격 CI](https://github.com/kasa500000-png/KoreaMap/actions/runs/39261616248)에서
+Windows/macOS는 통과했고 Linux의 새 소비 앱 검사만 metadata 캐시 누락으로 실패했다.
+이를 숨기거나 재시도만 하지 않고 위 QA-05로 설치 준비 조건과 회귀 스크립트를 수정했다.
+최종 원격 판정은 [Draft PR #14](https://github.com/kasa500000-png/KoreaMap/pull/14)의 최신 commit checks를 따른다.
+503 복구 검사는 실패한 지도를 종료하고 사용자 버튼으로 로컬 fixture를 재생성하는 흐름이다.
+원격 provider 자동 retry/장애 후 동일 서버 복구까지 검증했다는 뜻은 아니다.

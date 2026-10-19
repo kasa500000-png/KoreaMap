@@ -80,12 +80,50 @@ try {
   // Local unpublished packages resolve only to the audited tarballs, never workspace source.
   writeFileSync(
     resolve(temp, 'pnpm-workspace.yaml'),
-    `ignoreScripts: true\noverrides:\n${Object.entries(dependencies)
+    `ignoreScripts: true\ncacheDir: '${resolve(temp, 'empty-metadata-cache').replaceAll('\\', '/')}'\noverrides:\n${Object.entries(
+      dependencies,
+    )
       .map(([name, value]) => `  '${name}': '${value}'`)
       .join('\n')}\n`,
   );
   const store = dirname(pnpm(['store', 'path']).trim());
-  pnpm(['install', '--offline', '--ignore-scripts', '--store-dir', store], temp);
+  // A new consumer needs registry metadata even when package files are cached.
+  // Prepare its lock explicitly, then verify installation with networking forbidden by --offline.
+  // Seed from the repository lock and reject any third-party version outside the reviewed graph.
+  cpSync(resolve(root, 'pnpm-lock.yaml'), resolve(temp, 'pnpm-lock.yaml'));
+  console.log('Preparing consumer lock from public registry metadata; no lifecycle scripts');
+  pnpm(
+    [
+      'install',
+      '--lockfile-only',
+      '--no-frozen-lockfile',
+      '--ignore-scripts',
+      '--store-dir',
+      store,
+    ],
+    temp,
+  );
+  pnpm(
+    ['install', '--offline', '--frozen-lockfile', '--ignore-scripts', '--store-dir', store],
+    temp,
+  );
+  const reviewedGraph = new Set(
+    Object.values(
+      JSON.parse(pnpm(['-r', '--include-workspace-root', 'licenses', 'list', '--json'])),
+    ).flatMap((entries) =>
+      entries.flatMap(({ name, versions }) => versions.map((version) => `${name}@${version}`)),
+    ),
+  );
+  for (const entries of Object.values(JSON.parse(pnpm(['licenses', 'list', '--json'], temp)))) {
+    for (const { name, versions } of entries) {
+      if (Object.hasOwn(dependencies, name)) continue;
+      for (const version of versions)
+        assert(
+          reviewedGraph.has(`${name}@${version}`),
+          `Unreviewed consumer dependency: ${name}@${version}`,
+        );
+    }
+  }
   const source = `import type { Coordinate, MapMarker } from '@korea-map-kit/core';
 import { normalizeSearchText } from '@korea-map-kit/core';
 import { createMapState, createMap } from '@korea-map-kit/web';
@@ -228,10 +266,10 @@ await map.ready; document.body.dataset.ready = 'true'; window.consumerMap = map;
   assert.deepEqual(errors, []);
   writeFileSync(
     resolve('artifacts/qa/packages.json'),
-    `${JSON.stringify({ packages, nodeNextProbe, coreNodeNextTypes: 'passed without DOM or ambient types', reproducibility: 'same Linux host, clean SDK rebuild, byte-identical five tarballs', isolatedConsumer: 'four Web packages: offline install, strict declaration check, Node SSR import, Chromium render/select/destroy; zero external requests', nativeConsumer: 'not executed' }, null, 2)}\n`,
+    `${JSON.stringify({ packages, nodeNextProbe, coreNodeNextTypes: 'passed without DOM or ambient types', reproducibility: 'same Linux host, clean SDK rebuild, byte-identical five tarballs', isolatedConsumer: 'four Web packages: explicit registry metadata preparation, frozen offline install, reviewed dependency graph, strict declaration check, Node SSR import, Chromium render/select/destroy; zero external requests', nativeConsumer: 'not executed' }, null, 2)}\n`,
   );
   console.log(
-    'PASS: five byte-identical rebuilt SDK tarballs; isolated four-package consumer install/typecheck/SSR/browser smoke; zero external requests',
+    'PASS: five byte-identical rebuilt SDK tarballs; isolated four-package consumer install/typecheck/SSR/browser smoke; zero browser external requests',
   );
   console.log(JSON.stringify(packages));
 } finally {

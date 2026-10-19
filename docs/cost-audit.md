@@ -328,3 +328,10 @@ npm audit는 기존 high2/exit1이며 공개 출시 차단을 유지한다.
 - Web15, 실제 PostGIS19, 실제 합성 Valhalla8, 단위100 및 출처19/비용16 회귀가 통과했다. 390/768/1440 Web와 독립 소비 앱 외부 HTTP 요청0. 모든 앱/운영자 설정에서 비용이 없음을 보증하지 않는다.
 - npm audit는 high2/exit1, 공식 수정 버전 없음으로 재확인했다. Web NodeNext 외부 선언, Android 물리 기기/iOS, 장시간 메모리/실데이터 부하/OS 네트워크는 미검증 또는 미해결이며 출시 차단을 유지한다.
 - 기존 표준 runner에서 license/offline/독립 tarball 소비 앱 검사만 추가했다. paid runner·remote cache·artifact 업로드·cron·배포·공유 계정·npm publish 없음.
+
+
+소비 앱 CI 보완: package store만 있는 새 runner에서는 registry metadata가 부족해 최초 Linux 검사가 실패했다.
+`verify:packages`는 빈 전용 metadata 캐시에서 공개 registry로 lock만 명시적으로 준비한 다음
+frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기존 검토된 그래프와 대조한다.
+이 개발용 metadata 요청은 제작자 API/계정을 사용하지 않는다. Web 실행 외부 요청0과 설치 준비 통신을 혼동하지 않는다.
+전체 workspace의 `offline:check`는 기존대로 frozen/offline 전용이다.

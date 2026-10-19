@@ -559,3 +559,12 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **잔여:** 물리 Android/iOS·Native glyph/PMTiles/권한/메모리·OS egress, 장시간/실제 타일·전국 데이터 부하, Web NodeNext, native/image SBOM, OS 간 및 앱 binary 바이트 재현은 미완료다. [전체 QA 보고서](qa-report.md)의 심각도별 표를 따른다.
 7. **Git:** `feat/quality-audit`, base `feat/scenario-apps` (`0d3a8d20bf490b841ca86e9e7854275862977edf`). 구현 커밋 조회: `git log -1 --format='%H %s' --grep='^fix: strengthen SDK quality gates and isolated consumer types$'`. 기능 회귀 통과 후 commit/push 및 연결 GitHub 커넥터 Draft PR. main 병합/운영 배포/npm 발행 없음.
 8. **다음 단계:** P1 의존성 수정 버전 확인과 실제 기기 QA 진행 가능. 전체 품질 감사·모바일 QA·공개 제품 출시 완료 판정은 불가하다.
+
+
+### CI 환경 차이 회귀 수정
+
+구현 커밋 `200a11fcd7c8029ad47b905a2a9278207e2ab1e5`를 연결 GitHub 커넥터의 [Draft PR #14](https://github.com/kasa500000-png/KoreaMap/pull/14)로 제출했다.
+첫 원격 Windows/macOS는 통과, Linux의 독립 소비 앱은 package store와 registry metadata 캐시의 차이로 실패했다.
+소비 앱 lock을 빈 metadata 캐시에서 공개 registry로 명시적으로 준비한 뒤 frozen/offline 설치하도록 고쳤다.
+기존 검토 그래프 밖의 제3자 버전은 거부한다. 로컬 재검증 뒤 후속 커밋하며 최신 원격 checks로 판정한다.
+이 변경은 검사 준비 절차이며 SDK runtime/타입/타일 endpoint는 변경하지 않는다.
