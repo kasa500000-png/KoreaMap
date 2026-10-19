@@ -493,6 +493,133 @@ export declare function createCancellationSource(): {
 export declare function runOperation<T>(operation: (context: OperationContext) => T | Promise<T>, options: OperationOptions | undefined, scheduler: Scheduler): Promise<T>;
 ```
 
+## PoiCategory
+
+```ts
+/** Stable categories; a trail POI is not a routing graph. */
+export type PoiCategory = 'park' | 'tourism' | 'parking' | 'toilet' | 'pet_facility' | 'trail' | 'other';
+```
+
+## PublicPlace
+
+```ts
+/** Source-attributed record. Missing coordinates remain null, never guessed or geocoded implicitly. */
+export interface PublicPlace {
+    readonly id: string;
+    readonly name: string;
+    readonly category: PoiCategory;
+    readonly location: Coordinate | null;
+    readonly address: string | null;
+    readonly source: string;
+    readonly source_id: string;
+    readonly license: string;
+    readonly attribution: string;
+    /** Source snapshot/record time, not the ingestion time; UTC ISO 8601. */
+    readonly updated_at: string;
+    readonly metadata: JsonObject;
+}
+```
+
+## PlaceQueryOptions
+
+```ts
+export interface PlaceQueryOptions {
+    /** 1..100; default 20. No implicit pagination/download of the entire DB. */
+    readonly limit?: number;
+}
+```
+
+## NearbyPlacesQuery
+
+```ts
+export interface NearbyPlacesQuery extends PlaceQueryOptions {
+    readonly center: Coordinate;
+    /** Positive meters, at most 50,000. */
+    readonly radiusMeters: number;
+    readonly category?: PoiCategory;
+}
+```
+
+## BoundsPlacesQuery
+
+```ts
+export interface BoundsPlacesQuery extends PlaceQueryOptions {
+    readonly bounds: MapBounds;
+    readonly category?: PoiCategory;
+}
+```
+
+## CategoryPlacesQuery
+
+```ts
+export interface CategoryPlacesQuery extends PlaceQueryOptions {
+    readonly category: PoiCategory;
+}
+```
+
+## PlacesQuery
+
+```ts
+export type PlacesQuery = ({
+    readonly kind: 'nearby';
+} & NearbyPlacesQuery) | ({
+    readonly kind: 'bounds';
+} & BoundsPlacesQuery) | ({
+    readonly kind: 'category';
+} & CategoryPlacesQuery);
+```
+
+## PlacesProvider
+
+```ts
+/** Implement this interface for any operator-owned DB/service. No storage vendor dependency. */
+export interface PlacesProvider {
+    query(query: PlacesQuery, context: OperationContext): Promise<readonly PublicPlace[]>;
+}
+```
+
+## PlacesClient
+
+```ts
+export interface PlacesClient {
+    getNearbyPlaces(query: NearbyPlacesQuery, options?: OperationOptions): Promise<readonly PublicPlace[]>;
+    getPlacesInBounds(query: BoundsPlacesQuery, options?: OperationOptions): Promise<readonly PublicPlace[]>;
+    getPlacesByCategory(query: CategoryPlacesQuery, options?: OperationOptions): Promise<readonly PublicPlace[]>;
+}
+```
+
+## validatePoiCategory
+
+```ts
+export declare function validatePoiCategory(value: unknown): PoiCategory;
+```
+
+## validatePlacesQuery
+
+```ts
+/** Validate before invoking a provider; returns a detached query. */
+export declare function validatePlacesQuery(query: PlacesQuery): PlacesQuery;
+```
+
+## validatePublicPlace
+
+```ts
+export declare function validatePublicPlace(value: unknown): PublicPlace;
+```
+
+## publicPlaceToPlace
+
+```ts
+/** Explicit conversion to the original display/search Place model. Unlocated records cannot be markers. */
+export declare function publicPlaceToPlace(value: PublicPlace): Place;
+```
+
+## createPlacesClient
+
+```ts
+export declare function createPlacesClient(provider: PlacesProvider, scheduler: Scheduler): PlacesClient;
+```
+
 ## copyJson
 
 ```ts

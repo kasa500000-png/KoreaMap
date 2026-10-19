@@ -446,3 +446,17 @@
 ### Native 타입 및 CI 회귀 보강
 
 Native의 실제 MapLibre 선언 해석을 검사해 NodeNext의 암묵적 any를 발견하고 Bundler로 수정했다. CameraStop union과 RN 고정 Style Spec 26.2.1(ISC) validator를 적용하고 `check:native-types`를 CI 필수 단계로 추가했다. pnpm lockfile에는 기존 전이 버전을 Native 직접 의존성으로만 연결했다. 첫 원격 CI는 Windows/macOS 통과, Linux 기존 font-probe 조회 실패였다. 폰트 준비·레이아웃 후 동일 KR face 조건을 검사하도록 보강하고 전체 check/pack/브라우저 6개를 다시 통과했다. 후속 커밋의 원격 CI 결과는 PR checks로 구분한다. 후속 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: enforce resolved native API types and font readiness$'`.
+## 공공 POI 데이터 통합 기반 — 2026-10-19
+
+1. **구현:** A CSV 3종의 opt-in/권리·기한·CRS·해시·필드 검증, 인코딩/중복 처리, PostGIS 변환·원자적 upsert·갱신·복구·실행 로그, 로컬 Docker, 비공개 schema/RLS·reader/writer, 제한된 HTTP 조회. 공통 PublicPlace/PlacesProvider와 getNearbyPlaces/getPlacesInBounds/getPlacesByCategory, 합성 7카테고리·운영자 transport, 타입 예제·API 문서.
+2. **파일:** packages/core/src/places.ts 및 index, packages/data-adapters/src/places.ts 및 index/README, services/geo-data/src와 compose/manifest/tsconfig/README, scripts/geo-local.mjs, tests/unit/geo-ingestion·places, tests/geo-integration·types/places·core-independent, root scripts/lockfile/CI/.env, data 원장/출처 해시, 문서·Changeset·AGENTS.
+3. **테스트:** `pnpm check` 통과(Vitest 52, 독립 core 1, 데이터 정책 17, 비용 감사 13, strict/ESLint/포맷/API 선언·설계 검사, Next production build, Expo Android/iOS JS export). `pnpm test:geo` 실제 임시 Docker PostgreSQL18/PostGIS3.6.4 총 12개 통과. 개발용 start/migrate/fixture/stop 7건 적재 확인. 초기화 중 socket ready 판정 실패를 TCP healthcheck로 수정 후 통과했다. tarball/staged/브라우저 최종 기록은 아래에 확정한다.
+4. **실화면 QA:** 이번 기능은 headless 서비스/API이며 신규 지도 UI를 구현하지 않았다. 실제 DB·HTTP 동작을 검증했지만 공공 POI의 지도 화면과 Android/iOS 실기기 화면은 **미검증**이다. 기존 Web 렌더러의 회귀 검사와 별개로 판단한다.
+5. **라이선스·보안:** SDK/합성 자료 MIT, pg/csv-parse MIT. 실제 데이터와 PostGIS/GPL·PostgreSQL/DB 이미지 라이선스는 분리. Git/npm에 공공 행·사진·폰트·암호 미포함. 원본은 메모리 처리, 개인 필드/이미지 저장 제외. 제작자 서비스 fallback 없음. 최신 의존성 감사의 기존 high2는 미해결이며 출시 차단 유지.
+6. **잔여/차단:** 공공데이터포털/LOCALDATA HTTP 503으로 원본 파일·헤더·실위치 미검증. 공원/화장실 추가 승인, TourAPI CRS/키, XLSX, 대규모 파일/삭제·병합·행별 기준시각, 운영 인증/공개 서버, Supabase·Native 실기기·macOS/Windows Docker 검증은 후속. 현재 수집기를 실제 전국 데이터 통합 완료로 표시하지 않는다.
+7. **Git:** `feat/public-poi-etl`, base `feat/shared-public-api` (`7bd4ea416de0d2f19de4b80ca09a79aa7a757d2d`). 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: add rights-gated public POI ingestion and queries$'`. 검사 후 커밋/푸시하고 연결 GitHub 커넥터로 draft PR을 생성한다. main/배포/npm 발행 없음.
+8. **다음 단계:** 접근 가능한 정확한 A 원본의 운영자 검토/매핑/좌표 QA와 누락 분야 권리 검토 진행 가능. 실자료 적재 성공·전체 M6 완료·운영 공개 판정은 아직 불가하다. [가이드](public-data-etl.md), [검증 기록](research/poi-etl-validation.md) 참조.
+
+### 최종 로컬 검사 확정
+
+`pnpm check`, 실제 Docker `pnpm test:geo` 12개, `pnpm pack:check` 5개 SDK tarball, 기존 Web Playwright 6개가 통과했다. Vitest 52·core 독립 1·데이터 정책 17·비용 회귀 13개이며 새 CSV 인코딩/opt-in 타입 오류 차단도 확인했다. 패키지에서 DB 서비스/원본/키가 제외되고 검토한 빌드와 바이트가 일치한다. stage 후 `check:data --staged`와 비용 검사를 다시 수행하고 커밋한다. 원격 3 OS CI는 PR checks의 실제 결과로 구분한다. 신규 공공 POI 실화면·실자료·Supabase·Native 디바이스와 high2는 미검증/잔여 상태를 유지한다.

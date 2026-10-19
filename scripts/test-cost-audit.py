@@ -134,6 +134,15 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit()
         self.assertIn("DEPLOYMENT_BILLING_REQUIRES_REVIEW", rules)
 
+    def test_parser_documentation_does_not_enable_sdk_network(self):
+        url = 'https' + '://' + 'csv.js.org/parse/options/'
+        self.write('docs/parser.md', url + '\n')
+        process, _, _ = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        self.write('packages/data-adapters/src/remote.ts', 'const url = "' + url + '";\n')
+        _, _, rules = self.run_audit()
+        self.assertIn('EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW', rules)
+
 
 if __name__ == "__main__":
     unittest.main()

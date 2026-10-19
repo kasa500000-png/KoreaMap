@@ -51,6 +51,28 @@ test('core runs in an isolated directory without node_modules, MapLibre or brows
     await assert.rejects(map.setCenter([37, 127]), { code: 'INVALID_ARGUMENT' });
     map.destroy();
     await assert.rejects(map.setZoom(2), { code: 'UNAVAILABLE' });
+    const queries = [];
+    const client = core.createPlacesClient(
+      {
+        query: async (query) => {
+          queries.push(query);
+          return [];
+        },
+      },
+      {
+        schedule(callback, delay) {
+          const timer = globalThis.setTimeout(callback, delay);
+          return () => globalThis.clearTimeout(timer);
+        },
+      },
+    );
+    await client.getNearbyPlaces({ center: [127, 37], radiusMeters: 100 });
+    await client.getPlacesInBounds({ bounds: { west: 126, south: 36, east: 128, north: 38 } });
+    await client.getPlacesByCategory({ category: 'park' });
+    assert.deepEqual(
+      queries.map((q) => q.kind),
+      ['nearby', 'bounds', 'category'],
+    );
   } finally {
     globalThis.fetch = previousFetch;
     rmSync(dir, { recursive: true, force: true });

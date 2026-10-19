@@ -109,3 +109,10 @@
 - 사용자가 요청한 자체 합성 4종 테마 스크린샷은 `docs/screenshots/themes/{standard,dark,pastel,outdoor}.png` 네 경로에 한해 허용한다. `data/publication.json`의 `screenshots` 출처·SHA-256과 실제 PNG 구조를 검증한다. 다른 이미지·폰트·지도 payload 허용으로 확대하지 않는다.
 - 스크린샷은 실제 렌더러 캡처 후 직접 확인하고 해시를 갱신한다. 폰트 파일·glyph PBF는 여전히 Git/npm에 포함하지 않으며 로컬 QA 파일의 라이선스와 해시를 문서에 기록한다.
 - Web 로컬 폰트 결과를 Android/iOS 결과로 대신하지 않는다. Native glyph 공급원 누락은 실패시키고, 실기기/시뮬레이터 없이 해당 렌더링을 통과로 표시하지 않는다.
+## 공공 POI ETL 검증
+
+- `services/geo-data`는 private 운영자 서비스다. pg/CSV parser/DB 자격증명을 SDK에 넣지 않는다.
+- 현재 CSV 수집 프로파일은 원장 A 등급의 `yongsan-parking`, `mois-animal-hospitals`, `bukgu-walking`만 지원한다. 미지원 A도 자동 활성화하지 않는다. 기한·권리·CRS·해시·필드 검증은 우회하지 않는다.
+- 실제 원천 파일과 합성 fixture를 구분한다. 위치 미제공은 null, 이미지·불필요 개인 필드는 보존하지 않는다. 실제 파일 접근·헤더·기준점 미검증은 합성 테스트로 대체 완료 처리하지 않는다.
+- DB/ETL/조회 SQL·권한 변경 시 `pnpm test:geo`로 임시 Docker PostGIS 실제 통합 검사를 추가 실행한다. Docker가 없으면 미검증/차단으로 보고한다. 기존 check/pack/staged 규칙은 유지한다.
+- 원본 데이터/설정/DB 암호는 ignored 운영자 저장소만 사용하고 출력하지 않는다. Git/npm의 제3자 payload 금지 규칙을 유지한다. Supabase·외부 DB 배포나 공개 HTTP 노출은 자동으로 수행하지 않는다.

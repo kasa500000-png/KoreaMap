@@ -27,3 +27,12 @@
 `pnpm check:data`는 각 후보의 비어 있지 않은 출처 문구와 권리 근거를 확인한다. `pnpm check:data-docs`는 원장과 공급원 문서의 일치를 확인한다. 코드의 합성 fixture는 공개 검토 목록의 해시로 보호한다. 이는 실제 화면에서 OSM/기관 출처가 올바르게 노출된다는 QA가 아니다.
 
 외부 provider를 구현할 때 Web/Android/iOS에서 작은 화면, 확대/축소, provider 변경, 오류/오프라인, 지도 캡처 각각의 표시를 실제 검증한다. 현재 실화면은 합성 fixture의 기존 Web 테스트만 가능하며, 외부 데이터 표시와 Native 화면은 미검증이다.
+## POI 조회·저장 산출물
+
+공공 POI의 `source`, `source_id`, `license`, `attribution`, `updated_at`과
+`metadata.source_url/snapshot_sha256/source_crs`를 DB·SDK 응답에서 보존한다.
+장소 카드/목록에는 원본 `PublicPlace`의 출처와 기준일을 표시한다.
+`publicPlaceToPlace()`는 기존 표시 모델로 바꾸는 함수이므로 출처 문구를 별도로 유지해야 한다.
+현재 fixture의 MIT 출처를 실제 공공기관 데이터의 출처로 바꾸지 않는다.
+원본 데이터 배포/표시 시에도 SDK MIT와 데이터 조건을 분리하며
+[ETL 가이드](public-data-etl.md)의 미검증·제외 범위를 따른다.

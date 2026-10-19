@@ -37,7 +37,13 @@
     "test:core": "pnpm exec tsc -b packages/core && node --test tests/core-independent.test.mjs",
     "docs:api": "pnpm exec tsc -b packages/core && node scripts/render-api-docs.mjs",
     "check:api-docs": "node scripts/render-api-docs.mjs --check",
-    "check:native-types": "node scripts/check-native-types.mjs"
+    "check:native-types": "node scripts/check-native-types.mjs",
+    "geo:local": "node scripts/geo-local.mjs",
+    "geo": "node --env-file-if-exists=artifacts/geo-dev/.env services/geo-data/dist/cli.js",
+    "geo:migrate": "pnpm geo migrate",
+    "geo:fixture": "pnpm geo fixture",
+    "geo:serve": "pnpm geo serve",
+    "test:geo": "pnpm build:sdk && node scripts/geo-local.mjs test"
   },
   "devDependencies": {
     "typescript": "6.0.3",

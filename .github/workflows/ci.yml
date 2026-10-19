@@ -39,6 +39,7 @@ jobs:
       - run: sudo apt-get install --no-install-recommends --yes fonts-noto-cjk
       - run: node scripts/check-font.mjs --font /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc --face 1
       - run: pnpm test:web
+      - run: pnpm test:geo
   windows:
     runs-on: windows-2025
     timeout-minutes: 20
