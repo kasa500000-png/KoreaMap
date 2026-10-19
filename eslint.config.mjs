@@ -38,7 +38,9 @@ export default [
       'no-restricted-imports': [
         'error',
         {
-          patterns: [{ group: ['*'], message: 'Core must have no external or platform imports.' }],
+          patterns: [
+            { regex: '^(?!\\./)', message: 'Core must have no external or platform imports.' },
+          ],
         },
       ],
       'no-restricted-globals': [

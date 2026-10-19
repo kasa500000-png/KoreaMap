@@ -28,7 +28,8 @@
   },
   "dependencies": {
     "@korea-map-kit/core": "workspace:*",
-    "@korea-map-kit/styles": "workspace:*"
+    "@korea-map-kit/styles": "workspace:*",
+    "@maplibre/maplibre-gl-style-spec": "26.2.1"
   },
   "devDependencies": {
     "react": "19.3.0",

@@ -73,3 +73,5 @@ main 병합·운영 배포·공개 전환·npm 발행에는 각각 명시적 승
 Web 지도 API와 Next 클라이언트 사용법은 [Web SDK 가이드](packages/web/README.md)를 참고하세요. 카메라·배치 마커·장소 카드·GeoJSON/경로 표시·사용자 레이어를 지원하며, 운영자 스타일은 명시적 URL/허용 origin/비용동의를 요구합니다. [실행 검증과 제한](docs/research/web-sdk-validation.md)에 Chromium 결과와 전역 worker 유지·실기기 미검증 사항을 기록합니다.
 
 Standard·Dark·Pastel·Outdoor의 [지도 디자인 시스템과 비교 화면](docs/design-system.md), [폰트·아이콘 라이선스 및 플랫폼 검증](docs/font-icon-licenses.md)을 제공합니다. `pnpm dev:web` 실행 후 `/themes/`에서 토큰 색상과 확대 레벨을 비교할 수 있습니다. 글꼴 파일과 실제 지도 데이터는 패키지에 포함하지 않습니다.
+
+공통 SDK API: [계약·사용 예제·Web/Native 기능 동등성](docs/public-api.md), [생성 API 참조](docs/api/core.md). Web `MapHandle.api`와 Native `MapView` ref가 같은 `MapController`를 사용합니다. `pnpm dev:web` 후 `/api/`에서 외부 키 없는 예제를 실행할 수 있습니다. Native 실기기 QA는 아직 미검증입니다.

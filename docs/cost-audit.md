@@ -201,3 +201,15 @@ pnpm audit --json
 - main 병합·공개 전환·배포·npm 발행 및 유료 Actions 기능 변경은 없다. 로컬/원격 최종 결과는 [디자인 검증](research/design-system-validation.md)과 PR checks에 기록한다.
 
 - 디자인 단계 최종 로컬 검사: `pnpm check`, 5개 tarball 및 최종 Web E2E 5개 통과. Noto/OFL 공식 문서 호스트 두 개를 문서 참조용으로 검토했으며 runtime URL 허용으로 확대되지 않음을 새 회귀 검사로 확인했다(비용 회귀 총 12개).
+
+## 공통 Public API 감사 — 2026-10-19
+
+이번 core 계약·검증·취소 로직은 외부 import/DOM/backend 의존성 0이며 경계 검사는 `import('…')` 타입 참조도 검사한다. standalone 테스트는 node_modules 없는 임시 폴더에서 fetch 금지 상태로 주요 API를 실행한다. Provider는 인터페이스만으로 자동 생성·호출되지 않고 운영자가 주입한다. 공개 클라이언트 설정은 비밀 저장소가 아니다.
+
+Web `/api/`는 직접 작성한 합성 데이터만 inline으로 사용한다. 초기 config의 resource origin gate는 setStyle로 확대할 수 없다. Native는 origin interceptor가 아직 없어 외부 URL source/glyph/sprite 및 symbol 스타일을 실패시킨다. 스타일 timeout/취소는 해당 인스턴스를 종료하며 자동 재시도·공유계정 fallback이 없다. 공통 API 브라우저 테스트 외부 HTTP 시도 0, mock Native 검증을 native 실제 트래픽 감사로 표시하지 않는다.
+
+새 데이터·아이콘·폰트 payload나 credentials, paid endpoint, install hook, 유료 CI 기능을 추가하지 않았다. 17개 변경/추가 runtime source는 자체 계약/로컬 합성 예제/bridge 구현으로 검토하고 publication 해시를 갱신했다. API 화면 캡처는 ignored test-results에만 보관하며 승인된 테마 screenshot 예외를 확대하지 않는다. 실제 5개 SDK tarball/배포 JS 정적 검사와 Git worktree/index/도달 가능한 이력 검사는 최종 확정 기록을 따른다. 이 정적 검사는 숨겨진 비밀이나 운영자 과금 설정의 완전한 증명이 아니다.
+
+기존 dependency high2, Android/iOS 실제 compile·런타임 네트워크/메모리/권한 QA가 남아 있어 제품 출시는 차단된다. 신규 registry advisory 조회는 이번 범위에서 실행하지 않았다. Native가 이미 포함하던 Style Spec 26.2.1(ISC)을 직접 의존성으로 고정했으며 엔진/전이 그래프 버전은 바뀌지 않았다. main 병합·운영 배포·공개 전환·npm 발행을 수행하지 않는다.
+
+최종 로컬 판정: check/5개 실제 tarball/최종 Playwright 6개 통과, static findings 0, 로컬 브라우저 외부 HTTP 시도 0. artifact SHA는 [Public API 검증](research/public-api-validation.md)에 기록했다. staged index는 커밋 직전 별도 검사한다. 비용 없는 모든 운영 환경이나 Native 런타임 검증 완료를 뜻하지 않는다.

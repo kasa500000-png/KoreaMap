@@ -77,3 +77,9 @@ Chromium 100/1,000 마커, 모바일 터치 에뮬레이션, 반복 종료와 �
 `feat/map-design-system`에서 Standard/Dark/Pastel/Outdoor 토큰·스타일 생성기, 한국어 fallback, 원본 POI 기호, cmap/글리프 coverage 도구와 `/themes/` 비교 예제를 추가했다. M2의 스타일 커스터마이징과 M3의 스키마/폰트 준비 작업이다. [비교 문서](design-system.md), [폰트 정책](font-icon-licenses.md), [검증 기록](research/design-system-validation.md)을 따른다.
 
 Web 로컬 합성 데이터와 설치된 Noto CJK를 검증한다. Native 라벨은 명시적 glyph URL을 요구하며 Android/iOS 실화면은 미검증이다. 실제 vector tile 스키마 변환·글리프 pack 생성/배포·복잡한 도심/색각 QA와 전체 플랫폼 동등성은 후속이며 M2/M3/MVP 전체 완료 판정이 아니다.
+
+## 공통 Public API
+
+`feat/shared-public-api`에서 M4의 공통 `MapController`, 지리·스타일·GeoJSON·오류·취소·Provider 계약과 Web/Native bridge를 구현했다. [계약·기능 동등성](public-api.md), [생성 API 문서](api/core.md), [검증 기록](research/public-api-validation.md)을 따른다. 이전 Web API를 보존하고 Changesets minor로 신규 계약·오류 code 확장을 관리한다.
+
+Web은 실제 스타일 교체·overlay 유지까지 검증한다. Native 카메라/마커/도형/경로/ref는 구현했지만 실제 기기와 native renderer 수명 검증은 M4 잔여 작업이다. Native 외부 리소스 차단 interceptor, glyph 공급 설정과 디바이스 QA가 준비되기 전 외부 스타일은 명시적으로 미지원 처리한다. 검색/GPS/DB/실제 routing 엔진은 인터페이스 구현과 별개이며 M5/M6에서 선택적으로 연결한다.
