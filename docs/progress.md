@@ -161,3 +161,60 @@
 
 - main을 기준으로 독립 브랜치를 만들어 1단계 공식 문서·호환성·데이터 라이선스 조사 진행 가능.
 - 기본 브랜치 변경은 권한 차단 상태이며 별도 해결이 필요하다. 이후 main 병합은 해당 작업에 대한 명시적 승인을 받아야 한다.
+
+## 1단계 / M0 — 전체 기술 아키텍처 설계
+
+기준일: 2026-10-19 (UTC). 사용자가 요청한 기술 조사·도구 점검·UX 분석·설계 일관성 검증 범위다. 상태: 설계 문서와 검증 완료, 커밋 식별은 아래 명령 참조. 제품 코드 구현 완료를 뜻하지 않는다.
+
+### 1. 구현 완료 기능
+
+- 모노레포·Web/Native 공통 계약·지역별 타일 파이프라인·자체 호스팅·스타일/한글 글리프·선택형 검색/경로/PostGIS/Supabase의 전체 설계를 작성했다.
+- P0 전체 MVP(M1~M4), P1 서비스/데이터 확장(M5/M6), P2 고도화(M7)를 분리했다. 기능 요구사항 24개, 비기능 기준 7개, ADR 8개를 연결했다.
+- REA MCP/Ghidra MCP 노출 여부와 ADB/Ghidra CLI 가용성을 점검하고, 대체로 공식 문서 및 공개 MapLibre Web 예제를 관찰했다.
+- 최신 공식 문서·npm metadata·GitHub 공식 릴리스·Expo/RN 배포 manifest를 확인했다. exact 후보 버전과 통합 미검증을 구분했다.
+
+### 2. 생성/수정 파일
+
+- 신규: [architecture.md](architecture.md), [requirements.md](requirements.md).
+- 수정: [roadmap.md](roadmap.md), 이 진행 기록.
+- 신규 ADR: `docs/decisions/001-renderers-and-platforms.md`부터 `008-release-and-quality.md`까지 8개.
+- 신규 조사: [technical-review.md](research/technical-review.md), [design-validation.md](research/design-validation.md), `docs/research/dependency-snapshot.json`, `docs/research/ux-observations.json`.
+- 신규 검증 도구: [scripts/check-design.py](../scripts/check-design.py). 외부 의존 없는 문서 추적성 검사다.
+
+### 3. 실행한 테스트와 결과
+
+- `python3 scripts/check-design.py`: 통과. 내부 링크, R01~R24 유일성, 로드맵 단계/P0~P2 배치, ADR 양방향 참조, exact registry 관찰, UX 범위 구분.
+- `git diff --check`: 통과. 검사기 Python AST 구문 검사: 통과. 첫 staged 검사에서 ADR EOF 빈 줄 8건을 수정한 뒤 `git diff --cached --check` 재검사 통과. 최종 파일에도 재적용 후 커밋한다.
+- 수동 일관성 리뷰: 11개 시나리오 확인. 좌표 축 탐지 보장과 추가 이동 모드의 우선순위 표현을 수정해 계약/ADR/로드맵을 맞췄다.
+- 전체 SDK/Native/DB/검색/경로 테스트와 보안 audit는 미실행·미검증이다. 후보 버전의 peer 범위/문서 확인을 빌드 호환 테스트로 간주하지 않는다.
+
+### 4. 실화면 QA 결과
+
+- 공개 upstream Web 예제: Chromium/Playwright에서 마커 popup 열기·닫기, drag 위치 변화, wheel/Fly 클릭 전후 canvas 변화 확인. screenshot 두 장을 직접 열어 확인했으며 pageerror는 0이었다.
+- 첫 관찰 스크립트는 module-scope 변수에 접근해 실패했다. DOM/스크린샷 관찰로 수정 후 실행했다. Fly의 최종 화면은 단색 수역이어서 정확한 카메라 좌표·상세 타일 완전성은 미검증이다.
+- 자체 Korea Map Kit Web·Android·iOS 실화면, 실제 검색/경로 계산, native 제스처 및 성능은 미검증이다. REA/Ghidra/ADB 분석은 실행하지 않았다.
+
+### 5. 라이선스 및 보안 문제
+
+- SDK MIT 목표와 OSM ODbL·폰트 OFL·외부 라이브러리/서버 라이선스를 분리했다. 한국 공공데이터 후보를 배포 허가 완료로 표시하지 않았다.
+- 공개 문서/릴리스/예제만 확인했으며 보호 우회·비공개 데이터·타일·API 키 추출을 하지 않았다.
+- 외부 지도 screenshot은 workspace scratch에만 보관하며 저장소에는 관찰 로그와 hash만 기록한다. 데이터·폰트·타일 바이너리·자격 증명은 커밋하지 않는다.
+- 선택 Supabase 경계 검토에 Supabase 스킬을 적용했으며 프로젝트/테이블 생성이나 외부 메시지 전송은 하지 않았다.
+
+### 6. 남은 작업 또는 차단 요인
+
+- M1에서 exact 후보 설치·lockfile·Android/iOS 빌드, 실제 지원 OS/장비·메모리 예산을 확정해야 한다.
+- 공공데이터 원본별 라이선스·폰트 도구 잠금·한국어 검색 품질·타일 비용/성능은 해당 도입 단계에서 실제 검증해야 한다.
+- REA MCP/Ghidra MCP가 노출되지 않고 ADB/Ghidra CLI도 발견되지 않았다. 권한 있는 앱이나 APK가 제공되지 않아 모바일 앱 UX 분석은 미실행이다.
+- GitHub 기본 브랜치 설정은 여전히 main이 아니므로 PR base를 명시한다. 이번 설계 main 병합 및 실제 배포는 승인되지 않았다.
+
+### 7. Git 브랜치와 커밋 해시
+
+- 브랜치: `docs/technical-architecture`, base: `main`의 `38c36f84f1e62f0419583faa5b593a2d6a71daf8`.
+- 커밋 식별 명령: `git log -1 --format='%H %s' --grep='^docs: design Korea Map Kit architecture and MVP$'`.
+- 문서 검사 통과 후 commit/push하고 연결된 GitHub 커넥터로 검토용 PR을 생성한다. 실제 커밋 해시와 PR 결과는 사용자에게 보고한다.
+
+### 8. 다음 단계 진행 가능 여부
+
+- M1 모노레포·공통 계약·버전 잠금·모바일 호환성 spike 진행 가능. 설계 검증은 제품 구현/성능 합격과 별개다.
+- 이번 PR은 main에 자동 병합하지 않는다. main 병합·운영 배포·공개 전환·npm 실제 발행에는 각각 명시적 승인이 계속 필요하다.

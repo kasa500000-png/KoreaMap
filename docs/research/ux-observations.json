@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-10-19",
+  "browser": "Chromium via Playwright; headless software rendering; 1100x720",
+  "scope": "public upstream examples; not Korea Map Kit QA",
+  "observations": [
+    {
+      "url": "https://maplibre.org/maplibre-gl-js/docs/examples/attach-a-popup-to-a-marker-instance.html",
+      "popupClosed": true,
+      "dragMarkerBefore": "transform: translate(-50%, -50%) translate(550px, 360px) rotateX(0deg) rotateZ(0deg); opacity: 1;",
+      "dragMarkerAfter": "transform: translate(-50%, -50%) translate(651px, 410px) rotateX(0deg) rotateZ(0deg); opacity: 1;",
+      "wheelCanvasChanged": true,
+      "errors": [],
+      "popupVisible": true
+    },
+    {
+      "url": "https://maplibre.org/maplibre-gl-js/docs/examples/fly-to-a-location.html",
+      "canvasChangedAfterFly": true,
+      "errors": []
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "marker-popup.png",
+      "sha256": "3d28f37efc874512e41f261eee91dc7e6fc1dda83a057e70707f1c693d9db69b",
+      "location": "/workspace/scratch/koreamap-architecture/marker-popup.png",
+      "committed": false
+    },
+    {
+      "file": "marker-after-gestures.png",
+      "sha256": "72c05f5cb1691b0799992b4c5a623274c2381f562a2a220d6b661059f226798d",
+      "location": "/workspace/scratch/koreamap-architecture/marker-after-gestures.png",
+      "committed": false
+    },
+    {
+      "file": "camera-flyto.png",
+      "sha256": "4707d05bd59d3a1625f1ab15fc14a9cb8c51a93b1b26e7c54e55e271cafaa7dc",
+      "location": "/workspace/scratch/koreamap-architecture/camera-flyto.png",
+      "committed": false
+    }
+  ]
+}
