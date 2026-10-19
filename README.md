@@ -87,3 +87,7 @@ Standard·Dark·Pastel·Outdoor의 [지도 디자인 시스템과 비교 화면]
 SDK 소스·패키지 제공 비용과 데이터 다운로드·DB·타일·검색·라우팅 서버 운영 비용은
 별개다. 서비스 운영자는 자신의 DB/계정/트래픽 비용을 부담하며 SDK 사용자의 증가가
 제작자 소유 서비스 호출로 이어지는 기본 경로는 없다. Supabase는 선택 사항이다.
+
+한국 장소명·POI 주소 검색은 [검색 가이드](docs/search.md)를 따른다. `services/search`의 선택형 자체
+PostGIS/pg_trgm 서비스와 `/search/` 합성 Web 데모를 제공한다. SDK 검색에는 제작자 endpoint나
+API 키가 없으며 실제 DB·검색 서비스 운영 비용은 해당 운영자에게 있다. 전국 도로명주소 변환은 별도 Provider다.

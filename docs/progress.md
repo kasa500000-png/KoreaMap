@@ -460,3 +460,23 @@ Native의 실제 MapLibre 선언 해석을 검사해 NodeNext의 암묵적 any�
 ### 최종 로컬 검사 확정
 
 `pnpm check`, 실제 Docker `pnpm test:geo` 12개, `pnpm pack:check` 5개 SDK tarball, 기존 Web Playwright 6개가 통과했다. Vitest 52·core 독립 1·데이터 정책 17·비용 회귀 13개이며 새 CSV 인코딩/opt-in 타입 오류 차단도 확인했다. 패키지에서 DB 서비스/원본/키가 제외되고 검토한 빌드와 바이트가 일치한다. stage 후 `check:data --staged`와 비용 검사를 다시 수행하고 커밋한다. 원격 3 OS CI는 PR checks의 실제 결과로 구분한다. 신규 공공 POI 실화면·실자료·Supabase·Native 디바이스와 high2는 미검증/잔여 상태를 유지한다.
+
+## 한국 주소·장소 검색 — 2026-10-19
+
+1. **구현:** SearchProvider 호환 한국 POI 이름/주소·영역·근거리·카테고리 검색, 접두어 자동완성, 페이지·출처, portable 취소/기한/오류, 선택 카메라, nearby-poi 역조회. private PostGIS/pg_trgm 생성 열·GIN/prefix 인덱스·read-only SQL·로컬 HTTP와 Next `/search/` 합성 예제. 전국 주소 geocoding은 별도 계약으로 유지한다.
+2. **파일:** packages/core/src/search·index, data-adapters/src/search·index/README, services/search/src/{migration,provider,server,cli,index} 및 manifest/tsconfig/README, geo-data manifest, Web app/search, tests/unit·types·e2e·search-integration·core-independent, scripts/geo-local·비용 감사, .env·root scripts·lockfile·Changeset·publication, API/검색/검증/README·roadmap·cost-audit·진행 문서.
+3. **테스트:** `pnpm check` 통과: Vitest57, 독립 core1, 데이터정책17, 비용감사14, strict/native 타입·lint·format·API/설계·Next production·Expo Android/iOS JS export. 실제 Docker `pnpm test:geo`19개 통과(기존 ETL 포함), 서울/울산/제주·한글 오타/띄어쓰기·주소/필터/페이지·지연/취소·실제 HTTP 확인. 소형 fixture HTTP10회 p50 5.49ms/p95 23.61ms이며 전국 성능 증거가 아니다. 최종 tarball/staged/브라우저 결과는 아래 확정 기록을 따른다.
+4. **실화면 QA:** Chromium 7개 E2E 첫 실행 통과. `/search/` 캡처 직접 확인: 한글 결과·합성 주소·MIT 출처·중심 이동·마커 정상. fixture 배경 도형은 서울 일부만 있어 울산/제주는 단색 배경+선택 마커다. 실제 지도/주소 데이터 화면으로 표시하지 않는다. 신규 검색 Native 기기·Safari/Firefox는 **미검증**이다.
+5. **라이선스/보안:** 자체 코드·7건 fixture MIT, 제3자 데이터/키/DB URL 배포 없음. 공개 Nominatim 호출 없음, 운영자 서비스만 명시 연결. SDK core 외부 의존성0, pg는 private 서비스. 기존 high2 취약점 미해결로 출시 차단 유지; 새 advisory 조회는 하지 않았다.
+6. **잔여/차단:** 전국 도로명·필지 지오코딩, 실자료 적재/정확도·초성/형태소/동의어·규모/부하·운영 인증 gateway·Native UI/기기 QA 미완료. reverseNearby는 인접 POI 주소이며 정확한 지점 주소로 간주하지 않는다. 실제 원천 HTTP503과 이전 단계 제한 유지.
+7. **Git:** `feat/korean-search`, base `feat/public-poi-etl` (`2c1ed9690fdba647eada8b21f07c8c056973a2dd`). 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: add Korean PostGIS place and address search$'`. 테스트 후 커밋/푸시하고 연결된 GitHub 커넥터로 draft PR 생성. main 병합·운영 배포·npm 발행 없음.
+8. **다음 단계:** 사용권/접근성이 확인된 실자료를 이용한 한국 검색 품질·자연 query plan/규모 성능 및 Native UI 검증 진행 가능. 전국 주소 서비스·M5 전체·제품 출시 완료 판정은 불가하다. [검색 가이드](search.md), [검증 기록](research/search-validation.md) 참조.
+
+### 최종 로컬 검사 확정
+
+`pnpm check`, 실제 Docker `pnpm test:geo`19개, `pnpm pack:check` SDK5개, 최종 Next 배포물 Playwright7개가 통과했다.
+Vitest57·독립 core1·데이터정책17·비용감사14개이며 생략/재시도 통과 없음. 외부 HTTP 시도0, 정적 findings0.
+추가 CLI smoke에서 search:migrate와 loopback 서버 조회(기존 합성7건)/no-store/정상 종료를 확인했다.
+`pnpm search` 내장 명령 충돌은 search:service/search:migrate/search:serve로 수정했고 전체 검사를 다시 통과했다.
+SDK tarball의 서버/원본/비밀 제외와 빌드 바이트 일치도 검사했다. staged 데이터·비용 검사는 커밋 직전 별도로 실행한다.
+원격 Linux/Windows/macOS CI는 해당 PR checks의 실제 결과를 따른다. Native/전국 실주소/대규모 품질·기존 high2는 잔여다.

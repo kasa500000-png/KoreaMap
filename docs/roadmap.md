@@ -91,3 +91,11 @@ Web은 실제 스타일 교체·overlay 유지까지 검증한다. Native 카메
 공공 원문/파일은 HTTP 503으로 접근되지 않았으며 실제 적재·정확도는 미검증이다.
 도시공원·화장실 등 추가 승인, TourAPI 좌표/키, XLSX, Native 화면, 대량 갱신·운영 인증은 후속이다.
 M6 전체 완료 또는 전국 POI 서비스/공개 발행 준비 완료 판정은 아니다.
+
+## 자체 PostGIS 한국 POI 검색 / M5 일부 구현
+
+`feat/korean-search`에서 SearchProvider 호환 검색·POI 주소·공간/카테고리·자동완성·페이지·취소·출처,
+검색 선택 카메라 이동과 근처 POI 주소 역조회, pg_trgm 인덱스·로컬 서버를 구현했다.
+[검색 가이드](search.md), [검증 기록](research/search-validation.md)을 따른다.
+현재 M5의 첫 검색 엔진은 이미 운영하는 PostGIS POI다. Nominatim 설치를 선행 요구하지 않는다.
+전국 주소 지오코더·길찾기 엔진·실제 전국 데이터 품질/규모 성능·Native UI/기기 QA는 후속이며 M5 전체 완료가 아니다.

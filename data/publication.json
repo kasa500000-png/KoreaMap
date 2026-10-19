@@ -53,6 +53,21 @@
       "origin": "project-authored",
       "license": "MIT"
     },
+    "examples/web/app/search/page.tsx": {
+      "sha256": "40269bbb753e690261e02f60b6467c513922a72172ab335c1867b1e85bf7f675",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/search/search-client.tsx": {
+      "sha256": "23421c50824e0a96c19ab8d8b1af7e89ff04a7e193f7c3ef519430d7e8f211c1",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/search/search-demo.tsx": {
+      "sha256": "b1448a35a1d44f195b23e6371fee1a89322bb744cc2d45db0208ec74f21cb778",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
     "examples/web/app/style.css": {
       "sha256": "747594933e733a0df3fb64c94618db95103bd195ab254a0b8aa235d9046d56b3",
       "origin": "project-authored",
@@ -89,12 +104,22 @@
       "license": "MIT"
     },
     "packages/core/src/index.ts": {
-      "sha256": "19bd1ccef34275819e842e68616081804642dd0bad090014a85e485a2336dfa9",
+      "sha256": "b7fc8fddc02f20e46c797cfb7b6abb01af4441f4b58fb81f5c2e3e2d2309c612",
       "origin": "project-authored",
       "license": "MIT"
     },
     "packages/core/src/operations.ts": {
       "sha256": "7a08538a9d421f860f70c247bd6f1c189b79bd2f3b3122b82431da4649f11839",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/places.ts": {
+      "sha256": "72518db2aff4d7671f0a574409275b4869b58bdab624fff4d9d8311aefd6c467",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/search.ts": {
+      "sha256": "5c2b2247b8917b3edec35e3cb56570a00c5707ea3efaa1b0be021261298f7274",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -104,7 +129,17 @@
       "license": "MIT"
     },
     "packages/data-adapters/src/index.ts": {
-      "sha256": "2441e25a2ea772d70afcda68e47618d58fcb928d57e661795531377e9c32d61d",
+      "sha256": "5173fb65aacf57215c02b2925c56521f4d1c616def1c376affe62f83b2fc53e4",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/places.ts": {
+      "sha256": "023132bd85e37b0ba190de46064aab9f6a88a7e47029ca4458c7bf76c2a84484",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/search.ts": {
+      "sha256": "719eafb843e6de741008bc02ad904da5475dc5f43ccb7d9c50b2e4d7892d76cf",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -178,31 +213,6 @@
       "origin": "project-authored",
       "license": "MIT"
     },
-    "services/geo-data/src/index.ts": {
-      "sha256": "8967c3ddaae75b18224421ae817859f6e3202d21fc3b566595c6b425fc730519",
-      "origin": "project-authored",
-      "license": "MIT"
-    },
-    "services/routing/src/index.ts": {
-      "sha256": "2694342cef42578fc49dc35827a0beccd4370f7b9c42d245d127e2a2d96dd3f5",
-      "origin": "project-authored",
-      "license": "MIT"
-    },
-    "services/search/src/index.ts": {
-      "sha256": "5185094fca437afb5f549f00cdc8c967533458c7736528f0c859f2b403e6d2b2",
-      "origin": "project-authored",
-      "license": "MIT"
-    },
-    "packages/core/src/places.ts": {
-      "sha256": "72518db2aff4d7671f0a574409275b4869b58bdab624fff4d9d8311aefd6c467",
-      "origin": "project-authored",
-      "license": "MIT"
-    },
-    "packages/data-adapters/src/places.ts": {
-      "sha256": "023132bd85e37b0ba190de46064aab9f6a88a7e47029ca4458c7bf76c2a84484",
-      "origin": "project-authored",
-      "license": "MIT"
-    },
     "services/geo-data/src/cli.ts": {
       "sha256": "4eaa209dfc8f343a510b8d175445f27b6fdb7cda05099a6ad4e57f80d7712feb",
       "origin": "project-authored",
@@ -223,6 +233,11 @@
       "origin": "project-authored",
       "license": "MIT"
     },
+    "services/geo-data/src/index.ts": {
+      "sha256": "8967c3ddaae75b18224421ae817859f6e3202d21fc3b566595c6b425fc730519",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
     "services/geo-data/src/ingestion.ts": {
       "sha256": "f2e1ee13424ac77f4ca20ffe3ad85e3bd07b6d8f2e5251f2342854f755fc9da6",
       "origin": "project-authored",
@@ -235,6 +250,36 @@
     },
     "services/geo-data/src/server.ts": {
       "sha256": "c88329d8f1ee8f8ae6e5c977a405023fa20ed2b06e5449129fbeaa321fed448a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/routing/src/index.ts": {
+      "sha256": "2694342cef42578fc49dc35827a0beccd4370f7b9c42d245d127e2a2d96dd3f5",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/cli.ts": {
+      "sha256": "3739f26592eb7c54b62f76d787ccb17d910860f358759ae35d0e22dd2a0509b6",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/index.ts": {
+      "sha256": "9de6135c823d34508642c67802f6eaa8e28e8b4b9f6f81f0135ed7f237b94be2",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/migration.ts": {
+      "sha256": "80a5ace76f6f0af311d3f42c5df80a77781eca46259b8ee2708847fd561d8605",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/provider.ts": {
+      "sha256": "69ecc35e79ae6e7c26d7619d8db4e5b6f6da7cab305e3054e1a22ccf3f278d6d",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/server.ts": {
+      "sha256": "1950c42e2fbe10c820a6cfc618c10930ea91378450d836a82e235adc33cb6fdd",
       "origin": "project-authored",
       "license": "MIT"
     }

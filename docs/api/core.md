@@ -620,6 +620,123 @@ export declare function publicPlaceToPlace(value: PublicPlace): Place;
 export declare function createPlacesClient(provider: PlacesProvider, scheduler: Scheduler): PlacesClient;
 ```
 
+## KoreanSearchQuery
+
+```ts
+export interface KoreanSearchQuery extends SearchQuery {
+    readonly bounds?: MapBounds;
+    readonly center?: Coordinate;
+    readonly radiusMeters?: number;
+    readonly category?: PoiCategory;
+    /** Offset 0..1000. Stable ordering on an unchanged DB, not a snapshot across updates. */
+    readonly offset?: number;
+    readonly sort?: 'relevance' | 'distance';
+}
+```
+
+## SearchHit
+
+```ts
+export interface SearchHit {
+    readonly place: PublicPlace;
+    readonly distanceMeters: number | null;
+    readonly relevance: number;
+}
+```
+
+## SearchPage
+
+```ts
+export interface SearchPage {
+    readonly hits: readonly SearchHit[];
+    readonly nextOffset: number | null;
+}
+```
+
+## ReversePoiQuery
+
+```ts
+export interface ReversePoiQuery {
+    readonly center: Coordinate;
+    readonly radiusMeters?: number;
+    readonly category?: PoiCategory;
+}
+```
+
+## ReversePoiResult
+
+```ts
+/** Nearby facility address, never a parcel/road-address determination at the input coordinate. */
+export interface ReversePoiResult {
+    readonly kind: 'nearby-poi';
+    readonly place: PublicPlace;
+    readonly distanceMeters: number;
+}
+```
+
+## SearchRequest
+
+```ts
+export type SearchRequest = {
+    readonly kind: 'search' | 'autocomplete';
+    readonly query: KoreanSearchQuery;
+} | {
+    readonly kind: 'reverse';
+    readonly query: ReversePoiQuery;
+};
+```
+
+## SearchPort
+
+```ts
+export interface SearchPort {
+    request(request: SearchRequest, context: OperationContext): Promise<unknown>;
+}
+```
+
+## KoreanSearchProvider
+
+```ts
+export interface KoreanSearchProvider extends SearchProvider {
+    search(query: KoreanSearchQuery, options?: OperationOptions): ReturnType<SearchProvider['search']>;
+    searchPage(query: KoreanSearchQuery, options?: OperationOptions): Promise<SearchPage>;
+    autocomplete(query: KoreanSearchQuery, options?: OperationOptions): Promise<SearchPage>;
+    reverseNearby(query: ReversePoiQuery, options?: OperationOptions): Promise<ReversePoiResult | null>;
+}
+```
+
+## normalizeSearchText
+
+```ts
+/** NFC; remove ASCII whitespace, NBSP and ideographic space; ASCII case folding only. */
+export declare function normalizeSearchText(value: string): string;
+```
+
+## validateKoreanSearchQuery
+
+```ts
+export declare function validateKoreanSearchQuery(value: KoreanSearchQuery): KoreanSearchQuery;
+```
+
+## validateReversePoiQuery
+
+```ts
+export declare function validateReversePoiQuery(q: ReversePoiQuery): ReversePoiQuery;
+```
+
+## createKoreanSearchProvider
+
+```ts
+export declare function createKoreanSearchProvider(port: SearchPort, scheduler: Scheduler): KoreanSearchProvider;
+```
+
+## focusSearchHit
+
+```ts
+/** Map selection helper; null-location results cannot move the camera. */
+export declare function focusSearchHit(map: MapController, hit: SearchHit, options?: OperationOptions): Promise<void>;
+```
+
 ## copyJson
 
 ```ts

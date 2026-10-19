@@ -58,10 +58,19 @@ try {
     connection.username = 'kmk_admin';
     connection.password = credential;
     if (testing) {
-      const result = spawnSync(process.execPath, ['--test', 'tests/geo-integration.test.mjs'], {
-        env: { ...env, GEO_DATABASE_URL: connection.href },
-        stdio: 'inherit',
-      });
+      const result = spawnSync(
+        process.execPath,
+        [
+          '--test',
+          '--test-concurrency=1',
+          'tests/geo-integration.test.mjs',
+          'tests/search-integration.test.mjs',
+        ],
+        {
+          env: { ...env, GEO_DATABASE_URL: connection.href },
+          stdio: 'inherit',
+        },
+      );
       if (result.error || result.status !== 0) process.exitCode = 1;
     } else {
       writeFileSync(resolve(dir, '.env'), `GEO_DATABASE_URL=${connection.href}\n`, { mode: 0o600 });

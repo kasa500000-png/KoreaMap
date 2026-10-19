@@ -73,6 +73,20 @@ test('core runs in an isolated directory without node_modules, MapLibre or brows
       queries.map((q) => q.kind),
       ['nearby', 'bounds', 'category'],
     );
+    const search = core.createKoreanSearchProvider(
+      { request: async () => ({ hits: [], nextOffset: null }) },
+      {
+        schedule(callback, delay) {
+          const timer = globalThis.setTimeout(callback, delay);
+          return () => globalThis.clearTimeout(timer);
+        },
+      },
+    );
+    assert.deepEqual(await search.searchPage({ text: '서울', language: 'ko', limit: 10 }), {
+      hits: [],
+      nextOffset: null,
+    });
+    assert.equal(core.normalizeSearchText('서 울'), '서울');
   } finally {
     globalThis.fetch = previousFetch;
     rmSync(dir, { recursive: true, force: true });

@@ -7,5 +7,16 @@
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b"
-  }
+  },
+  "dependencies": {
+    "@korea-map-kit/core": "workspace:*",
+    "@korea-map-kit/service-geo-data": "workspace:*",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/pg": "8.23.1"
+  },
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts"
 }
