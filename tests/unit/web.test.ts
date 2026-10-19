@@ -1,50 +1,129 @@
-import { expect, it, vi } from 'vitest';
-import { createMap } from '@korea-map-kit/web';
-const mock = vi.hoisted(() => ({ construct: vi.fn(), remove: vi.fn() }));
-vi.mock('maplibre-gl', () => ({
-  setWorkerUrl: vi.fn(),
-  Map: class {
-    constructor(options: unknown) {
-      mock.construct(options);
-    }
-    remove = mock.remove;
-  },
-}));
-it('does not construct renderer when required config is absent', async () => {
-  // Simulates a JavaScript consumer bypassing TypeScript.
+import { expect, it } from 'vitest';
+import { createMap, createMapState } from '@korea-map-kit/web';
+import {
+  validateWebConfig,
+  resourceUrl,
+  escapeAttribution,
+} from '../../packages/web/src/provider.js';
+import { validateGeoJSON } from '../../packages/web/src/geojson.js';
+const fixture = { mode: 'local-fixture', fixtureId: 'synthetic-v1' } as const;
+it('imports safely without DOM and fails missing config before construction', async () => {
   await expect(
     createMap({
       container: {} as HTMLElement,
-      workerUrl: '/vendor/maplibre/maplibre-gl-worker.mjs',
+      workerUrl: '/worker.mjs',
       config: undefined as never,
     }),
   ).rejects.toThrow('CONFIG_REQUIRED');
-  expect(mock.construct).not.toHaveBeenCalled();
-});
-it('rejects invalid camera before renderer construction', async () => {
   await expect(
-    createMap({
-      container: {} as HTMLElement,
-      workerUrl: '/vendor/maplibre/maplibre-gl-worker.mjs',
-      config: { mode: 'local-fixture', fixtureId: 'synthetic-v1' },
-      center: [0, 89],
-    }),
-  ).rejects.toThrow('OUTSIDE_MERCATOR');
-  expect(mock.construct).not.toHaveBeenCalled();
+    createMap({ container: {} as HTMLElement, workerUrl: '/worker.mjs', config: fixture }),
+  ).rejects.toThrow('CLIENT_ONLY');
 });
-it('constructs only explicit local style and removes once', async () => {
-  const handle = await createMap({
-    container: {} as HTMLElement,
-    workerUrl: '/vendor/maplibre/maplibre-gl-worker.mjs',
-    config: { mode: 'local-fixture', fixtureId: 'synthetic-v1' },
-  });
-  const options = mock.construct.mock.calls[0]?.[0] as {
-    style: object;
-    transformRequest: () => void;
-  };
-  expect(JSON.stringify(options.style)).not.toMatch(/https?:/);
-  expect(options.transformRequest).toThrow('forbids remote resources');
-  handle.destroy();
-  handle.destroy();
-  expect(mock.remove).toHaveBeenCalledTimes(1);
+it('keeps immutable copied state across renderer lifecycles, supports unsubscribe', () => {
+  const state = createMapState();
+  let calls = 0;
+  const off = state.subscribe(() => calls++);
+  const markers = [{ id: 'a', label: 'A', coordinate: [127, 37] as [number, number] }];
+  state.setMarkers(markers);
+  markers[0]!.coordinate[0] = 128;
+  expect(state.getSnapshot().markers[0]?.coordinate[0]).toBe(127);
+  state.selectMarker('a');
+  expect(state.getSnapshot().selectedId).toBe('a');
+  state.setMarkers([]);
+  expect(state.getSnapshot().selectedId).toBeNull();
+  off();
+  state.setMarkers([]);
+  expect(calls).toBe(3);
+});
+it('rejects duplicate IDs, invalid camera and missing selection atomically', () => {
+  const state = createMapState();
+  const before = state.getSnapshot();
+  expect(() => state.setCamera({ center: [0, 89], zoom: 10, bearing: 0, pitch: 0 })).toThrow(
+    'OUTSIDE_MERCATOR',
+  );
+  expect(() => state.setCamera({ ...before.camera, zoom: Infinity })).toThrow('INVALID_CAMERA');
+  const marker = { id: 'a', label: 'A', coordinate: [127, 37] as const };
+  expect(() => state.setMarkers([marker, marker])).toThrow('INVALID_MARKER');
+  expect(() => state.selectMarker('missing')).toThrow('MARKER_NOT_FOUND');
+  expect(state.getSnapshot()).toBe(before);
+});
+it('requires explicit cost acknowledgement and exact HTTPS resource origins', () => {
+  const operator = {
+    mode: 'operator',
+    styleUrl: 'https://tiles.example.invalid/style.json',
+    allowedOrigins: ['https://tiles.example.invalid'],
+    attribution: 'Operator',
+    costAcknowledged: true,
+  } as const;
+  const config = validateWebConfig(operator, 'http://localhost');
+  expect(resourceUrl(config, 'https://tiles.example.invalid/a.pbf', 'http://localhost')).toContain(
+    'a.pbf',
+  );
+  expect(() =>
+    resourceUrl(config, 'https://other.example.invalid/a.pbf', 'http://localhost'),
+  ).toThrow('RESOURCE_ORIGIN_BLOCKED');
+  expect(() => resourceUrl(fixture, '/a.pbf', 'http://localhost')).toThrow(
+    'FIXTURE_RESOURCE_BLOCKED',
+  );
+  expect(() =>
+    validateWebConfig({ ...operator, costAcknowledged: false } as never, 'http://localhost'),
+  ).toThrow('PROVIDER_CONFIG_REQUIRED');
+  expect(() =>
+    validateWebConfig(
+      { ...operator, styleUrl: 'http://tiles.example.invalid/style.json' },
+      'http://localhost',
+    ),
+  ).toThrow('UNSAFE_PROVIDER_URL');
+  expect(() =>
+    validateWebConfig(
+      { ...operator, allowedOrigins: ['https://tiles.example.invalid/path'] },
+      'http://localhost',
+    ),
+  ).toThrow('EXACT_ORIGIN_REQUIRED');
+  expect(escapeAttribution('<img onerror="bad">')).toBe('&lt;img onerror=&quot;bad&quot;&gt;');
+});
+it('validates GeoJSON and clones caller data; rejects open rings and unsupported types', () => {
+  const data = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: { name: 'test' },
+        geometry: { type: 'Point', coordinates: [127, 37] },
+      },
+    ],
+  } as const;
+  const copy = validateGeoJSON(data as never);
+  expect(copy).toEqual(data);
+  expect(copy).not.toBe(data);
+  expect(() =>
+    validateGeoJSON({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1],
+              ],
+            ],
+          },
+        },
+      ],
+    }),
+  ).toThrow('INVALID_GEOJSON');
+  expect(() =>
+    validateGeoJSON({
+      type: 'FeatureCollection',
+      features: [
+        { type: 'Feature', properties: {}, geometry: { type: 'MultiPoint', coordinates: [] } },
+      ],
+    } as never),
+  ).toThrow('INVALID_GEOJSON');
 });

@@ -74,3 +74,30 @@ export function requireSearchProvider(provider?: SearchProvider): SearchProvider
   if (!provider) throw new KitError('UNAVAILABLE', 'SEARCH_PROVIDER_REQUIRED');
   return provider;
 }
+
+/** Serializable camera and marker contracts shared by platform adapters. */
+export interface CameraState {
+  readonly center: LngLat;
+  readonly zoom: number;
+  readonly bearing: number;
+  readonly pitch: number;
+}
+export interface MapMarker {
+  readonly id: string;
+  readonly coordinate: LngLat;
+  readonly label: string;
+  readonly description?: string;
+}
+export type MapGeometry =
+  | { type: 'Point'; coordinates: [number, number] }
+  | { type: 'LineString'; coordinates: [number, number][] }
+  | { type: 'Polygon'; coordinates: [number, number][][] };
+export interface MapFeatureCollection {
+  type: 'FeatureCollection';
+  features: {
+    type: 'Feature';
+    id?: string;
+    properties: Record<string, string | number | boolean | null>;
+    geometry: MapGeometry;
+  }[];
+}

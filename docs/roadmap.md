@@ -65,3 +65,9 @@ Native 실기기/시뮬레이터, 수정 버전이 없는 전이 취약점, 실�
 `feat/data-source-policy`에서 [공급원 조사](data-sources.md), [라이선스](data-licenses.md), [출처 표시](attribution.md), [데이터 원장](../data/sources.json)을 추가했다. M3/M6에 앞선 권리 검토로 A 6 / B 0 / C 8 / D 2개를 분류했으며, 실제 데이터 수집·DB·타일 생성은 완료하지 않았다.
 
 M3는 OSM 공개 추출본으로 시작하고, M6는 개별 공공데이터 필드부터 추가한다. 전국 표준 취합의 권리 범위, VWorld·NGII·주소정보 공급 조건, TourAPI 사진의 개별 유형은 후속 확인 대상이다. API-only B 항목이 확인되면 운영자 opt-in 어댑터를 구현한다. 2027-01-17 이후에는 근거 재확인 없이 카탈로그 검사를 통과할 수 없다. 검증 결과는 [데이터 검증 기록](research/data-validation.md)을 따른다.
+
+## Web 지도 SDK 구현
+
+`feat/web-map-sdk`에서 M2의 Web 지도 생명주기, 공통 카메라/마커 상태, GeoJSON/경로 표시, 사용자 레이어, 이벤트·접근성 및 운영자 스타일 URL 설정을 구현했다. [Web API 가이드](../packages/web/README.md)와 [검증 기록](research/web-sdk-validation.md)을 따른다. Next 클라이언트 동적 import와 합성 데모를 제공한다.
+
+Chromium 100/1,000 마커, 모바일 터치 에뮬레이션, 반복 종료와 오류 복구를 검사한다. MapLibre 6.14.0 전역 dispatcher worker 1개 유지, Safari/Firefox/실기기 및 Native 동등 API 검증은 남아 있다. 실제 타일·한글 glyph·온라인 검색/경로 계산·실행 중 style 교체는 이번 범위가 아니다. M2/MVP 전체 완료나 출시 승인을 의미하지 않는다.
