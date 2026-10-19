@@ -174,3 +174,5 @@ pnpm audit --json
 - CI는 기존 무료 표준 3 OS job에 데이터 검사와 staged 검사만 추가했다. 유료 runner/cache/artifact/스케줄/운영 서비스는 추가하지 않았다. 원격 실행 결과는 PR과 진행 기록에 별도로 보고한다.
 
 산출물 SHA-256과 검증 범위는 [데이터 검증 기록](research/data-validation.md)에 있다. 정책 검사 통과는 제작자 계정의 실제 청구 설정이나 법적 권리 판단의 정확성을 자동 보증하지 않는다.
+
+- 원격 추가 증거: `ac2d4d2`의 [3 OS CI](https://github.com/kasa500000-png/KoreaMap/actions/runs/39207562003) 모두 통과. XML/RDF/줄 단위 JSON 및 검토되지 않은 경로의 JSON 차단을 보강했으며 새로운 네트워크 기능은 없다. 후속 커밋은 같은 PR의 CI로 확인한다.

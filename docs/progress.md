@@ -391,3 +391,9 @@
 ### 8. 다음 단계 진행 가능 여부
 
 - 승인 범위의 A 데이터에 대한 운영자 수집 파이프라인·파일 QA 및 독립 SDK 개발 진행 가능. C/D 도입, 실제 데이터 공개 배포, MVP 전체 완료 판정은 불가하다.
+
+### 원격 검증과 구조화 데이터 차단 보강
+
+- [PR #4](https://github.com/kasa500000-png/KoreaMap/pull/4)를 연결된 GitHub 커넥터로 생성했다. `ac2d4d209f848c70ab9b49afe05f431623d50ad6`의 [CI 실행](https://github.com/kasa500000-png/KoreaMap/actions/runs/39207562003)은 Linux·Windows·macOS 모두 success다. 각 OS의 check/staged/pack과 Linux E2E가 통과했다.
+- 추가 수동 검토에서 CSV 외 XML/RDF/줄 단위 JSON 등의 형식과 임의 경로의 JSON도 명시적으로 거부하도록 보강했다. 알려진 설정/조사 JSON 경로만 허용하며 그 안의 중첩 GeoJSON도 거부한다. 음성 회귀 사례를 확장한 뒤 `pnpm check`, 실제 tarball 검사, staged 검사를 통과했다.
+- 보강 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: reject unreviewed structured data payloads$'`. 최종 커밋의 원격 결과는 PR checks와 사용자 보고를 따른다. Native 및 외부 데이터 QA 미검증 범위는 동일하다.

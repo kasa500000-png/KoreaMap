@@ -97,10 +97,10 @@ class DataPolicyTest(unittest.TestCase):
             with self.assertRaises(ValueError): validate_catalog(c, TODAY)
 
     def test_raw_data_asset_and_renamed_geojson(self):
-        for path in ('docs/raw.CSV', 'packages/web/src/photo.jpg', 'data/extra.json', 'maps/demo.pmtiles'):
+        for path in ('docs/raw.CSV', 'packages/web/src/photo.jpg', 'data/extra.json', 'maps/demo.pmtiles', 'docs/api.xml', 'docs/api.rdf', 'docs/records.ndjson', 'raw-records.json'):
             with self.assertRaises(ValueError): check_file(path, b'{}')
         for value in (b'\x00binary', b'{"nested":[{"type":"FeatureCollection","features":[]}]}'):
-            with self.assertRaises(ValueError): check_file('examples/web/app/renamed.json', value)
+            with self.assertRaises(ValueError): check_file('package.json', value)
 
     def test_unknown_changed_and_deleted_runtime_code(self):
         files = {'packages/core/src/index.ts': b'export const x = 1;\n'}

@@ -26,3 +26,7 @@
 | test-results/fixture-renders-pans-searc-4f16d-s-using-only-local-requests/local-fixture.png | `7b8b0d14f59662dee9408c205344a0bed9b855e00a7c91b3a4f2ef24a422e76f` |
 
 tarball·원본 화면은 Git에 포함하지 않는다. SDK 소스·의존성은 이 단계에서 변경하지 않았다. 원장 hash는 검토 시점의 메타데이터를 고정하며 원격 사이트 원문의 hash가 아니다. pnpm pack은 발행하지 않는다.
+
+## 원격 실행
+
+`ac2d4d209f848c70ab9b49afe05f431623d50ad6`에서 [3 OS CI](https://github.com/kasa500000-png/KoreaMap/actions/runs/39207562003)가 모두 통과했다. Windows/macOS도 check/staged/pack을 실행했으며 Linux는 browser E2E까지 성공했다. 이후 XML/RDF/줄 단위 JSON·미등록 JSON 차단 보강도 로컬 전체 검사를 통과했다. 최종 커밋 결과는 [PR #4 checks](https://github.com/kasa500000-png/KoreaMap/pull/4)에 연결된다.

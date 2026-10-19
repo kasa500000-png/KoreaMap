@@ -28,8 +28,19 @@ DATA_SUFFIXES = {'.pbf', '.osm', '.osc', '.pmtiles', '.mbtiles', '.shp', '.shx',
                  '.dbf', '.prj', '.gpkg', '.geojson', '.topojson', '.csv', '.tsv',
                  '.xlsx', '.xls', '.tif', '.tiff', '.sqlite', '.db', '.kml', '.gpx',
                  '.png', '.jpg', '.jpeg', '.webp', '.svg', '.woff', '.woff2',
-                 '.ttf', '.otf', '.zip', '.gz', '.tgz', '.pdf'}
+                 '.ttf', '.otf', '.zip', '.gz', '.tgz', '.pdf', '.xml', '.rdf',
+                 '.jsonl', '.ndjson', '.parquet', '.feather', '.sql'}
 DATA_METADATA = {'data/sources.json', 'data/publication.json'}
+# Exact reviewed configuration/research paths, never a general JSON data allowlist.
+JSON_METADATA = DATA_METADATA | {
+    '.changeset/config.json', '.prettierrc.json', 'package.json',
+    'tsconfig.base.json', 'tsconfig.build.json', 'tests/tsconfig.json',
+    'examples/expo/app.json', 'docs/research/dependency-snapshot.json',
+    'docs/research/toolchain-snapshot.json', 'docs/research/ux-observations.json',
+} | {f'{directory}/{name}' for directory in
+     [*(f'packages/{name}' for name in SDK), 'examples/web', 'examples/expo',
+      'services/geo-data', 'services/search', 'services/routing']
+     for name in ('package.json', 'tsconfig.json')}
 
 
 def require(condition, message):
@@ -131,6 +142,7 @@ def check_file(path, data):
     require(len(data) <= 8 * 1024 * 1024 and b'\0' not in data, 'Binary/oversize file requires review: ' + path)
     text = data.decode('utf-8')
     if p.suffix.lower() == '.json':
+        require(path in JSON_METADATA, 'Unreviewed JSON metadata or payload: ' + path)
         obj = json.loads(text)
         def walk(value):
             if isinstance(value, dict):

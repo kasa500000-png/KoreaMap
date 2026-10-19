@@ -48,7 +48,7 @@ OSM은 [저작권 안내](https://www.openstreetmap.org/copyright) 및 [ODbL 원
 1. 카탈로그 필수 필드, 중복 ID, 공식 출처 도메인, HTTPS, 키 없는 URL, 권리 상태, 근거 상태, 출처 문구, 기준일 구분을 검증한다. A 승격 시 정확한 원본의 열람 근거와 네 가지 권리가 필요하다. unknown 또는 접근 실패는 허가가 아니다.
 2. 검토는 최대 90일 후 만료된다. 현재 만료일은 2027-01-17이며 그 이후 검사는 실패한다. 조건 변경을 확인하여 원장과 보고서를 갱신한다. 날짜만 연장해 통과시키지 않는다.
 3. `select_source`는 명시적 source ID와 운영자 opt-in이 있어야 한다. collect는 A만, external-api는 A/B만 선택할 수 있다. 함수/CLI는 자격 검사일 뿐 요청·다운로드·API 키 탐색을 수행하지 않는다. C/D는 두 경로 모두 차단한다.
-4. Git 추적 파일과 무시되지 않은 신규 파일에서 지도 DB·CSV·GeoJSON·이미지·글꼴·아카이브 등 payload를 차단한다. JSON 이름 변경/중첩 GeoJSON, 바이너리, 심볼릭 링크도 검사한다. `data/`에는 두 정책 JSON만 허용한다. `.gitignore`와 별개로 index 검사는 강제 추가된 파일도 거부한다.
+4. Git 추적 파일과 무시되지 않은 신규 파일에서 지도 DB·CSV·XML/RDF·줄 단위 JSON·GeoJSON·이미지·글꼴·아카이브 등 payload를 차단한다. 검토된 정확한 설정/조사 경로 외 JSON, 중첩 GeoJSON, 바이너리, 심볼릭 링크도 검사한다. `data/`에는 두 정책 JSON만 허용한다. `.gitignore`와 별개로 index 검사는 강제 추가된 파일도 거부한다.
 5. [공개 검토 목록](../data/publication.json)은 SDK/예제/서비스 runtime source의 출처와 SHA-256을 고정한다. 코드 속에 데이터를 끼워 넣거나 새 runtime 파일을 추가하면 검토 목록 불일치로 실패한다. 변경할 때 diff의 출처와 권리를 사람이 확인한 다음 해당 해시를 갱신한다. 일괄 자동 승인 스크립트는 제공하지 않는다.
 6. `pnpm pack:check`는 실제 다섯 npm tarball을 검사한다. 현재 검토된 TS 소스에 대응하는 JS/선언 파일, MIT LICENSE, README, 제한된 package manifest만 허용한다. 원치 않는 데이터/소스맵/중복 파일/링크/경로 이동을 차단하고, tarball 바이트를 빌드 산출물과 대조한다. 깨끗한 소스 빌드 후 실행한다.
 7. 커밋 직전 `pnpm check:data --staged`로 index를 검사한다. CI도 이 명령을 실행한다. source 자체에는 A 데이터도 넣지 않으며 별도 운영자 데이터 릴리스 정책이 준비되기 전 제3자 payload 허용 목록은 비어 있다.
