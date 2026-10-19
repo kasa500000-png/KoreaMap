@@ -40,6 +40,25 @@
 | R23 | P2 | M7 | Photon/Pelias 한국어 자동완성·초성·오타·다중출처 검색은 평가셋과 운영 예산 확보 후 결정한다. | ADR-005 |
 | R24 | P2 | M7 | 오프라인 다운로드·보행/자전거·고급 내비게이션·terrain/MLT/스타일 GUI는 기능별 ADR과 라이선스/비용 검토 후 착수한다. | ADR-008 |
 
+## Zero Publisher Cost 필수 요구사항
+
+Z01~Z12는 모든 provider·데모·배포물에 적용한다. 단계는 최초 검증 책임이며 후속 P1/P2에도 예외 없이 적용한다. 현재 SDK가 없으므로 정적 검사 외 실제 설치/실행 검증은 미검증이다.
+
+| ID | 우선순위 | 단계 | 요구사항 및 수락 기준 | ADR |
+| --- | --- | --- | --- | --- |
+| Z01 | P0 | M1 | 제작자 소유 키·DB·타일·백엔드·유료 계정 기본 연결 없음. import/설정 누락 상태에서 네트워크 시도 0을 검증한다. | ADR-009 |
+| Z02 | P0 | M1 | 지도·검색·경로·공공데이터 provider를 운영자가 명시적으로 주입한다. 내장 endpoint 및 환경변수 자동 탐색 금지. | ADR-009 |
+| Z03 | P0 | M1 | 필수 설정 누락 시 renderer 생성 전에 CONFIG_REQUIRED로 실패하고, 명시적 로컬 fixture만 허용한다. 외부 fallback 없음. | ADR-009 |
+| Z04 | P0 | M4 | Git 작업 트리·index·이력·npm tarball·앱 bundle에서 secret/token/개인 endpoint/결제 설정을 검사하고 미해결 항목은 배포를 차단한다. | ADR-009 |
+| Z05 | P0 | M2 | 브라우저·앱 환경변수와 source map은 공개로 취급한다. 서버 비밀 키가 bundle에 없는지 확인하며 Native에도 재검증한다. | ADR-009 |
+| Z06 | P0 | M3 | 공개 데모는 허가된 로컬 fixture와 정적 자산만 사용한다. 제작자 유료 API·범용 proxy·공유 토큰·유료 fallback 없음. | ADR-009 |
+| Z07 | P0 | M1 | 기본 빌드/테스트가 유료 계정·원격 DB·remote cache 없이 실행된다. 공개 의존성 설치 후 오프라인 fixture 경로를 검사한다. | ADR-009 |
+| Z08 | P0 | M1 | 외부 provider opt-in 전에 계정·사용료·한도·키·데이터 권리의 책임이 설정 운영자에게 있음을 문서/예제에 알린다. | ADR-009 |
+| Z09 | P0 | M1 | Actions는 무료 표준 runner만 기본 사용한다. larger/유료 cache·artifact 초과·빌드·배포 활성화는 별도 승인 및 감사 대상이다. | ADR-009 |
+| Z10 | P0 | M4 | 배포 전 docs/cost-audit.md에 commit/artifact hash, 보안 검사와 모든 비용 경로, 미검증·차단 및 승인을 기록한다. | ADR-009 |
+| Z11 | P0 | M4 | 패키지 설치/기본 실행/테스트의 browser worker·Native 포함 네트워크를 관측해 제작자 과금 endpoint 요청 0을 확인한다. | ADR-009 |
+| Z12 | P0 | M1 | README에서 무료 SDK 코드 제공과 데이터·타일·검색·라우팅 서버 운영 비용/책임을 구분한다. | ADR-009 |
+
 ## 공통 비기능 수락 기준
 
 | ID | 기준 | 책임 단계 |

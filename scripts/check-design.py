@@ -11,7 +11,7 @@ import sys
 
 def main(root: Path) -> None:
     docs = root / "docs"
-    files = [root / "AGENTS.md", *sorted(docs.rglob("*.md"))]
+    files = [root / "README.md", root / "AGENTS.md", *sorted(docs.rglob("*.md"))]
     link_count = 0
     for path in files:
         text = path.read_text(encoding="utf-8")
@@ -26,7 +26,7 @@ def main(root: Path) -> None:
 
     requirements = {}
     for line in (docs / "requirements.md").read_text().splitlines():
-        if re.match(r"\| R\d{2} \|", line):
+        if re.match(r"\| [RZ]\d{2} \|", line):
             row = [cell.strip() for cell in line.split("|")[1:-1]]
             rid, priority, milestone, acceptance, adr = row
             assert rid not in requirements, f"Duplicate requirement: {rid}"
@@ -34,20 +34,20 @@ def main(root: Path) -> None:
             allowed = {"P0": {"M1", "M2", "M3", "M4"}, "P1": {"M5", "M6"}, "P2": {"M7"}}
             assert milestone in allowed[priority], f"Priority/milestone mismatch: {rid}"
             requirements[rid] = (priority, milestone, adr)
-    assert len(requirements) == 24, "Expected R01-R24"
-    assert set(requirements) == {f"R{i:02}" for i in range(1, 25)}
+    assert len(requirements) == 36, "Expected R01-R24 and Z01-Z12"
+    assert set(requirements) == ({f"R{i:02}" for i in range(1, 25)} | {f"Z{i:02}" for i in range(1, 13)})
 
     assigned = {}
     for line in (docs / "roadmap.md").read_text().splitlines():
         if re.match(r"\| M[1-7] \|", line):
             row = [cell.strip() for cell in line.split("|")[1:-1]]
-            for rid in re.findall(r"\bR\d{2}\b", row[2]):
+            for rid in re.findall(r"\b[RZ]\d{2}\b", row[2]):
                 assert rid not in assigned, f"Duplicate roadmap assignment: {rid}"
                 assigned[rid] = row[0]
     assert set(assigned) == set(requirements), "Missing/unknown roadmap requirements"
     for rid, (_, milestone, _) in requirements.items():
         assert assigned[rid] == milestone, f"Roadmap mismatch: {rid}"
-    print("PASS: 24 unique requirements; priority and milestone assignments agree")
+    print("PASS: 36 unique requirements; priority and milestone assignments agree")
 
     adrs = {}
     for path in sorted((docs / "decisions").glob("*.md")):
@@ -59,12 +59,12 @@ def main(root: Path) -> None:
         assert path.name.startswith(aid[-3:]), f"ADR filename mismatch: {aid}"
         for heading in ["## 결정", "## 이유와 대안", "## 결과와 제약", "## 검증과 재검토", "## 근거"]:
             assert heading in text, f"Missing {heading}: {aid}"
-        adrs[aid] = set(re.findall(r"\bR\d{2}\b", text))
+        adrs[aid] = set(re.findall(r"\b[RZ]\d{2}\b", text))
         assert adrs[aid] <= requirements.keys(), f"Unknown ADR requirement: {aid}"
-    assert len(adrs) == 8, "Expected 8 ADRs"
+    assert len(adrs) == 9, "Expected 9 ADRs"
     for rid, (_, _, aid) in requirements.items():
         assert aid in adrs and rid in adrs[aid], f"Missing reverse ADR mapping: {rid} -> {aid}"
-    print("PASS: 8 ADRs; every requirement has a matching ADR reference")
+    print("PASS: 9 ADRs; every requirement has a matching ADR reference")
 
     versions = json.loads((docs / "research/dependency-snapshot.json").read_text())
     names = set()

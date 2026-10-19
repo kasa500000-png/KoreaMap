@@ -15,10 +15,10 @@
 | 단계 | 범위/우선순위 | 요구사항 | 완료 조건 | 상태 |
 | --- | --- | --- | --- | --- |
 | M0 | 기술 조사·설계 | 모든 요구사항의 설계 근거 | 링크·추적성·상호 일관성 검사 및 수동 리뷰, 문서 커밋 | 설계 검증 통과; 커밋은 진행 기록의 식별 명령 참조 |
-| M1 | 코어·버전 잠금·모바일 spike / P0 | R01 R02 R03 R12 | exact version/lockfile, core tests, Web 최소 지도, Expo Android/iOS 최소 지도 실제 실행, 장비·메모리 예산 확정 | 미착수 |
-| M2 | Web SDK·React/Next 예제 / P0 | R04 R05 R06 R07 | 브라우저 카메라·피처·스타일·SSR/lifecycle 테스트; fixture 검색/경로를 실서비스로 표시하지 않음 | 미착수 |
-| M3 | 한국 타일·한글·자체 호스팅 / P0 | R08 R09 R10 R11 R17 | 시범 bbox 배치·schema·글리프·라이선스·서버 smoke·rollback, 키 없는 별도 환경 재현 | 미착수 |
-| M4 | 모바일 parity·성능·MVP 패키징 / P0 | R13 R14 R15 R16 | 모든 P0의 Android/iOS 수락 기준, 실화면/접근성·성능, dry-run package 소비 검증 | 미착수 |
+| M1 | 코어·버전 잠금·모바일 spike / P0 | R01 R02 R03 R12 Z01 Z02 Z03 Z07 Z08 Z09 Z12 | exact version/lockfile, core tests, Web 최소 지도, Expo Android/iOS 최소 지도 실제 실행, 장비·메모리 예산 확정 | 미착수 |
+| M2 | Web SDK·React/Next 예제 / P0 | R04 R05 R06 R07 Z05 | 브라우저 카메라·피처·스타일·SSR/lifecycle 테스트; fixture 검색/경로를 실서비스로 표시하지 않음 | 미착수 |
+| M3 | 한국 타일·한글·자체 호스팅 / P0 | R08 R09 R10 R11 R17 Z06 | 시범 bbox 배치·schema·글리프·라이선스·서버 smoke·rollback, 키 없는 별도 환경 재현 | 미착수 |
+| M4 | 모바일 parity·성능·MVP 패키징 / P0 | R13 R14 R15 R16 Z04 Z10 Z11 | 모든 P0의 Android/iOS 수락 기준, 실화면/접근성·성능, dry-run package 소비 검증 | 미착수 |
 | M5 | 검색·길찾기 adapter / P1 | R18 R19 | 자체 Nominatim/OSRM의 정규화·품질·오류/취소·출처 계약, provider 없는 회귀 | 미착수 |
 | M6 | 한국 공공 레이어·저장·직접 archive / P1 | R20 R21 R22 | 데이터별 권리, PostGIS query plan, RLS 격리, Native PMTiles range/cache 검증 | 미착수 |
 | M7 | 고도화 / P2 | R23 R24 | 수요·품질 평가·운영 비용·신규 ADR 확보 후 기능별 개발 | 보류 |
@@ -47,3 +47,9 @@ M4 후 0.x release candidate를 만들 수 있지만 main 병합·운영 배포�
 - 공공데이터 원본별 권리, 폰트 산출물 고지: 각각 M6, M3.
 - 배치 속도·트래픽·한국어 검색 품질: 실제 입력 확보 후 측정. 예상치를 실측으로 표기하지 않는다.
 - GitHub 기본 브랜치 설정: 제품 개발 차단은 아니며 PR base를 명시해 진행 가능.
+
+## Zero Publisher Cost 적용
+
+[비용 감사](cost-audit.md)와 [ADR-009](decisions/009-zero-publisher-cost.md)를 M1~M7 전체에 적용한다. 기존 아키텍처 PR 위의 `docs/zero-publisher-cost` 브랜치에서 정책·정적 감사 도구를 추가한다. 제품 설치·실행 네트워크 감사가 완료되기 전에는 Zero Publisher Cost 런타임 합격이나 발행 가능으로 표시하지 않는다.
+
+M1은 명시적 provider/설정 누락 실패/유료 계정 없는 기본 테스트, M2는 클라이언트 노출, M3는 로컬 fixture 데모, M4는 실제 npm·Web·Native 배포물과 설치/실행/테스트 요청 감사를 검증한다. P1 서비스와 공공데이터 수집도 운영자가 설정한 계정·인프라만 사용한다. SDK 이용자 수에 따라 제작자 서비스 API 사용량이 늘어나는 기본 경로는 허용하지 않는다.

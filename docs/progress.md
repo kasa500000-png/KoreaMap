@@ -218,3 +218,55 @@
 
 - M1 모노레포·공통 계약·버전 잠금·모바일 호환성 spike 진행 가능. 설계 검증은 제품 구현/성능 합격과 별개다.
 - 이번 PR은 main에 자동 병합하지 않는다. main 병합·운영 배포·공개 전환·npm 실제 발행에는 각각 명시적 승인이 계속 필요하다.
+
+## M0 후속 — Zero Publisher Cost 정책과 정적 감사
+
+기준일: 2026-10-19 (UTC). 기존 아키텍처 설계에 사용자가 지정한 비용 정책 12개를 적용한다. 상태: 정책·설계 반영 및 정적 검사 통과. SDK 런타임 정책 구현과 실제 요청 검증은 미완료다.
+
+### 1. 구현 완료 기능
+
+- 제작자 계정 기본 연결 금지, 운영자 provider 설정, 무설정 안전 실패/명시적 로컬 fixture, 공개 환경변수 노출, 데모·Actions 비용 제한을 프로젝트 정책에 저장했다.
+- README에 무료 SDK 배포와 운영자 타일·검색·경로·서버 비용의 차이를 설명했다. 요구사항 Z01~Z12와 ADR-009를 추가해 MVP 단계에 배치했다.
+- 외부 요청 없이 작업 트리·Git index·도달 가능한 이력 및 지정 npm tarball을 검사하는 정적 감사 도구를 구현했다. 실제 비밀값을 출력하지 않으며 런타임 검증 여부를 항상 별도로 표시한다.
+- 실제 배포 전 설치·실행·테스트의 네트워크 시도를 조사하는 절차와 현재 증거/미검증을 비용 감사 문서에 기록했다.
+
+### 2. 생성/수정 파일
+
+- 신규: [README.md](../README.md), `.gitignore`, [cost-audit.md](cost-audit.md), [ADR-009](decisions/009-zero-publisher-cost.md).
+- 신규 도구: [audit-cost-security.py](../scripts/audit-cost-security.py), [test-cost-audit.py](../scripts/test-cost-audit.py).
+- 수정: [AGENTS.md](../AGENTS.md), [architecture.md](architecture.md), [requirements.md](requirements.md), [roadmap.md](roadmap.md), [ADR-008](decisions/008-release-and-quality.md), [design-validation.md](research/design-validation.md), [check-design.py](../scripts/check-design.py), 이 진행 기록.
+
+### 3. 실행한 테스트와 결과
+
+- `python3 scripts/check-design.py`: 통과. 36개 요구사항, ADR 9개, 단계별 배치와 상대 링크 검사.
+- `python3 scripts/audit-cost-security.py`: `PASS_STATIC_ONLY`, 탐지 규칙에 해당하는 발견 사항 0건. 정적 범위이며 SDK 무요청 증명이 아니다.
+- `python3 scripts/test-cost-audit.py`: 11개 통과. staged/삭제 이력 secret, 값 미출력, 외부/사설 endpoint, install hook·runner·cache·배포 config, tar 내부 secret·경로 탈출 등의 회귀 검증.
+- 초기 스캐너 자신의 문자열에 대한 탐지 결과를 검토하고 오프라인 참조/합성 fixture를 명확히 한 뒤 재검사했다. 실제 키를 예외로 허용하지 않았다.
+- 최종 변경에도 위 세 명령, Python AST, `git diff --check`와 `git diff --cached --check`를 재적용한 후 커밋한다. 실제 SDK/npm/Web·Native 빌드 테스트는 제품 코드가 없어 미실행·미검증이다.
+
+### 4. 실화면 QA 결과
+
+- 이번 변경의 Web·Android·iOS 실화면 QA는 미실행·미검증이다. 실행할 자체 지도 UI나 앱이 없고 기존 upstream 예제 관찰을 이 정책의 제품 QA로 재사용하지 않는다.
+
+### 5. 라이선스 및 보안 문제
+
+- 데이터·폰트·타일·런타임 의존성 추가 없음. MIT 코드 목표와 데이터별 이용허락 분리 유지.
+- 현재 정적 감사 발견 사항 0건. 정규식 기반 도구는 임의/난독화 secret과 실제 네트워크를 증명하지 못하며 한계를 비용 감사에 명시했다.
+- `.env`·인증 파일·빌드 파일을 ignore하고 실제 npm publish allowlist/tarball 검사를 출시 gate로 설정했다. `.gitignore`만으로 유출 방지를 보장하지 않는다.
+- 제작자 API/유료 계정, 원격 cache, Actions workflow, 운영 데모, 배포 설정을 생성하거나 활성화하지 않았다.
+
+### 6. 남은 작업 또는 차단 요인
+
+- M1부터 provider 필수 검증과 로컬 fixture를 실제 구현하고 외부 통신이 차단된 환경에서 기본 빌드·테스트를 검증해야 한다.
+- 실제 npm 산출물, Web bundle/APK·IPA, 설치/실행 네트워크, 데모 및 CI 계정 한도 감사가 남아 있다. 제품 배포는 이 미검증 항목이 해소되기 전 완료 처리하지 않는다.
+- 아키텍처 PR #1이 미병합 상태이므로 이번 PR은 해당 브랜치를 기준으로 정책 변경만 비교한다. 후속 main 병합과 실제 배포는 이번 요청의 범위가 아니다.
+
+### 7. Git 브랜치와 커밋 해시
+
+- 브랜치: `docs/zero-publisher-cost`, base: `docs/technical-architecture`의 `e832012f341c41f6670ba27c423195f97ad927d1`.
+- 커밋 식별 명령: `git log -1 --format='%H %s' --grep='^chore: enforce Zero Publisher Cost policy$'`.
+- 검사 후 commit/push하고 연결된 GitHub 커넥터로 draft PR을 만든다. 실제 커밋 해시와 PR URL은 사용자 보고에 포함한다. main 변경·npm 발행·운영 배포는 수행하지 않는다.
+
+### 8. 다음 단계 진행 가능 여부
+
+- 정책과 정적 검사를 기반으로 M1 구현 진행 가능. 현재 결과는 제품 Zero Publisher Cost 런타임 검증 완료나 출시 승인이 아니다.
