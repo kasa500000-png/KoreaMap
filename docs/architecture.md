@@ -42,9 +42,8 @@ Actions는 무료 조건을 충족하는 공개 저장소 표준 runner를 기�
 
 ```mermaid
 flowchart TB
-  W[Next.js Web 예제] --> RW[react 패키지]
-  RW --> WEB[web / MapLibre GL JS]
-  M[Expo 개발 빌드] --> NAT[react-native / MapLibre Native]
+  W[Next.js Web 예제 / React lifecycle] --> WEB[web / MapLibre GL JS]
+  M[Expo 개발 빌드] --> NAT[native / MapLibre Native]
   WEB --> CORE[core / 공통 계약]
   NAT --> CORE
   AD[선택 검색·경로·저장 어댑터] --> CORE
@@ -60,41 +59,34 @@ flowchart TB
   PG -. 선택 동적 레이어 .-> HOST
 ```
 
-`core`는 React, MapLibre, DB, Supabase, 네트워크 SDK를 import하지 않는다. `web → core`, `react → web + core`, `react-native → core`, `adapters/* → core` 방향만 허용한다. 런타임 순환 의존을 금지하고 타입 import도 같은 경계를 유지한다. 서버 바이너리·데이터·DB 드라이버는 npm 클라이언트 패키지에 포함하지 않는다.
+`core`는 React, MapLibre, DB, Supabase, 네트워크 SDK를 import하지 않는다. `web → core + styles`, `native → core + styles`, `styles → core`, `data-adapters → core` 방향만 허용한다. 런타임 순환 의존을 금지하고 타입 import도 같은 경계를 유지한다. 서버 바이너리·데이터·DB 드라이버는 npm 클라이언트 패키지에 포함하지 않는다.
 
 ```text
 KoreaMap/
-  AGENTS.md
+  AGENTS.md / README.md / LICENSE
   packages/
-    core/                    # 좌표 검증, 공개 계약, capability, 오류
-    web/                     # 프레임워크 무관 GL JS 래퍼
-    react/                   # 얇은 React lifecycle 바인딩
-    react-native/            # MapLibre RN 바인딩; WebView 방식 아님
-    styles/                  # 자체 작성 style.json, 토큰, 스키마 호환 메타데이터
-    adapters/
-      nominatim/             # P1: 사용자가 지정한 자체 서버
-      osrm/                  # P1: driving 우선
-      supabase/              # P1: 저장/사용자 레이어만, 핵심 비의존
-  apps/
-    web-example/             # Next.js App Router, client-only map
-    mobile-example/          # Expo config plugin + development build
-  tools/
-    tiles/                   # Planetiler profile, 배치와 재현 manifest
-    glyphs/                  # 허가된 폰트로 PBF 생성
-    data/                    # P1: CRS·스키마 정제, 원본 provenance
-  infra/
-    self-host/               # 정적 서버 + Martin; 선택 서비스는 별도 profile
-  data/
-    manifests/               # 입력 URL/hash/date/license, 원본 데이터는 Git 밖
-  tests/
-    contracts/               # 각 플랫폼/어댑터 공통 계약
-    fixtures/                # 자체 작성 합성 데이터, 작은 허가된 샘플
-    e2e-web/
-    e2e-mobile/
-  scripts/                   # 문서·릴리스 검증
+    core/                    # ES-only 공통 계약/검증; 외부 의존성 없음
+    web/                     # GL JS; React lifecycle은 현재 예제에서 처리
+    native/                  # MapLibre RN; Expo 개발 빌드 대상
+    styles/                  # 자체 합성 스타일; 실제 스타일/글리프는 M3
+    data-adapters/           # 합성 검색; 실제 서비스 adapter는 M5/M6
+  examples/
+    web/                     # private Next.js 소비 앱
+    expo/                    # private Expo 소비 앱
+  services/
+    geo-data/                # private 상태 경계; 배치 엔진은 M3/M6
+    search/                  # private 상태 경계; 검색 엔진은 M5
+    routing/                 # private 상태 경계; 경로 엔진은 M5
+  tests/unit/
+  tests/e2e-web/
+  scripts/
   docs/decisions/
   docs/research/
+  .github/workflows/
+  .changeset/
 ```
+
+사용자의 모노레포 구축 지시에 따라 위 경로로 실제 생성했다. services는 private 상태 descriptor만 가지며 실행 가능한 지도 서비스로 표시하지 않는다. 별도 React 패키지, 인프라/전국 데이터 도구는 필요 시 추가한다. 현재 코드 범위와 미구현 API는 [개발 가이드](development.md)에 구분한다.
 
 초기 생성은 필요한 디렉터리에 한정한다. P1/P2 폴더를 빈 패키지로 미리 발행하지 않는다. pnpm workspace + TypeScript 프로젝트 참조로 시작하고 작업 캐시 도구는 빌드 시간 측정 후 도입한다. [ADR-008](decisions/008-release-and-quality.md)
 
@@ -147,7 +139,9 @@ type Route = {
   snappedWaypoints: LngLat[]; provenance: Provenance;
 };
 type ServiceResult<T> = { data: T; attributions: Attribution[]; requestId: string };
-type RequestContext = { requestId: string; signal?: AbortSignal; timeoutMs?: number };
+// 플랫폼 AbortSignal은 wrapper에서 이 구조로 변환해 core에 DOM 타입을 넣지 않는다.
+type Cancellation = { readonly aborted: boolean; subscribe(listener: () => void): () => void };
+type RequestContext = { requestId: string; signal?: Cancellation; timeoutMs?: number };
 type SearchQuery = { text: string; language: string; limit: number; bias?: LngLat; bounds?: Bounds };
 type RouteQuery = { waypoints: LngLat[]; profile: 'driving' | 'walking' | 'cycling'; language: string };
 interface SearchProvider {
@@ -267,9 +261,9 @@ SDK의 자동 출처 수집은 누락 방지 도구다. 사용자가 제공하�
 
 ## 11. 버전·배포·검증 정책
 
-정확한 **첫 호환성 시험 후보 버전**은 [조사표](research/technical-review.md)에 기록했다. 이번 단계는 설치하지 않았으므로 lockfile·Native build·취약점 검사 완료를 주장하지 않는다. M1에서 후보를 실제 설치해 검증하고 packageManager/engines/exact dependency/lockfile, Gradle·Pod 잠금 및 CI 이미지 digest를 커밋한다. npm peer 범위는 실제 검증한 조합만 문서화하고 사용자의 renderer 중복 설치를 피한다.
+정확한 **첫 호환성 시험 후보 버전**은 [조사표](research/technical-review.md)에 기록했다. 원본 설계 단계에는 설치하지 않았다. 후속 모노레포 단계의 실제 설치·lockfile·JS 빌드·잔여 보안 문제는 [도구 검증](research/monorepo-toolchain.md)과 [비용 감사](cost-audit.md)에 기록한다. Native build는 아직 미검증이다. M1에서 후보를 실제 설치해 검증하고 packageManager/engines/exact dependency/lockfile, Gradle·Pod 잠금 및 CI 이미지 digest를 커밋한다. npm peer 범위는 실제 검증한 조합만 문서화하고 사용자의 renderer 중복 설치를 피한다.
 
-공개 API SemVer와 데이터 스키마/스타일/데이터 날짜 버전을 분리한다. 초기 패키지는 `0.x`, breaking change는 minor를 올리고 migration note를 제공한다. core/web/react/react-native는 초기에는 같은 버전, 선택 어댑터는 호환 core 범위를 명시한 독립 버전이다. 대형 지도 데이터는 npm/Git에 넣지 않는다. GitHub 공개 상태와 출시 readiness는 별개다.
+공개 API SemVer와 데이터 스키마/스타일/데이터 날짜 버전을 분리한다. 초기 패키지는 `0.x`, breaking change는 minor를 올리고 migration note를 제공한다. core/web/native/styles/data-adapters는 초기에는 같은 버전, 선택 어댑터는 호환 core 범위를 명시한 독립 버전이다. 대형 지도 데이터는 npm/Git에 넣지 않는다. GitHub 공개 상태와 출시 readiness는 별개다.
 
 CI는 lint/types/build/contract, 패키지 exports, `npm pack --dry-run`, 소비 앱 설치, Web E2E, Android 및 macOS iOS 빌드·실화면 QA, attribution/license/SBOM, dependency audit, credential scan을 단계에 맞게 실행한다. native/브라우저 테스트가 실행되지 않으면 해당 플랫폼은 미검증이며 MVP 완료·발행을 막는다. 공식 예제 관찰은 프로젝트 E2E가 아니다.
 

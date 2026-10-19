@@ -1,38 +1,67 @@
 # Korea Map Kit
 
-한국에 특화된 무료 오픈소스 지도 SDK를 설계하는 프로젝트입니다. MapLibre 기반으로 Web·Android·iOS를 지원하고 SDK 자체 코드의 최종 라이선스는 MIT를 목표로 합니다. **현재는 설계 단계이며 설치 가능한 SDK 패키지는 아직 발행하지 않았습니다.** 지도 데이터와 폰트의 라이선스는 코드와 별도입니다.
+한국에 특화된 MapLibre 기반 무료 오픈소스 지도 SDK입니다. 현재는 **모노레포와 로컬 합성 지도 기반 구현**이며, 완성된 한국 지도 SDK 또는 발행된 npm 제품이 아닙니다. 자체 작성 SDK 코드와 합성 fixture는 [MIT](LICENSE), 외부 라이브러리·실제 지도 데이터·폰트는 각각의 라이선스를 따릅니다.
+
+## 시작하기
+
+Node.js **24.19.0**, pnpm **12.14.0**, 문서/감사용 Python **3.12+** 및 Git을 사용합니다. API 키, 클라우드 계정, `.env` 복사 없이 빌드와 기본 테스트가 실행됩니다. 최초 설치에는 공개 패키지 레지스트리 접속이 필요합니다.
+
+```sh
+npm install --global pnpm@12.14.0 --ignore-scripts --no-audit --no-fund
+pnpm install --frozen-lockfile
+pnpm check
+pnpm dev:web
+```
+
+| 명령                                       | 실행 범위                                                                  |
+| ------------------------------------------ | -------------------------------------------------------------------------- |
+| `pnpm build:sdk`                           | SDK 5개와 서비스 경계 TypeScript 빌드, 타입 선언·MIT 고지 생성             |
+| `pnpm typecheck`                           | SDK·서비스·Web·Expo·테스트 strict 검사                                     |
+| `pnpm test`                                | 외부 API 없는 Vitest 단위 테스트                                           |
+| `pnpm lint` / `pnpm format:check`          | ESLint / Prettier 검사                                                     |
+| `pnpm build`                               | SDK·서비스 + Next.js 정적 출력 + Android/iOS JavaScript 번들               |
+| `pnpm check`                               | 경계·lint·format·types·unit·build·문서·정적 감사·감사 회귀·Changesets 검사 |
+| `pnpm test:web`                            | 빌드된 Web의 Playwright 화면/외부 요청 검사; 로컬 Chromium 필요            |
+| `pnpm pack:check`                          | 빌드된 SDK 5개 tarball 생성 및 검사; npm 발행 안 함                        |
+| `pnpm offline:check`                       | 최초 설치로 채운 pnpm 저장소에서 새 임시 workspace 오프라인 설치           |
+| `pnpm dev:expo`                            | Expo offline/localhost 개발 서버; Expo Go 미지원                           |
+| `pnpm changeset` / `pnpm changeset:status` | 버전 변경 계획 작성 / 확인; 자동 발행 없음                                 |
+| `pnpm clean`                               | 알려진 로컬 빌드 산출물 정리                                               |
+
+Playwright 브라우저는 `pnpm exec playwright install chromium`으로 준비합니다. OS별 전제조건, native 로컬 빌드, worker, 서비스 범위는 [개발 가이드](docs/development.md)를 따릅니다. **Expo JS export는 APK/IPA 빌드나 Android/iOS 실화면 QA가 아닙니다.** 의존성 보안 미해결 사항은 [비용·보안 감사](docs/cost-audit.md)에 기록하며 제품 출시는 차단합니다.
+
+## 모노레포
+
+```text
+packages/       core · web · native · styles · data-adapters (SDK)
+examples/       web (Next.js) · expo (비공개 소비 앱)
+services/       geo-data · search · routing (비공개 서비스 경계, 엔진 미구현)
+docs/           설계 · 요구사항 · 로드맵 · 진행 · 감사
+scripts/        Windows/macOS/Linux 공통 Node/Python 개발 명령
+tests/          단위 계약 · Web 화면/네트워크
+```
+
+`core`는 외부 runtime/dev 의존성 없이 ES 표준 라이브러리만 사용합니다. DOM·React·React Native·Supabase·서버 의존성은 금지하며 manifest/AST/ESLint/TypeScript로 경계를 검사합니다. 백엔드 엔진, 데이터 수집 및 외부 HTTP provider는 후속 단계입니다. 현재 지원 모드는 **명시적 `local-fixture`**뿐이며 미지원 모드는 실패합니다.
 
 ## Zero Publisher Cost
 
-SDK는 사용자 요청을 제작자의 API 키·DB·타일 서버·백엔드·유료 계정으로 기본 연결하지 않습니다. 지도 타일, 검색, 경로, 공공데이터 Provider는 사용하는 운영자가 직접 설정합니다. 설정이 없으면 명시적으로 실패하거나 허가된 로컬 테스트 데이터만 사용하며 숨겨진 원격 fallback은 두지 않습니다.
+제작자 API 키·DB·타일·백엔드 계정을 기본 연결하지 않습니다. 설정 누락 시 renderer 생성 전에 실패하며 공용 OSM/Nominatim 등의 숨겨진 fallback도 없습니다. Web 예제의 worker도 설치된 MapLibre에서 복사한 same-origin 자산입니다. 기본 테스트는 별도 허가된 합성 데이터만 사용합니다.
 
-이 구조의 목표는 **SDK 사용자 수가 증가해도 기본 사용 때문에 제작자의 지도 API 비용이 증가하지 않는 것**입니다. 모든 호스팅·배포·장비 비용이 무조건 무료라는 보장은 아닙니다. 현재 감사는 문서/검사 도구의 정적 범위이며 SDK 설치·실행의 네트워크 검증은 구현 후 수행해야 합니다.
+| 구분                                | 비용과 책임                                                                                                                         |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| SDK 코드 제공                       | 무료 오픈소스입니다. GitHub/npm 코드 배포 한도·빌드 장비는 유지관리 영역이며 지도 서비스 사용료와 별개입니다.                       |
+| 지도·타일·글리프·스프라이트         | 운영자가 자료와 호스팅을 선택하고 저장·전송·갱신 비용 및 라이선스 의무를 부담합니다.                                                |
+| 검색·지오코딩·라우팅·공공데이터 API | 선택형입니다. 서비스를 설정한 운영자가 계정·사용료·한도·키를 관리합니다.                                                            |
+| 자체 호스팅                         | 유료 클라우드 없이 로컬 장비를 사용할 수 있습니다. 장비·전력·네트워크 비용까지 0원이라는 뜻은 아닙니다.                             |
+| 데모                                | 로컬 fixture와 정적 자산만 사용합니다. 제작자 유료 API를 호출하지 않습니다. 실제 호스팅과 무료 한도는 배포 승인 시 별도 확인합니다. |
+| GitHub Actions                      | 공개 저장소의 무료 표준 runner 3종만 구성합니다. cache·artifact 업로드·배포·유료 runner를 활성화하지 않습니다.                      |
 
-| 구분 | 제공/책임 범위 |
-| --- | --- |
-| SDK 코드 | 무료 공개 목표. GitHub/npm 코드 배포 정책·저장 한도·빌드 장비는 유지관리 영역이며 지도 서비스 사용료와 별개입니다. |
-| 지도 데이터·타일·글리프·스프라이트 | 운영자가 허가된 자료와 호스팅을 선택합니다. 저장·전송·갱신·라이선스 의무는 해당 운영자 책임입니다. |
-| 검색·지오코딩·라우팅·공공데이터 API | 선택 기능입니다. 설정한 서비스의 계정·사용료·한도·키 관리·운영 책임은 이를 설정한 운영자에게 있습니다. |
-| 자체 호스팅 | 유료 클라우드 계정 없이 로컬/자체 장비로 실행할 수 있도록 개발합니다. 장비·전력·네트워크 비용까지 없어진다는 뜻은 아닙니다. |
-| 공개 데모 | 소형 허가 로컬 fixture와 정적 assets로 제한합니다. 제작자의 유료 API를 호출하지 않으며 무료 구간 초과 시 유료로 자동 전환하지 않습니다. |
-| GitHub Actions | 공개 저장소의 무료 표준 runner를 기본으로 합니다. 과금 가능 runner·스토리지 확장·원격 캐시·배포는 별도 승인 대상입니다. |
+브라우저 `NEXT_PUBLIC_*`, Expo `EXPO_PUBLIC_*`, 앱 bundle·소스맵의 값은 공개 정보입니다. 비공개 키는 운영자 서버에만 두고 개인 endpoint·토큰·결제 설정을 Git/npm/예제에 넣지 않습니다. `.env.example`은 필수 값이 없는 안전한 템플릿이며 SDK는 환경변수에서 provider를 자동 탐색하지 않습니다.
 
-브라우저의 `NEXT_PUBLIC_*`, Expo의 `EXPO_PUBLIC_*`, 모바일 앱에 번들된 환경값은 사용자가 볼 수 있습니다. Secret을 여기에 넣지 마세요. 외부 서비스에 서버 비밀 키가 필요하면 **운영자 소유 서버**에 보관해야 합니다. 개인 endpoint·계정·결제 정보를 예제 설정이나 Git에 넣지 않습니다.
+## 문서와 배포
 
-## 설계와 현재 검증
+- [아키텍처](docs/architecture.md), [요구사항](docs/requirements.md), [로드맵](docs/roadmap.md), [진행 기록](docs/progress.md)
+- [개발 가이드](docs/development.md), [도구 버전 근거](docs/research/monorepo-toolchain.md)
+- [Zero Publisher Cost ADR](docs/decisions/009-zero-publisher-cost.md), [비용·보안 감사](docs/cost-audit.md), [프로젝트 정책](AGENTS.md)
 
-- [아키텍처](docs/architecture.md), [요구사항](docs/requirements.md), [로드맵](docs/roadmap.md)
-- [Zero Publisher Cost ADR](docs/decisions/009-zero-publisher-cost.md), [보안·비용 감사](docs/cost-audit.md)
-- [개발 정책](AGENTS.md), [진행 기록](docs/progress.md)
-
-현재 문서·정적 감사 도구는 Python 3와 Git만으로 실행할 수 있으며 클라우드 계정·API 키가 필요 없습니다.
-
-```sh
-python3 scripts/check-design.py
-python3 scripts/audit-cost-security.py
-python3 scripts/test-cost-audit.py
-```
-
-SDK 구현 후에는 잠금된 의존성을 일반 공개 레지스트리에서 설치하고, 기본 빌드/테스트는 로컬 fixture로 실행합니다. 최초 의존성 다운로드와 사용자 설정 서비스 요청을 구분합니다. 유료 지도 계정·EAS·원격 DB·remote build cache를 필수 빌드 경로에 두지 않습니다. public registry 접속도 설치 스크립트/전이 의존 감사 대상입니다.
-
-main 병합·운영 배포·공개 저장소 전환·npm 실제 발행은 각각 명시적 승인과 배포 전 감사 통과 후 수행합니다.
+main 병합·운영 배포·공개 전환·npm 발행에는 각각 명시적 승인이 필요합니다. npm scope 소유권, Native 실제 빌드/화면 및 잔여 보안 감사가 완료되기 전 제품 발행을 진행하지 않습니다.

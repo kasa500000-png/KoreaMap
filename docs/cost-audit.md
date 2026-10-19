@@ -1,8 +1,10 @@
 # Zero Publisher Cost — 보안 및 비용 경로 감사
 
+현재 상태는 마지막 「모노레포 foundation 감사」를 따른다. 아래 1~8절은 SDK 구현 전 정책 단계의 증거와 출시 절차다. 현재 일부 코드/실행 증거가 추가됐지만 Native 실빌드와 보안 미해결 2건으로 제품 출시는 차단된다.
+
 감사일: 2026-10-19 (UTC). 대상 브랜치: `docs/zero-publisher-cost`. 기준 설계 커밋: `e832012f341c41f6670ba27c423195f97ad927d1`. 정책: [AGENTS.md](../AGENTS.md), 설계: [ADR-009](decisions/009-zero-publisher-cost.md), 책임 구분: [README](../README.md).
 
-**현재 판정: 정책·정적 감사 통과, 제품 설치/실행/테스트 네트워크는 미검증. SDK 발행·데모 운영 배포 승인이 아니다.** 현재 package.json, SDK 런타임, 실제 npm tarball, 배포된 데모, GitHub Actions workflow가 없다. 따라서 제작자 과금 endpoint 요청이 없다는 실행 결과를 만들어 보고하지 않는다.
+**이전 정책 단계 판정(보존): 정책·정적 감사 통과, 제품 설치/실행/테스트 네트워크는 미검증. SDK 발행·데모 운영 배포 승인이 아니다.** 현재 package.json, SDK 런타임, 실제 npm tarball, 배포된 데모, GitHub Actions workflow가 없다. 따라서 제작자 과금 endpoint 요청이 없다는 실행 결과를 만들어 보고하지 않는다.
 
 ## 1. 감사 범위와 책임
 
@@ -99,3 +101,63 @@ python3 scripts/audit-cost-security.py --artifact /path/to/package.tgz
 ## 8. 후속 작업
 
 정책/정적 감사는 현재 적용 가능하다. SDK M1~M4의 설치·실행 네트워크, 실제 package allowlist/tarball, Native bundle과 공개 데모 감사는 구현 시 수행한다. 그때까지 제품 Zero Publisher Cost 런타임 검증은 미완료다. 실제 비용 책임은 외부 서비스를 설정한 운영자에게 있다는 고지를 provider 설명과 예제에도 유지한다.
+
+## 9. 모노레포 foundation 감사 — 2026-10-19
+
+대상: `feat/monorepo-foundation`, base `131a1789231745d1dc791597d0a9844f384a2bb5`. 최종 커밋은 `git log -1 --format='%H' --grep='^feat: bootstrap Korea Map Kit monorepo$'`로 식별한다. 산출물은 발행하지 않았고 서비스/DB/클라우드 계정을 만들지 않았다.
+
+### 구성과 비용 경로
+
+- SDK 5개, private 예제 2개, private 서비스 상태 경계 3개, private root. core는 외부 의존성 0개이고 ES-only다. 서비스는 descriptor만 내보내며 listener나 다운로드를 실행하지 않는다.
+- fixture 모드를 앱이 명시적으로 선택한다. 설정 누락/미지원 모드는 renderer 생성 전에 실패한다. 실제 운영자 HTTP provider는 아직 미구현이며 자동 기본 endpoint가 없다.
+- 초기 설치는 공개 registry를 사용한다. 모든 install hook은 `ignoreScripts: true`; 직접 버전/lockfile을 고정한다. 새 임시 workspace의 `pnpm offline:check`는 캐시에서 618개 패키지를 재사용해 성공했다. 해당 Linux `strace -f -e trace=connect` 관측에서 AF_INET/AF_INET6 connect 0건이었다.
+- SDK 함수/테스트는 API 키가 필요 없다. Web의 worker는 설치된 MapLibre에서 로컬 public 경로로 복사하고 BSD 고지를 함께 제공한다. GeoJSON/스타일은 직접 작성한 합성 fixture로 source/glyph/sprite/tile 원격 URL이 없다.
+- Next/Expo telemetry를 실행기에서 끄고 Expo dotenv/OTA를 비활성화했다. 실제 환경파일은 없다. `.env.example`만 Git에 들어간다. 사용자 provider 값은 클라이언트에 공개될 수 있다는 고지를 유지한다.
+- Next16.4 기본 agentUpgrade 조회가 초기 trace에서 공개 registry 접속을 시도했다. 공식 `experimental.agentUpgrade: false`로 일반 build의 자동 조회를 비활성화했다. 보안 검사를 생략하는 승인이 아니며 별도 `pnpm audit` 결과를 아래와 같이 보존한다.
+- Expo58의 `lan-network`가 로컬 인터페이스 선택을 위해 UDP connect 방식으로 기본 경로를 검사하는 점을 조사했다. SDK provider 요청이나 제작자 과금 endpoint가 아니다. `EXPO_OFFLINE`에서도 이 내부 주소 탐색이 실행될 수 있으며 기본 build 전체를 단순히 “모든 socket 생성 0”으로 표현하지 않는다. 최종 실행 관측은 진행 기록에 추가한다.
+
+### 검사 결과와 한계
+
+| 대상 | 결과 | 범위/제한 |
+| --- | --- | --- |
+| 단위/타입/경계/lint/format | 통과 | core·fixture·web lifecycle 단위 테스트 16개, 실제 Native rendering 아님 |
+| SDK/services/Next/Expo build | 통과 | Expo는 Android/iOS JavaScript export, APK/IPA 아님 |
+| Web Chromium E2E | 통과 | 로드·pan·합성검색·새로고침, 관측 외부 HTTP 요청 0, pageerror 0 |
+| SDK tarball 5개 | 정적 검사 통과 | 실제 pack 내용에 JS/d.ts/MIT 고지/manifest/README만 포함; 발행 없음 |
+| Git 작업 트리/index/이력 | 정적 검사 통과 | heuristic rule 범위; 배포물 전체의 임의 secret 부재를 증명하지 않음 |
+| Python 감사 회귀 | 11개 통과 | 이력/index/합성 token/tar/CI 규칙 |
+| Native 실빌드·실화면·네트워크 | 미검증 | Android SDK/ADB와 macOS/Xcode 실행 환경 없음 |
+| 초기 온라인 설치 전체 packet inventory | 미수집 | registry 조회 및 scripts 차단 확인과 캐시 오프라인 재설치 증거로 구분 |
+| 원격 CI | PR checks를 근거로 별도 확인 | workflow 작성만으로 3 OS 실행 성공을 주장하지 않음 |
+| 결제 계정/운영 데모 | 변경·배포 없음 | 실제 무료 한도/과금 설정 검증 전 운영 배포 금지 |
+
+브라우저 QA는 context 요청 계측/차단과 화면 관찰이며 OS/Native 모든 전송 경로의 완전한 증거는 아니다. service worker는 차단하며 로컬 MapLibre worker를 사용했다. Linux syscall 추적은 작업 환경에 한정한다. `unshare -n` 네트워크 namespace 격리는 권한 부족으로 실행 불가였으므로 격리 환경 검증으로 보고하지 않는다.
+
+### 의존성 보안 — 미통과, 출시 차단
+
+`pnpm audit --json`의 최초 결과는 moderate1/high2였다. `xcode>uuid`를 CommonJS v4 호환이 있는 11.1.1로 한정 override하고 합성 xcode project ID 생성·빌드를 재검증해 moderate 항목을 제거했다. 최종 결과는 **high 2, critical 0**, exit code 1이다. suppression/ignoreCves로 통과 처리하지 않았다.
+
+| 패키지/경로 | 알려진 문제 | 현재 조치 |
+| --- | --- | --- |
+| node-forge 1.4.0 / Expo CLI·code-signing 도구 | [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv), signature 검증 | registry 수정 버전 없음. 클라우드/서명 기능 미사용, 배포 차단; upstream 수정 후 갱신·재검증 |
+| braces 3.0.3 / Metro file-map | [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) | registry 수정 버전 없음. 신뢰된 로컬 소스 fixture에서만 검증; upstream 수정 후 갱신·재검증 |
+
+이 항목은 MIT SDK 자체 코드의 취약점 여부와 별개로 소비 앱/도구 공급망 위험이다. 영향을 자동으로 무시하지 않으며 제품 전체 보안 합격·출시 완료를 선언하지 않는다. 실제 서비스 연결/불특정 입력 처리/패키지 발행 전에 해결 또는 검토된 대체 도구 결정이 필요하다.
+
+### GitHub Actions 비용
+
+이번 사용자 지시에 따라 무료 표준 runner 3종으로 CI를 구성했다. cache·artifact 업로드·스케줄·대형 runner·배포·발행은 없다. setup-node 자동 cache도 `package-manager-cache: false`로 끄고 실행당 20분 timeout과 concurrency 취소를 둔다. 공개 저장소의 표준 runner 무료 조건을 적용하며 결제 한도를 올리지 않는다. `contents: read` 및 checkout credential 비보존이다. 워크플로를 실제 실행한 결과/차단은 PR checks와 진행 기록/사용자 보고를 따른다.
+
+### 재현 명령
+
+```sh
+pnpm install --frozen-lockfile
+pnpm check
+pnpm offline:check
+pnpm pack:check
+pnpm exec playwright install chromium
+pnpm test:web
+pnpm audit --json
+```
+
+마지막 audit는 현재 high2로 실패한다. 앞선 기능/정적 검사 통과를 이 실패의 해결로 해석하지 않는다. artifact hash와 실행 플랫폼/미검증은 [foundation 검증 기록](research/foundation-validation.md)에 보존한다.

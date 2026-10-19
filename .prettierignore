@@ -1,0 +1,14 @@
+pnpm-lock.yaml
+node_modules
+**/dist
+**/.next
+**/.expo
+**/next-env.d.ts
+**/*.tsbuildinfo
+artifacts
+playwright-report
+test-results
+examples/web/public/vendor
+# Preserve the existing design history; new/edited prose is checked by check-design.py.
+docs
+AGENTS.md

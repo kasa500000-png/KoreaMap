@@ -1,0 +1,12 @@
+packages:
+  - packages/*
+  - examples/*
+  - services/*
+# Dependency lifecycle scripts never run implicitly during install.
+ignoreScripts: true
+strictPeerDependencies: true
+minimumReleaseAge: 1440
+
+# xcode uses uuid.v4; 11.1.1 retains its CommonJS API and fixes GHSA-w5hq-g745-h8pq.
+overrides:
+  'xcode>uuid': 11.1.1

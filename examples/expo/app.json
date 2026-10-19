@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Korea Map Kit Local",
+    "slug": "korea-map-kit-local",
+    "version": "0.1.0",
+    "platforms": ["android", "ios"],
+    "plugins": ["@maplibre/maplibre-react-native"],
+    "android": {
+      "package": "org.koreamapkit.example"
+    },
+    "ios": {
+      "bundleIdentifier": "org.koreamapkit.example"
+    },
+    "updates": {
+      "enabled": false
+    }
+  }
+}

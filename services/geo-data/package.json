@@ -1,0 +1,11 @@
+{
+  "name": "@korea-map-kit/service-geo-data",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b"
+  }
+}
