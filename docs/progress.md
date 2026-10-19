@@ -523,3 +523,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 지역 한국 graph/원본은 ignored 상태로 보존하고 QA용 컨테이너/gateway는 종료한다.
 커밋 전 index 데이터·비용 감사와 diff를 확인한다. 원격 CI의 실제 결과는 해당 PR checks를 따른다.
 기존 high2, 현장/전국 품질·운영 부하·Native 기기·OS 전체 egress·이미지 CVE 검증은 잔여다.
+
+## React Native SDK — 2026-10-19
+
+1. **구현:** 공통 MapController와 MapLibre RN 11.5.0을 연결한 지도/카메라/마커·닫기 카드/GeoJSON·경로·이벤트를 확장했다. 명시적 XYZ/glyph/sprite, 실험 PMTiles 및 HTTP fallback source, 4종 테마·레이어 예제, 접근 가능한 장소 버튼과 제스처 전환, 스타일 revision·카메라 유지·리스너 정리를 추가했다. 기존 foreground GPS 동의/권한/정확도·기록 화면을 유지한다.
+2. **파일:** `packages/native/src/{index.tsx,controller.ts,resources.ts}`, Native README, `examples/expo/{App.tsx,app.json,package.json,.env.example,README.md}`, lockfile, Native 단위 테스트, Changeset·publication 원장, AGENTS/README/공통 API·roadmap·cost 문서, 공식 Android 문서 검토와 비용 회귀 검사를 변경했다. [설치 가이드](native-sdk.md), [검증 기록](research/native-sdk-validation.md).
+3. **테스트:** 최종 `pnpm check` 통과: Vitest95/12파일, 독립 core1, 데이터 정책18, 비용 회귀16, strict/Native 실제 타입·lint/format·API/문서·Next production·Expo Android/iOS JS export. SDK5개 실제 `pnpm pack:check` 통과. Android/iOS prebuild 후 Android x86_64 Development Build APK Gradle 컴파일 성공(최종 2m 3s). APK SHA256는 검증 문서에 기록했다. npm audit는 기존 high2로 실패, 출시 차단 유지.
+4. **실화면 QA:** Expo Go를 사용하지 않았다. 하드웨어 가속 없는 API35 x86_64 에뮬레이터를 설치·기동했으나 부팅 중 package service 부재 및 APK 설치 45초 timeout으로 앱 화면을 검증하지 못했다. black boot 캡처는 지도 렌더링 성공 증거가 아니다. Android 실제 기기 없음, iOS/Xcode 없음. 터치·회전·복귀·OS 권한·native 메모리·4종 테마/한글 glyph와 PMTiles/HTTP 네이티브 렌더링은 미검증이다.
+5. **라이선스·보안:** SDK/합성 자료 MIT, 상위 native/font/data 조건 분리. 제3자 지도/font payload·서명·APK는 Git/npm에 포함하지 않는다. 기본 리소스 요청 endpoint 없음; operator origin 입력 검사는 native redirect 방화벽이 아니다. worktree/index/history/tarball 정적 감사는 OS 전체 네트워크 감사를 대체하지 않는다. node-forge/braces high2 해결 필요.
+6. **남은 작업:** 실제 ARM64 Android 및 iOS 빌드/기기·한글 glyph·PMTiles/XYZ·네트워크 capture·장시간 heap/GPU·제스처/회전/복귀/권한 QA. 개발 APK는 x86_64 전용이며 물리 기기 설치 패키지가 아니다. 배경 지속 GPS·자동 native redirect 제어·파일 PMTiles는 미지원이다.
+7. **Git:** `feat/native-sdk`, 커밋 식별: `git log -1 --format=%H feat/native-sdk`. `feat/self-hosted-routing` 위에 Draft PR을 구성한다. main 병합·운영 배포·npm 발행은 수행하지 않는다.
+8. **다음 단계:** 코드 리뷰 및 기기 QA 준비는 가능하다. M4 전체/실화면 합격/공개 출시 완료로 처리하지 않는다.

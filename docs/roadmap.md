@@ -82,7 +82,7 @@ Web 로컬 합성 데이터와 설치된 Noto CJK를 검증한다. Native 라벨
 
 `feat/shared-public-api`에서 M4의 공통 `MapController`, 지리·스타일·GeoJSON·오류·취소·Provider 계약과 Web/Native bridge를 구현했다. [계약·기능 동등성](public-api.md), [생성 API 문서](api/core.md), [검증 기록](research/public-api-validation.md)을 따른다. 이전 Web API를 보존하고 Changesets minor로 신규 계약·오류 code 확장을 관리한다.
 
-Web은 실제 스타일 교체·overlay 유지까지 검증한다. Native 카메라/마커/도형/경로/ref는 구현했지만 실제 기기와 native renderer 수명 검증은 M4 잔여 작업이다. Native 외부 리소스 차단 interceptor, glyph 공급 설정과 디바이스 QA가 준비되기 전 외부 스타일은 명시적으로 미지원 처리한다. 검색/GPS/DB/실제 routing 엔진은 인터페이스 구현과 별개이며 M5/M6에서 선택적으로 연결한다.
+Web은 실제 스타일 교체·overlay 유지까지 검증한다. Native 카메라/마커/도형/경로/ref는 구현했지만 실제 기기와 native renderer 수명 검증은 M4 잔여 작업이다. 당시 Native 외부 스타일은 미지원이었다. 아래 Native 확장에서 명시적 운영자 리소스 입력 검사를 추가하며 실제 기기 요청 감사는 계속 출시 조건으로 남긴다. 검색/GPS/DB/실제 routing 엔진은 인터페이스 구현과 별개이며 M5/M6에서 선택적으로 연결한다.
 ## 공공 POI ETL / M6 일부 구현
 
 `feat/public-poi-etl`에서 세 A CSV 프로파일의 명시적 다운로드/검증, PostGIS 좌표 변환·upsert·복구·로그,
@@ -117,3 +117,14 @@ background 지속 수집은 별도 설계/기기 QA 후 결정한다. 장기 저
 
 전국 통행 품질·안전·부하/SLA·경계 clipping/변경분 갱신·실시간 교통·내비게이션·Native 기기 화면은 미완료다.
 이번 구현으로 M5 전체 또는 공개 제품 출시 완료를 표시하지 않는다.
+
+## React Native SDK / M4 확장
+
+`feat/native-sdk`에서 명시적 운영자 XYZ/glyph/sprite와 실험 PMTiles/HTTP 대체 경로,
+4종 테마 예제·선택 카드·제스처 설정·스타일 세대/정리 처리를 추가한다.
+Expo Development Build 설정과 엔진 버전을 고정한다. [설치 가이드](native-sdk.md),
+[검증 기록](research/native-sdk-validation.md)을 따른다.
+
+PMTiles RN 런타임, 한글 glyph, 물리 기기·iOS·장시간 메모리/OS lifecycle QA는 검증 결과에 따라
+별도로 판정한다. 단위 검사·JS export·prebuild를 Native 렌더링 성공으로 취급하지 않는다.
+전체 플랫폼 M4 또는 공개 출시 완료를 선언하지 않는다.

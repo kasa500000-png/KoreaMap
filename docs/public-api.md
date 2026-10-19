@@ -84,7 +84,7 @@ if (browserAbort.signal.aborted) request.cancel();
 | PlaceRepository | get/put/remove. get의 미존재 값은 null; 인가·영속성은 구현 책임 |
 | TileProvider | id/attribution/costResponsibility='operator', getStyle(options). SDK가 자동 조회·선택하지 않음 |
 
-어댑터 인스턴스는 사용자가 생성·주입한다. core는 fetch, Supabase, DB schema, 특정 HTTP transport, 계정 정보를 갖지 않는다. TileProvider 반환값을 setStyle에 넘겨도 처음 mount 때 지정한 Web allowedOrigins는 확대되지 않는다. 외부 리소스 사용에는 운영자 URL·허용 origin·비용 동의를 포함한 기존 WebMapConfig가 필요하다. Native는 origin별 요청 차단을 아직 구현하지 않아 외부 source/glyph/sprite 및 symbol 스타일을 `UNSUPPORTED`로 거부한다. 라이브 검색·지오코딩·경로·GPS·DB 구현을 이번 계약 추가만으로 완료했다고 보지 않는다.
+어댑터 인스턴스는 사용자가 생성·주입한다. core는 fetch, Supabase, DB schema, 특정 HTTP transport, 계정 정보를 갖지 않는다. TileProvider 반환값을 setStyle에 넘겨도 처음 mount 때 지정한 Web allowedOrigins는 확대되지 않는다. 외부 리소스 사용에는 운영자 URL·허용 origin·비용 동의를 포함한 기존 WebMapConfig가 필요하다. Native는 명시적 operator config의 직접 XYZ/glyph/sprite를 입력 검사 후 허용한다. remote style/TileJSON 탐색은 거부하며 native HTTP redirect 차단은 보장하지 않는다. [설치·정책](native-sdk.md)을 따른다. 라이브 검색·지오코딩·경로·GPS·DB 구현을 이번 계약 추가만으로 완료했다고 보지 않는다.
 
 ## SDK 사용
 
@@ -122,10 +122,10 @@ Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 R
 | setCenter/setZoom/setCamera/fitBounds | 실제 Chromium 검증 | bridge 구현·mock 검증; 기기 미검증 | bridge 구현·mock 검증; 기기 미검증 |
 | add/removeMarker, GeoJSON, showRoute | 실제 렌더링 검증 | 선언형 Source/Layer 구현; 기기 미검증 | 선언형 Source/Layer 구현; 기기 미검증 |
 | getVisibleBounds/날짜변경선 | 렌더러 경계 + 순수 함수/브리지 테스트 | bridge 구현·mock 검증 | bridge 구현·mock 검증 |
-| setStyle 및 overlay 유지 | 실제 반복 교체 검증 | 로컬 도형 스타일만 구현; 렌더링 미검증 | 로컬 도형 스타일만 구현; 렌더링 미검증 |
-| 외부 tiles/glyph/sprite | 초기 허용 origin 정책 아래 사용 가능 | 미지원, 명시적 거부 | 미지원, 명시적 거부 |
+| setStyle 및 overlay 유지 | 실제 반복 교체 검증 | 4종 테마·운영자 스타일 구현; 렌더링 미검증 | 4종 테마·운영자 스타일 구현; 렌더링 미검증 |
+| 외부 tiles/glyph/sprite | 초기 허용 origin 정책 아래 사용 가능 | 명시적 운영자 설정·입력 검사; 기기 미검증 | 명시적 운영자 설정·입력 검사; 기기 미검증 |
 | MapEvent | 실제 카메라·선택·종료 연결 | event props 연결, 화면 미검증 | event props 연결, 화면 미검증 |
-| 선택 UI/접근성 | 키보드 selector/팝업 검증 | 터치 선택·Text 표시 구현; 접근성 QA 미검증 | 터치 선택·Text 표시 구현; 접근성 QA 미검증 |
+| 선택 UI/접근성 | 키보드 selector/팝업 검증 | 터치·장소 버튼·닫기 카드 구현; 접근성 QA 미검증 | 터치·장소 버튼·닫기 카드 구현; 접근성 QA 미검증 |
 | 취소/timeout/종료 | core 단위 + 실제 pre-cancel/종료 | core·mock bridge 통과, 기기 lifecycle 미검증 | core·mock bridge 통과, 기기 lifecycle 미검증 |
 | 검색/라우팅/GPS/POI | 선택형 PostGIS/Valhalla·foreground GPS 및 Web 검증. 별도 가이드 참조 | 같은 Provider·foreground Expo 어댑터. 실제 기기 통합 미검증 | 같은 Provider·foreground Expo 어댑터. 실제 기기 통합 미검증 |
 

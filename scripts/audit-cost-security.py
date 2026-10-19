@@ -37,6 +37,7 @@ OFFLINE_REFERENCE_URLS = {
     "scripts/audit-cost-security.py": {"https://registry.npmjs.org/"},
 }
 DOCUMENTATION_HOSTS = {
+    "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
     "www.w3.org", "www.topografix.com",  # Geolocation / GPX specifications, docs only.
     "www.postgresql.org",  # Reviewed SQL documentation, not a runtime endpoint.
     "csv.js.org",  # Reviewed parser documentation only; never a runtime provider.

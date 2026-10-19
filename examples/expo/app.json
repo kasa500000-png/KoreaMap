@@ -5,16 +5,35 @@
     "version": "0.1.0",
     "platforms": ["android", "ios"],
     "plugins": [
-      "@maplibre/maplibre-react-native",
+      [
+        "@maplibre/maplibre-react-native",
+        {
+          "android": {
+            "nativeVersion": "13.6.1",
+            "nativeVariant": "opengl",
+            "locationEngine": "default"
+          },
+          "ios": {
+            "nativeVersion": "6.31.0"
+          }
+        }
+      ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "선택한 GPS 기능에서만 위치와 이동 경로를 기기 메모리에 기록합니다.",
+          "locationWhenInUsePermission": "\uc120\ud0dd\ud55c GPS \uae30\ub2a5\uc5d0\uc11c\ub9cc \uc704\uce58\uc640 \uc774\ub3d9 \uacbd\ub85c\ub97c \uae30\uae30 \uba54\ubaa8\ub9ac\uc5d0 \uae30\ub85d\ud569\ub2c8\ub2e4.",
           "locationAlwaysPermission": false,
           "locationAlwaysAndWhenInUsePermission": false,
           "isIosBackgroundLocationEnabled": false,
           "isAndroidBackgroundLocationEnabled": false,
           "isAndroidForegroundServiceEnabled": false
+        }
+      ],
+      [
+        "expo-dev-client",
+        {
+          "launchMode": "launcher",
+          "addGeneratedScheme": false
         }
       ]
     ],
@@ -26,6 +45,7 @@
     },
     "updates": {
       "enabled": false
-    }
+    },
+    "scheme": "koreamapkit-local"
   }
 }

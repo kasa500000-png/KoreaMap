@@ -131,3 +131,9 @@
 - 모든 모드·경유점·스냅·오류를 검증한다. 실패를 직선이나 다른 이동 모드로 대체하지 않는다. 실제 교통·안전·현장 통행 가능성을 보장하지 않는다.
 - 라우팅 엔진/어댑터/운영 스크립트 변경 시 `pnpm test:routing`의 실제 Docker 통합 검사를 실행한다. 합성 그래프·한국 공개 OSM 표본·현장 검증 결과를 구분한다.
 - 지역 갱신은 A 원장/검토기한/해시/기준일/ODbL opt-in과 새 graph smoke 뒤 진행한다. 실패 시 이전 세대를 보존하고 전환/롤백은 명시적으로 수행한다.
+
+## Native SDK 검증 기준
+
+- MapLibre RN·Expo·React Native 및 native engine 버전을 정확히 고정하고 공식 호환성·New Architecture·config plugin 결과를 기록한다. Expo Go, JS export 또는 prebuild를 Android/iOS Development Build·실화면 검증으로 표시하지 않는다.
+- Native provider는 명시적 operator config로만 받는다. 리소스 입력 origin 검사를 native redirect 방화벽으로 표현하지 않는다. PMTiles의 엔진 문서상 지원과 RN/OS 실제 실행 결과를 구분하며 일반 HTTP XYZ 대체 설정을 유지한다.
+- Native 변경은 `docs/research/native-sdk-validation.md`에 APK/IPA 컴파일, 실기기/에뮬레이터, 한글 glyph, 제스처·회전·복귀·권한·메모리·테마 결과와 미검증 항목을 기록한다. 생성 프로젝트·서명·APK·지도/font payload는 Git/npm에 포함하지 않는다.

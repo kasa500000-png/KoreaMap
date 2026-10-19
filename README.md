@@ -104,3 +104,5 @@ Android/iOS 실제 기기·백그라운드 검증은 미완료다. 장기 저장
 공급자 미설정·연결 불가에서도 지도는 동작하고 직선 fallback은 없다. 실시간 교통·보행 안전은 보장하지 않는다.
 SDK 코드는 무료이며 OSM 다운로드·graph 갱신·라우팅 서버의 CPU/RAM/저장·전송 비용은 해당 운영자가 부담한다.
 OSM/파생 graph는 ODbL이고 Git/npm에 포함하지 않는다. [실제 한국 데이터/합성 검증 기록](docs/research/routing-validation.md).
+
+Native Development Build 설치, 4종 테마·운영자 타일·한글 glyph·PMTiles 제한은 [Native SDK 가이드](docs/native-sdk.md)를 따른다.
