@@ -106,3 +106,7 @@ SDK 코드는 무료이며 OSM 다운로드·graph 갱신·라우팅 서버의 C
 OSM/파생 graph는 ODbL이고 Git/npm에 포함하지 않는다. [실제 한국 데이터/합성 검증 기록](docs/research/routing-validation.md).
 
 Native Development Build 설치, 4종 테마·운영자 타일·한글 glyph·PMTiles 제한은 [Native SDK 가이드](docs/native-sdk.md)를 따른다.
+
+두 활용 예제: [반려견 산책 지도·여행 일정 지도](docs/example-apps.md).
+Web `/walk/`, `/trip/` 및 Expo의 산책/여행 화면에서 동일한 core API를 사용한다.
+모든 사용자·장소·GPS는 자체 합성 자료이며 저장·일정 정책은 SDK 밖의 private 예제에 둔다.

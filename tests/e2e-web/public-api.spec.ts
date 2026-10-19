@@ -20,7 +20,11 @@ test('common API: camera/bounds, overlays and markers survive style replacement;
     await page.getByRole('button', { name: '공통 API 실행', exact: true }).click();
     await expect(page.getByTestId('api-status')).toHaveText('passed');
     await expect(page.getByTestId('api-rendered')).toHaveText('1 / 3');
-    await expect(page.getByText('자체 합성 공통 API 예제 · MIT', { exact: true })).toBeVisible();
+    await expect(page.locator('.maplibregl-ctrl-attrib')).toHaveCount(1);
+    await expect(page.locator('.maplibregl-ctrl-attrib')).toBeVisible();
+    await expect(page.locator('.maplibregl-ctrl-attrib')).toContainText(
+      '자체 합성 공통 API 예제 · MIT',
+    );
     const bounds = JSON.parse(await page.getByTestId('api-result').innerText()) as {
       west: number;
       east: number;

@@ -303,3 +303,17 @@ Web 외부 HTTP 시도0. 이는 OS 전체 또는 원격 과금 계정의 안전�
 - 로컬 SDK/Gradle/에뮬레이터 다운로드는 개발 검증용이며 SDK 설치 hook이 아니다. 인증/결제 계정 없이 수행한다. APK/생성 프로젝트·SDK·타일·glyph·폰트·실화면은 Git/npm에 포함하지 않는다.
 - npm audit high 2(node-forge, braces) 유지, exit 1. 취약점 해결 및 native runtime 네트워크/메모리/실기기/iOS QA 전 공개 출시 차단 유지.
 - 최종 worktree/index/history/tarball 결과와 실제 빌드 상태는 [Native 검증 기록](research/native-sdk-validation.md), [진행 기록](progress.md)에 구분해 기록한다.
+
+## 두 예제 앱 감사 — 2026-10-19
+
+- private `examples/scenarios`에만 산책/여행 분기·가짜 장소·저장 정책을 둔다. SDK가 이 패키지를 import하지 않으며 npm SDK tarball에 포함하지 않는다.
+- 새 예제는 실제 GPS/외부 검색·라우팅·tile/glyph API를 호출하지 않는다. 모든 지도와 사용자 기록은 합성 자료다. Web localStorage/Native AsyncStorage의 지정 키에 명시적 저장만 수행한다.
+- AsyncStorage 2.2.0(MIT)은 Expo 권장 버전으로 고정한 예제 전용 의존성이다. 저장 내용은 비암호화이며 실제 개인정보 정책으로 재사용하지 않는다. 서버·키·과금 계정·OTA를 추가하지 않았다.
+- Android SDK/JDK 다운로드와 Gradle dependency resolution은 로컬 개발 빌드에서만 수행한다. JDK는 공식 metadata checksum과 환경 CA trust를 유지하며 APK·기기 로그·캡처는 ignored artifacts에만 둔다.
+- 검토된 private scenario 소스를 데이터 출처 해시 검사에 포함하고 누락을 거부하는 회귀 검사를 추가한다. APK/지도/font payload 공개 허용 규칙을 확대하지 않는다.
+- 실제 브라우저 시나리오에서 외부 요청 0을 검사한다. Native OS 전체 egress/암호화/실기기 보안 보증은 아니다. 최종 검사·npm audit 결과는 검증/진행 문서를 따른다.
+
+로컬 최종 확인: check(99 단위/19 데이터/16 비용 회귀), SDK tarball5, Web E2E12 통과.
+새 두 앱의 Web 외부 HTTP 시도0, worktree/index/도달 가능한 history/tarball 정적 findings0.
+Android APK 빌드·설치 및 합성 앱 화면 실행은 성공했다. 초기 startup ANR가 있었으며 OS 전체 요청 검증은 미완료다.
+npm audit는 기존 high2/exit1이며 공개 출시 차단을 유지한다.

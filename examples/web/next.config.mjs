@@ -7,6 +7,7 @@ const config = {
   reactStrictMode: true,
   poweredByHeader: false,
   transpilePackages: [
+    '@korea-map-kit/example-scenarios',
     '@korea-map-kit/core',
     '@korea-map-kit/web',
     '@korea-map-kit/styles',

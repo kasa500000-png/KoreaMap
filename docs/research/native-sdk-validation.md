@@ -99,3 +99,10 @@ boot 스크린샷은 검은 화면으로 직접 확인했으며 앱/지도 화�
 로그·APK·캡처는 ignored `artifacts/native/`에만 보관한다. 실제 Android 기기 미연결,
 iOS 환경 부재와 함께 실화면 QA 차단으로 기록한다. PMTiles와 HTTP fallback의 native 렌더링을
 단위 검사나 문서상 엔진 지원으로 대체하지 않는다.
+
+## 후속 소비 앱 검증 — 2026-10-19
+
+산책/여행 예제와 AsyncStorage를 포함한 x86_64 개발 APK 빌드·설치는 성공했다.
+이번 API35 에뮬레이터는 초기 System UI 및 앱 startup ANR가 있었으나 사전 컴파일 후
+실제 산책/여행 합성 지도 화면까지 실행했다. 기능별 확인 범위와 남은 QA는 [상세 결과](example-apps-validation.md)를 따른다.
+이 결과는 이전 PMTiles/XYZ·한글 glyph·제스처·실기기/iOS 미검증 판정을 해제하지 않는다.

@@ -43,7 +43,7 @@ JSON_METADATA = DATA_METADATA | {
     'examples/expo/app.json', 'docs/research/dependency-snapshot.json',
     'docs/research/toolchain-snapshot.json', 'docs/research/ux-observations.json',
 } | {f'{directory}/{name}' for directory in
-     [*(f'packages/{name}' for name in SDK), 'examples/web', 'examples/expo',
+     [*(f'packages/{name}' for name in SDK), 'examples/web', 'examples/expo', 'examples/scenarios',
       'services/geo-data', 'services/search', 'services/routing']
      for name in ('package.json', 'tsconfig.json')}
 
@@ -136,6 +136,7 @@ def runtime_source(path):
     parts = PurePosixPath(path).parts
     return ((len(parts) >= 4 and parts[0] in {'packages', 'services'} and parts[2] == 'src')
             or path.startswith('examples/web/app/')
+            or path.startswith('examples/scenarios/src/')
             or (path.startswith('examples/expo/') and PurePosixPath(path).suffix in {'.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'}))
 
 

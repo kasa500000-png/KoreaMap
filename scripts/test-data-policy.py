@@ -128,6 +128,13 @@ class DataPolicyTest(unittest.TestCase):
         inv['runtimeSources'] = {p:dict(sha256=hashlib.sha256(b).hexdigest(), origin='project-authored', license='MIT') for p,b in files.items()}
         check_inventory(files, inv)
 
+    def test_private_scenario_source_requires_provenance_review(self):
+        files = {'examples/scenarios/src/index.ts': b'export const screen = 1;\n'}
+        inv = {'schemaVersion':1, 'reviewedAt':'2026-10-19', 'thirdPartyPayloads':[], 'runtimeSources':{}}
+        with self.assertRaises(ValueError): check_inventory(files, inv)
+        inv['runtimeSources'] = {p:dict(sha256=hashlib.sha256(b).hexdigest(), origin='project-authored', license='MIT') for p,b in files.items()}
+        check_inventory(files, inv)
+
     def test_tarball_manifest_cannot_smuggle_extra_fields(self):
         manifest = {'name': '@korea-map-kit/core', 'license': 'MIT',
                     'files': ['dist/**/*.js', 'dist/**/*.d.ts', 'dist/LICENSE', 'README.md']}
