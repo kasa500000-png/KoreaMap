@@ -136,3 +136,5 @@ PMTiles RN 런타임, 한글 glyph, 물리 기기·iOS·장시간 메모리/OS l
 SDK에는 bounds 유틸리티와 Web 출처 컨트롤 수정만 추가한다.
 [가이드](example-apps.md), [검증 기록](research/example-apps-validation.md).
 합성 UX 검증이며 실데이터 길찾기·실GPS·전국 검색·iOS/물리 기기 또는 공개 출시 완료가 아니다.
+
+Web E2E12와 Linux/Windows/macOS CI가 통과했다. Android API35 개발 APK에서 두 지도·산책 저장/복원/재생·여행 날짜/연결선·테마 전환을 실제 확인했다. 초기 ANR/소프트웨어 실행 지연과 전체 모바일 QA·물리 기기/iOS 미검증은 후속 검증 기록에 유지한다.

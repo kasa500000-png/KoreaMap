@@ -315,5 +315,5 @@ Web 외부 HTTP 시도0. 이는 OS 전체 또는 원격 과금 계정의 안전�
 
 로컬 최종 확인: check(99 단위/19 데이터/16 비용 회귀), SDK tarball5, Web E2E12 통과.
 새 두 앱의 Web 외부 HTTP 시도0, worktree/index/도달 가능한 history/tarball 정적 findings0.
-Android APK 빌드·설치는 성공했지만 startup ANR로 런타임 요청 검증은 미완료다.
+Android APK 빌드·설치 및 합성 앱 화면 실행은 성공했다. 초기 startup ANR가 있었으며 OS 전체 요청 검증은 미완료다.
 npm audit는 기존 high2/exit1이며 공개 출시 차단을 유지한다.

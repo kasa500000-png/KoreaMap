@@ -68,9 +68,8 @@ UI 미표시/백그라운드 전환 때 구독·타이머·replay를 정리하�
   로컬 산출물 `artifacts/scenarios/app-debug.apk`는 Git/npm 제외다.
 - 기동 시 System UI ANR와 앱의 `failed to complete startup` ANR가 관찰되었다. CPU pressure
   avg10 약 68.71%, KVM 없는 소프트웨어 에뮬레이터다. 해상도를 540×960으로 줄이고 OS animation을
-  끈 뒤 재시도했으나 현재까지 앱 UI를 확인하지 못했다. Metro의 JS 화면 렌더링까지 도달한 증거가 없다.
-  따라서 **Android 두 앱 실화면·터치·저장·복귀·성능 QA는 미검증**이며 빌드/설치 성공과 구분한다.
-  에뮬레이터 문제만이 원인이라고 확정하거나 앱 정상 작동을 주장하지 않는다.
+  끈 초기 재시도에서는 앱 UI를 확인하지 못했다. 이후 사전 컴파일·개발 메뉴 닫기 뒤 실행된
+  **최종 Android 결과는 아래 후속 검사 기록**을 따른다. 초기 ANR의 원인을 에뮬레이터만으로 확정하지 않는다.
 - 실제 Android 기기 및 iOS Development Build/실화면은 환경 부재로 미검증이다.
 - npm audit: high 2(node-forge/braces), exit 1. 기존 출시 차단 항목을 유지한다.
   worktree/index/history/tarball 정적 검사는 findings 0이나 Native OS 전체 egress를 증명하지 않는다.
@@ -79,3 +78,32 @@ Android 재현: Native 가이드의 development build를 설치하고 `pnpm dev:
 ADB reverse `tcp:8081 tcp:8081` 후 개발 클라이언트를 로컬 Metro에 연결하고 상단 산책 앱/여행 앱에서
 이 문서의 Web과 동일한 흐름을 실행한다. UI 계층과 logcat, 캡처는 ignored artifacts에 저장한다.
 남은 QA는 가속 에뮬레이터/실기기에서 먼저 수행하며, iOS는 macOS/Xcode 환경에서 별도로 수행한다.
+
+### 후속 Android 실행 및 CI 확인
+
+위 ANR 재현 뒤 OS 패키지 관리자의 `cmd package compile -m speed -f org.koreamapkit.example`가
+성공했다. 이 사전 컴파일과 낮춘 해상도로 재시도했으며 ANR timeout을 해제하거나 앱 코드를 우회하지 않았다.
+개발 클라이언트의 첫 실행 안내를 닫은 뒤 Metro bundle(828 modules)과 React Fabric 실행,
+**산책 지도의 준비 완료·실제 MapLibre 도형·3개 시설 마커·한글 UI·항상 보이는 출처**를 확인했다.
+따라서 위의 '앱 화면까지 미도달'은 초기 시도의 결과이며 최종적으로 지도 표시까지는 실행되었다.
+UI 계층의 버튼 bounds로 조작하고 캡처를 직접 확인했다. 소프트웨어 환경의 긴 첫 실행과 ANR는
+여전히 성능 합격 근거가 아니며 물리 기기/가속 환경 검증이 필요하다.
+
+구현 커밋 `30792ba4ee1a311b498c84efd4f790890e6a7ecb`의
+[GitHub Actions](https://github.com/kasa500000-png/KoreaMap/actions/runs/39251573849)는
+Linux·Windows·macOS 모두 success다. Linux의 Web12와 기존 실제 PostGIS/Valhalla 회귀도 포함한다.
+연결된 GitHub 커넥터로 [Draft PR #13](https://github.com/kasa500000-png/KoreaMap/pull/13)을 생성했다.
+
+
+| Android 실제 확인 | 결과 |
+| --- | --- |
+| 지도·UI | 산책 Pastel/Outdoor, 여행 Standard, 자체 도형·시설 마커·한글 UI·출처 표시 직접 캡처 확인 |
+| 산책 | 시작 후 recording 2점, 종료 5점/8.8m, 명시적 저장 1개, 여행 앱 왕복 후 저장 1개 복원, Outdoor에서 5점/8.8m 경로 다시 보기 완료 |
+| 여행 | 가상 장소 검색 목록, 1일차 2곳 저장, 2일차 0곳, 1일차 복귀 후 핀 2개·방문 연결선·카메라 확인 |
+| 터치/스크롤 | UI 계층에서 찾은 버튼 tap, 지도 조작 꺼짐 상태의 바깥 ScrollView 이동, 앱 메뉴 전환 확인 |
+| 남은 범위 | 실제 기기/iOS, 센서·한글 glyph, 지도 제스처 켜짐/회전/OS background·프로세스 종료, 전체 입력/카드 분기·장시간 성능·네트워크 감사 미검증 |
+
+`walk-ready.png`, `walk-saved.png`, `trip-controls.png`, `trip-route.png`, `walk-outdoor.png`, `walk-replay-finished.png`와
+대응 UI XML은 `artifacts/scenarios/`에서 직접 확인했다. APK·로그·이미지를 Git에 추가하지 않았다.
+사전 컴파일은 이 로컬 QA 기기에만 적용했으며 SDK/예제의 실행 전제나 설치 hook으로 만들지 않았다.
+초기 ANR와 긴 bridge/UI 지연이 있었으므로 Android 실행을 정상 기기 FPS·배터리 성능의 증거로 사용하지 않는다.
