@@ -68,3 +68,29 @@ export function createFixtureStyle(config: LocalMapConfig): StyleSpecification {
     ],
   };
 }
+
+export {
+  themeNames,
+  resolveTheme,
+  contrastRatio,
+  type ThemeName,
+  type DesignTokens,
+  type ThemeOverrides,
+} from './tokens.js';
+export {
+  createThemeStyle,
+  parseCustomStyle,
+  extendStyle,
+  type ThemeStyleOptions,
+  type TypographyConfig,
+  type FeatureKind,
+} from './themes.js';
+export {
+  koreanNameExpression,
+  resolveKoreanName,
+  requiredCodePoints,
+  auditGlyphCoverage,
+} from './labels.js';
+export { createPoiIcon, poiKinds, type PoiKind, type RgbaIcon } from './icons.js';
+export { createDesignFixture, designAttribution, designLabelCorpus } from './design-fixture.js';
+export { inspectFontCoverage } from './font-coverage.js';

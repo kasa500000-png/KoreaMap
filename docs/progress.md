@@ -412,3 +412,18 @@
 ### 최종 로컬 검사 확정
 
 `pnpm check`·`pnpm pack:check` 통과, 최종 Next 배포물 Playwright 4개 통과(0 skipped/flaky). SDK 상태/오류 단위 테스트를 포함한 Vitest 18개, 데이터 정책 16개, 비용 감사 11개 통과. 다섯 재생성 전후 GC heap 증가 +206,008 bytes; 공유 worker 1개 유지와 SDK 리스너/observer 해제 확인. artifact SHA와 범위는 Web 검증 문서에 기록했다. staged 검사를 통과한 뒤 커밋하며 원격 3 OS CI는 PR에서 확인한다.
+
+## 독립 지도 디자인 시스템 — 2026-10-19
+
+1. **구현:** Standard/Dark/Pastel/Outdoor 토큰·JSON 생성기, 도로/건물/녹지/수역/경계/POI/지명/배경·zoom 규칙, 사용자 색/테마 override, custom JSON/추가 source/layer, 자체 RGBA 아이콘. 한국어 fallback·cmap/glyph coverage·Web inline style/image API 및 Next `/themes/` 비교 예제.
+2. **파일:** packages/styles/src의 tokens/themes/labels/icons/design-fixture/font-coverage와 index, packages/web의 index/provider, examples/web의 themes 페이지·CSS·Next 설정·manifest/lockfile, 단위/E2E, scripts/check-font.mjs·data policy 검사, 네 screenshot과 publication manifest, CI·Changeset·AGENTS·README·디자인/폰트/비용/검증 문서.
+3. **테스트:** 4종 실제 Style Spec과 Native glyph 설정 계약, Noto KR face 1의 11,190 코드포인트 coverage, Chromium 테마/기존 SDK 회귀 검사를 실행한다. 최종 전체 검사·tarball·staged 결과는 아래 확정 기록에 추가한다.
+4. **실화면 QA:** Web Chromium 4종의 합성 지형·한글·아이콘·출처를 실제 캡처하고 직접 확인. Android/iOS·Safari/Firefox는 미검증. Web 결과를 Native 결과로 보고하지 않는다.
+5. **라이선스·보안:** 자체 코드/합성 fixture/아이콘은 MIT. Noto OFL-1.1 조건 확인, 폰트/glyph payload는 Git/npm 미포함. 외부 endpoint 기본값과 제작자 키 없음. 사용자 요청 screenshot 네 경로만 검토·해시 승인하며 원본 데이터 차단 유지. 기존 high2 미해결.
+6. **남은 작업:** REA/ADB/Ghidra/iOS 환경 부재. Native 실화면·운영자 glyph pack QA, 실제 tile 스키마 변환·지명 밀집/색각·전체 플랫폼 동등성 검증 필요. MapLibre 전역 worker 제한 유지.
+7. **Git:** `feat/map-design-system`, base `feat/web-map-sdk`의 `7eb09fce85b5dbbf4f33afe3b57da0ab7467f1e2`. 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: add independent map design system$'`. 테스트 후 커밋/푸시 및 연결된 GitHub 커넥터로 draft PR을 준비한다.
+8. **다음 단계:** 실제 타일·폰트/glyph 운영자 파이프라인 및 Native 시각 QA 개발 가능. 플랫폼 전체 검증 또는 출시 완료 판정은 불가하다.
+
+### 최종 로컬 검사 확정
+
+`pnpm check`(Vitest 31·데이터 정책 17·비용 감사 12), `pnpm pack:check`(5개 tarball), 최종 Next 배포물 Playwright 5개가 통과했다. Noto KR face 1의 11,190 코드포인트와 Chromium font 선택/실제 한글 raster·4종 화면·override 픽셀·출처 표시를 확인했다. 외부 HTTP 시도 0. staged 검사를 통과한 뒤 커밋하며 원격 결과는 해당 PR checks를 따른다. Android/iOS 렌더링 미검증과 high2 출시 차단은 유지한다.

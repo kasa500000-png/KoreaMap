@@ -71,3 +71,5 @@ main 병합·운영 배포·공개 전환·npm 발행에는 각각 명시적 승
 [공급원 조사](docs/data-sources.md), [데이터 라이선스](docs/data-licenses.md), [출처 표시](docs/attribution.md), [기계 판독 원장](data/sources.json)을 참고하세요. A 후보만 운영자 선택 후 수집 자격을 얻으며, B는 선택형 API, C/D는 제외합니다. 실제 외부 데이터는 Git/npm에 포함하지 않습니다. `pnpm check:data`, `pnpm test:data`, `pnpm pack:check`로 권리 메타데이터와 공개 산출물을 검사합니다.
 
 Web 지도 API와 Next 클라이언트 사용법은 [Web SDK 가이드](packages/web/README.md)를 참고하세요. 카메라·배치 마커·장소 카드·GeoJSON/경로 표시·사용자 레이어를 지원하며, 운영자 스타일은 명시적 URL/허용 origin/비용동의를 요구합니다. [실행 검증과 제한](docs/research/web-sdk-validation.md)에 Chromium 결과와 전역 worker 유지·실기기 미검증 사항을 기록합니다.
+
+Standard·Dark·Pastel·Outdoor의 [지도 디자인 시스템과 비교 화면](docs/design-system.md), [폰트·아이콘 라이선스 및 플랫폼 검증](docs/font-icon-licenses.md)을 제공합니다. `pnpm dev:web` 실행 후 `/themes/`에서 토큰 색상과 확대 레벨을 비교할 수 있습니다. 글꼴 파일과 실제 지도 데이터는 패키지에 포함하지 않습니다.

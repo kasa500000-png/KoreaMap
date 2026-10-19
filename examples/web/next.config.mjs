@@ -3,6 +3,7 @@ const config = {
   // Keep normal builds offline. Run pnpm audit explicitly; never hide its findings.
   experimental: { agentUpgrade: false },
   output: 'export',
+  trailingSlash: true,
   reactStrictMode: true,
   poweredByHeader: false,
   transpilePackages: [

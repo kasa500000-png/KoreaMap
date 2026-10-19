@@ -7,6 +7,8 @@ import json
 import re
 import subprocess
 import tarfile
+import struct
+import zlib
 
 OFFICIAL_HOSTS = {
     'download.geofabrik.de', 'www.openstreetmap.org', 'opendatacommons.org',
@@ -31,6 +33,9 @@ DATA_SUFFIXES = {'.pbf', '.osm', '.osc', '.pmtiles', '.mbtiles', '.shp', '.shx',
                  '.ttf', '.otf', '.zip', '.gz', '.tgz', '.pdf', '.xml', '.rdf',
                  '.jsonl', '.ndjson', '.parquet', '.feather', '.sql'}
 DATA_METADATA = {'data/sources.json', 'data/publication.json'}
+# User-requested, visually reviewed outputs of authored fixtures, never arbitrary assets.
+SCREENSHOTS = {f'docs/screenshots/themes/{name}.png' for name in ('standard','dark','pastel','outdoor')}
+
 # Exact reviewed configuration/research paths, never a general JSON data allowlist.
 JSON_METADATA = DATA_METADATA | {
     '.changeset/config.json', '.prettierrc.json', 'package.json',
@@ -134,9 +139,32 @@ def runtime_source(path):
             or path in {'examples/expo/App.tsx', 'examples/expo/index.js'})
 
 
+def validate_screenshot(data):
+    require(0 < len(data) <= 2 * 1024 * 1024 and data.startswith(b'\x89PNG\r\n\x1a\n'), 'Invalid/oversize reviewed screenshot')
+    pos, chunks = 8, []
+    while pos < len(data):
+        require(pos + 12 <= len(data), 'Truncated PNG')
+        length = struct.unpack('>I', data[pos:pos+4])[0]
+        kind = data[pos+4:pos+8]
+        require(kind in {b'IHDR',b'IDAT',b'IEND'} and pos+length+12 <= len(data), 'PNG metadata/payload chunk forbidden')
+        payload = data[pos+8:pos+8+length]
+        crc = struct.unpack('>I', data[pos+8+length:pos+12+length])[0]
+        require(zlib.crc32(kind+payload) & 0xffffffff == crc, 'PNG CRC mismatch')
+        if kind == b'IHDR':
+            require(not chunks and length == 13, 'PNG header')
+            width,height,depth,color,compression,filtering,interlace = struct.unpack('>IIBBBBB',payload)
+            require(1 <= width <= 2000 and 1 <= height <= 1800 and depth == 8 and color in {2,6} and compression == filtering == interlace == 0, 'PNG dimensions/encoding')
+        if kind == b'IEND': require(length == 0 and pos+12 == len(data), 'PNG trailing payload')
+        chunks.append(kind);pos += length+12
+    require(chunks and chunks[0] == b'IHDR' and chunks[-1] == b'IEND' and b'IDAT' in chunks, 'PNG structure')
+
+
 def check_file(path, data):
     p = PurePosixPath(path)
     require(not p.is_absolute() and '..' not in p.parts and '\\' not in path, 'Unsafe path')
+    if path in SCREENSHOTS:
+        validate_screenshot(data)
+        return
     require(p.suffix.lower() not in DATA_SUFFIXES, 'Data/asset payload forbidden: ' + path)
     require(not path.startswith('data/') or path in DATA_METADATA, 'Only reviewed metadata in data/: ' + path)
     require(len(data) <= 8 * 1024 * 1024 and b'\0' not in data, 'Binary/oversize file requires review: ' + path)
@@ -154,7 +182,14 @@ def check_file(path, data):
 
 
 def check_inventory(files, inventory):
-    require(set(inventory) == {'schemaVersion', 'reviewedAt', 'thirdPartyPayloads', 'runtimeSources'}, 'Inventory schema')
+    base = {'schemaVersion', 'reviewedAt', 'thirdPartyPayloads', 'runtimeSources'}
+    require(set(inventory) in (base, base | {'screenshots'}), 'Inventory schema')
+    screenshots = inventory.get('screenshots', {})
+    require(isinstance(screenshots, dict) and set(screenshots) == SCREENSHOTS.intersection(files), 'Unreviewed screenshot')
+    for path, record in screenshots.items():
+        require(set(record) == {'sha256','origin','license'} and record['origin'] == 'project-authored' and record['license'] == 'MIT', 'Screenshot provenance')
+        validate_screenshot(files[path])
+        require(record['sha256'] == hashlib.sha256(files[path]).hexdigest(), 'Screenshot digest mismatch')
     require(inventory['schemaVersion'] == 1 and inventory['thirdPartyPayloads'] == [], 'No third-party payload approval in this phase')
     iso_date(inventory['reviewedAt'])
     expected = inventory['runtimeSources']

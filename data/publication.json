@@ -29,7 +29,7 @@
       "license": "MIT"
     },
     "examples/web/app/map-demo.tsx": {
-      "sha256": "ab9b1a221ffbf2db454f8fad6ba0b48f260659257d8bc145ed8b886b2cbb0973",
+      "sha256": "0a971e9f9fb3ea5698bbaba60ec2277ec935bda7d3a345ae7e3f7b24cabe7678",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -39,7 +39,22 @@
       "license": "MIT"
     },
     "examples/web/app/style.css": {
-      "sha256": "7e8032e613fccffdad3577883db2c2a3ebb94075cb860ec37a09196ae5d27ffc",
+      "sha256": "747594933e733a0df3fb64c94618db95103bd195ab254a0b8aa235d9046d56b3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/themes/page.tsx": {
+      "sha256": "49260e3072697f0b23bf7bae9f8d325586faf9a0e211fd27282cf329fa4bbbc3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/themes/theme-client.tsx": {
+      "sha256": "c2eee3eac872698555f76944802cfeb059ebf581d121c43818514a7a6e9e9cc6",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/themes/theme-gallery.tsx": {
+      "sha256": "ed77e096c55aef296fd27c8874952a026926d1fad36263d863bd56ae5c495f2d",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -58,8 +73,38 @@
       "origin": "project-authored",
       "license": "MIT"
     },
+    "packages/styles/src/design-fixture.ts": {
+      "sha256": "3a415c09724ec596cfd41ed2486cf37535652bf43fe8c3cbf7ffb5ce78a669d8",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/font-coverage.ts": {
+      "sha256": "78d27b84a897cccfee7223ea4a957a24a60818c2196f34a98123c49f89d119ac",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/icons.ts": {
+      "sha256": "e702e527dbbaad9e0733535991cd9ed4c7db99431e85cfc05e0c8aa6943ad094",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
     "packages/styles/src/index.ts": {
-      "sha256": "c28bd6d807c7e5205f6a97ebfcab66cc7c17edc8428041f7db867c5fc0c1d674",
+      "sha256": "0e0ded2467986ea1b88856da5598842f2f7f8c10b75c174358869e43192dc787",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/labels.ts": {
+      "sha256": "9290ee7a367351381f0b628d5c2593d90e8e2d4300d702b73fe5618a9192d042",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/themes.ts": {
+      "sha256": "af79c19f718a0c7a12b8f0f60b2826725435888a2609af34197f4fad94421d22",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/tokens.ts": {
+      "sha256": "ed48d39ca583ac5ac68a257c926602ede050b66a8b2a1cbae7d5585b31077a72",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -69,12 +114,12 @@
       "license": "MIT"
     },
     "packages/web/src/index.ts": {
-      "sha256": "f7ef953138fdd801fb2b14784bbdaa605c4ce90f7a643059ca8e6baa83445b43",
+      "sha256": "0b7aa9ce768b43387603a981df1b1d7de511dca40506a8a618fb7794dc424050",
       "origin": "project-authored",
       "license": "MIT"
     },
     "packages/web/src/provider.ts": {
-      "sha256": "98752af1e4ee957d111fa6f0ea7c05975c47d2e9c4befb353aa28824a1e4d826",
+      "sha256": "3cfaf48f8b558e6d86249236c8e08f1439c5c3d090429eb0bf1615798486e4cb",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -95,6 +140,28 @@
     },
     "services/search/src/index.ts": {
       "sha256": "5185094fca437afb5f549f00cdc8c967533458c7736528f0c859f2b403e6d2b2",
+      "origin": "project-authored",
+      "license": "MIT"
+    }
+  },
+  "screenshots": {
+    "docs/screenshots/themes/standard.png": {
+      "sha256": "9cf7281d0db1f663694d1f2cb59eede1037cfa1dee7d2a4af2754617f0a21082",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "docs/screenshots/themes/dark.png": {
+      "sha256": "96b437e696cb6b545ccc3936e3c0fb82ac2a35b7a0d3ec97eadf949f10fecec3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "docs/screenshots/themes/pastel.png": {
+      "sha256": "9a3e5eded20356cadbdc5d40bdd4651f1d07e43cf60ac81b21b12414e1b8249a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "docs/screenshots/themes/outdoor.png": {
+      "sha256": "71b2573809421011bf6b229b7dc68e3def3e3535c3bf8eb0fae6c17e36470833",
       "origin": "project-authored",
       "license": "MIT"
     }
