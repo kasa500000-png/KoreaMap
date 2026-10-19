@@ -41,6 +41,9 @@ DOCUMENTATION_HOSTS = {
     "www.rfc-editor.org", "postgis.net", "docs.protomaps.com", "nominatim.org",
     "operations.osmfoundation.org", "project-osrm.org", "supabase.com",
     "www.openstreetmap.org", "www.kogl.or.kr", "www.data.go.kr",
+    "download.geofabrik.de", "opendatacommons.org", "wiki.openstreetmap.org",
+    "www.vworld.kr", "map.ngii.go.kr", "www.law.go.kr",
+    "business.juso.go.kr", "file.localdata.go.kr",
     "pnpm.io", "typescript-eslint.io", "vitest.dev", "prettier.io",
     "registry.npmjs.org", "nodejs.org", "www.juso.go.kr", "valhalla.github.io",
 }
@@ -80,7 +83,7 @@ def scan(path, data, scope):
             if not placeholder(match[1]):
                 add("EMBEDDED_CREDENTIAL_OR_BILLING_ID", len(text[:match.start()].encode("utf-8")))
 
-    documentation = path.startswith("docs/") or name in {"README.md", "AGENTS.md", "LICENSE", "NOTICE", "LICENSE.md", "NOTICE.md"}
+    documentation = path == "data/sources.json" or path.startswith("docs/") or name in {"README.md", "AGENTS.md", "LICENSE", "NOTICE", "LICENSE.md", "NOTICE.md"}
     for match in URL.finditer(text):
         try:
             url = urlsplit(match[0]); host = url.hostname or ""

@@ -59,3 +59,9 @@ M1은 명시적 provider/설정 누락 실패/유료 계정 없는 기본 테스
 `feat/monorepo-foundation`에서 사용자 지정 5 SDK / 2 예제 / 3 private 서비스 경계와 개발 도구를 구축한다. 실제 엔진 서비스는 아직 미구현이다. [개발 가이드](development.md), [도구 검증](research/monorepo-toolchain.md), [진행 기록](progress.md), [비용 감사](cost-audit.md)를 따른다. 아키텍처/비용 정책 PR이 미병합이라 이번 PR은 비용 정책 브랜치를 기준으로 비교한다.
 
 Native 실기기/시뮬레이터, 수정 버전이 없는 전이 취약점, 실제 공공/OSM 데이터와 한글 glyph 검증은 남아 있다. foundation 기능 테스트와 M1/MVP 전체 완료 또는 출시 승인을 구분한다.
+
+## 데이터 공급원 조사와 공개 차단
+
+`feat/data-source-policy`에서 [공급원 조사](data-sources.md), [라이선스](data-licenses.md), [출처 표시](attribution.md), [데이터 원장](../data/sources.json)을 추가했다. M3/M6에 앞선 권리 검토로 A 6 / B 0 / C 8 / D 2개를 분류했으며, 실제 데이터 수집·DB·타일 생성은 완료하지 않았다.
+
+M3는 OSM 공개 추출본으로 시작하고, M6는 개별 공공데이터 필드부터 추가한다. 전국 표준 취합의 권리 범위, VWorld·NGII·주소정보 공급 조건, TourAPI 사진의 개별 유형은 후속 확인 대상이다. API-only B 항목이 확인되면 운영자 opt-in 어댑터를 구현한다. 2027-01-17 이후에는 근거 재확인 없이 카탈로그 검사를 통과할 수 없다. 검증 결과는 [데이터 검증 기록](research/data-validation.md)을 따른다.

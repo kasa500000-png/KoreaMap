@@ -29,3 +29,5 @@ run(process.execPath, [
   'scripts/audit-cost-security.py',
   ...files.flatMap((name) => ['--artifact', resolve(destination, name)]),
 ]);
+
+run(process.execPath, ['scripts/python.mjs', 'scripts/check-data.py', '--artifacts']);

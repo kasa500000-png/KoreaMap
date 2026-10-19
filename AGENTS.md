@@ -94,3 +94,12 @@
 - Node/pnpm 버전과 exact 의존성·lockfile을 함께 관리한다. 의존성 install hook은 기본 차단하며 이유 없이 해제하지 않는다.
 - 변경 후 `pnpm check`를 실행하고 패키지 변경은 `pnpm pack:check`, Web 동작 변경은 `pnpm test:web`으로 확인한다. Expo JS export를 Native 앱 컴파일/QA로 보고하지 않는다.
 - 자체 코드와 합성 fixture는 루트 LICENSE의 MIT를 적용한다. 외부 데이터/라이브러리는 별도 조건을 유지한다.
+
+## 데이터 공급원·공개 차단 정책
+
+- `data/sources.json`과 `docs/data-sources.md`, `docs/data-licenses.md`, `docs/attribution.md`를 함께 유지한다. A는 확인된 자체 DB 저장·재배포 후보, B는 확인된 API-only, C는 조건 확인 필요, D는 해당 용도 제외다. API 전달 방식만으로 B를 부여하지 않는다.
+- 자동 수집 자격은 A만, B는 명시적 운영자 설정의 선택형 외부 API 어댑터만 허용한다. C/D는 기본 및 선택형 실행에서 제외한다. A도 기본 활성화하거나 제작자 계정으로 요청하지 않는다.
+- 기관 전체·포털 전체를 승인하지 않는다. 개별 데이터/필드/미디어 범위의 권리, 기준일, 출처, 비용·쿼터와 접근 실패를 기록한다. 검토 만료 및 변경된 약관은 재확인한다.
+- 현재 제3자 지도 데이터·사진·폰트 payload는 A도 Git/npm에 포함하지 않는다. 운영자 데이터 저장소와 SDK를 분리한다. 합성 fixture의 출처를 실제 공공데이터로 표시하지 않는다.
+- `pnpm check:data`, `pnpm test:data`, `pnpm check:data-docs`를 통과해야 한다. runtime source 수정은 `data/publication.json`의 출처·해시 검토를 함께 갱신한다. 해시 일괄 재생성으로 권리 검토를 대신하지 않는다.
+- 공개 전 실제 npm tarball을 `pnpm pack:check`로 검사하고, 커밋 전 `pnpm check:data --staged`로 index를 검사한다. 자동 검사가 법적 권리와 모든 위장 데이터를 증명하지 못한다는 한계를 보고한다.

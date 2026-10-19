@@ -161,3 +161,18 @@ pnpm audit --json
 ```
 
 마지막 audit는 현재 high2로 실패한다. 앞선 기능/정적 검사 통과를 이 실패의 해결로 해석하지 않는다. artifact hash와 실행 플랫폼/미검증은 [foundation 검증 기록](research/foundation-validation.md)에 보존한다.
+
+## 10. 데이터 출처·배포 gate 단계 — 2026-10-19
+
+- 조사 목적으로 공식 문서/메타데이터 페이지를 열람했다. 실제 지도 파일·사진을 내려받거나 API 키를 발급/사용하지 않았다. 파일 원본 QA와 quota 계정 검증은 미실행이다.
+- `data/sources.json`의 URL은 검토 메타데이터다. 비용 감사에서 이 정확한 경로만 문서로 구분하고, 공식 호스트·HTTPS·credential 없는 URL은 데이터 검사에서 추가 검증한다. SDK가 이 원장을 import하거나 기본 endpoint로 사용하지 않는다.
+- 모든 후보 `defaultEnabled=false`, 수집은 A + 운영자 opt-in 자격 검사만 가능하다. 서비스 collector, B 실 API 어댑터, 새 backend/proxy, shared key, 배포·발행 workflow를 추가하지 않았다.
+- `pnpm check`와 source/index 검사, 실제 다섯 `pnpm pack:check`가 통과했다. 데이터 정책 회귀 16개, 기존 비용 감사 회귀 11개가 잘못된 승인·payload·민감 설정 경로를 검사한다. tarball의 catalog/원본 데이터/사진 유입은 허용하지 않는다.
+- Linux에서 `strace -f -qq -e trace=network python scripts/check-data.py --select osm-geofabrik-kr --operator-opt-in` 실행: 네트워크 syscall 0건. 자격 판정만 출력하며 다운로드하지 않았다. 최초 pnpm wrapper를 직접 strace하는 시도는 Exec format error로 실패해 Python 진입점으로 범위를 명시하여 다시 확인했다.
+- 로컬 Chromium fixture E2E 통과: 외부 HTTP 시도 0, 화면 오류 0; 합성 지도/한글 UI/출처를 screenshot으로 확인했다. 이 결과는 외부 데이터 provider 및 Native 네트워크 검증이 아니다.
+- 의존성/lockfile 변경 없음. 앞 단계 high 2건은 해결되지 않은 출시 차단으로 유지하며 이번에 새로운 advisory 조회를 수행하지 않았다. 실제 배포 전 전체 dependency·비용·라이선스 감사를 다시 실행한다.
+- CI는 기존 무료 표준 3 OS job에 데이터 검사와 staged 검사만 추가했다. 유료 runner/cache/artifact/스케줄/운영 서비스는 추가하지 않았다. 원격 실행 결과는 PR과 진행 기록에 별도로 보고한다.
+
+산출물 SHA-256과 검증 범위는 [데이터 검증 기록](research/data-validation.md)에 있다. 정책 검사 통과는 제작자 계정의 실제 청구 설정이나 법적 권리 판단의 정확성을 자동 보증하지 않는다.
+
+- 원격 추가 증거: `ac2d4d2`의 [3 OS CI](https://github.com/kasa500000-png/KoreaMap/actions/runs/39207562003) 모두 통과. XML/RDF/줄 단위 JSON 및 검토되지 않은 경로의 JSON 차단을 보강했으며 새로운 네트워크 기능은 없다. 후속 커밋은 같은 PR의 CI로 확인한다.

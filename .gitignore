@@ -36,3 +36,14 @@ examples/expo/android/
 examples/expo/ios/
 **/next-env.d.ts
 examples/web/public/vendor/
+
+# Operator-owned raw/derived data; forced additions are also checked in CI.
+data/raw/
+data/downloads/
+data/derived/
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.osm
+*.osc

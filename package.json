@@ -29,7 +29,11 @@
     "pack:check": "node scripts/pack-check.mjs",
     "changeset": "changeset",
     "changeset:status": "changeset status --since=origin/main",
-    "offline:check": "node scripts/offline-install-check.mjs"
+    "offline:check": "node scripts/offline-install-check.mjs",
+    "check:data": "node scripts/python.mjs scripts/check-data.py",
+    "test:data": "node scripts/python.mjs scripts/test-data-policy.py",
+    "docs:data": "node scripts/python.mjs scripts/render-data-docs.py",
+    "check:data-docs": "node scripts/python.mjs scripts/render-data-docs.py --check"
   },
   "devDependencies": {
     "typescript": "6.0.3",

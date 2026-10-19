@@ -339,3 +339,61 @@
 - [https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239): 코드/CI 수정 커밋 `b538e9506fb6e238f60421a6751100c822fc3320`에서 Linux·Windows·macOS **모두 success**. 각 OS의 pnpm check와 pack 검사, Linux Chromium E2E까지 통과했다.
 - 이 결과는 3 OS에서 JavaScript/TypeScript 개발 경로를 검증한 것이다. macOS runner 사용 자체를 iOS 앱 컴파일·시뮬레이터 QA로 해석하지 않는다. Native 실빌드/기기 QA와 high2 출시 차단은 그대로 남는다.
 - 최종 문서 기록 커밋 식별: `git log -1 --format='%H %s' --grep='^docs: record foundation CI verification$'`. 문서 갱신 후 문서/감사/format/diff 검사를 통과한 뒤 커밋한다.
+
+## STEP 02 — 데이터 공급원·라이선스·공개 차단 (2026-10-19)
+
+### 1. 구현 완료 기능
+
+- 7개 조사 대상군을 16개 범위별 항목으로 분리: A 6 / B 0 / C 8 / D 2. 공식 원본·기관·형식·CRS·포털 수정일/데이터 기준일·권리·출처·비용/쿼터·충돌·접근 실패 기록.
+- A 수집 자격과 운영자 opt-in, A/B 외부 API 선택, C/D 제외, 90일 검토 만료를 offline 정책 검사로 구현했다. B 실제 확인 사례는 없어 실 API 어댑터를 추가하지 않았다.
+- Git worktree/index payload 차단, runtime source 출처·SHA-256 검토, 실제 npm tarball 파일/바이트 검사, 문서-원장 일치 검사와 CI 연결을 구현했다.
+
+### 2. 생성/수정 파일
+
+- 생성: docs/data-sources.md, docs/data-licenses.md, docs/attribution.md, docs/research/data-validation.md, data/sources.json, data/publication.json.
+- 생성: scripts/data_policy.py, scripts/check-data.py, scripts/test-data-policy.py, scripts/render-data-docs.py.
+- 수정: AGENTS.md, README.md, .gitignore, package.json, .github/workflows/ci.yml, scripts/tasks.mjs, scripts/pack-check.mjs, scripts/audit-cost-security.py, docs/roadmap.md, docs/progress.md, docs/cost-audit.md.
+- SDK runtime 코드·의존성·lockfile은 변경하지 않았다.
+
+### 3. 실행한 테스트와 결과
+
+- `pnpm check`: 데이터 정책 회귀16, 기존 Vitest16·비용 감사 회귀11, 경계·lint·format·타입·SDK/services/Next/Expo JS build·문서·원장 동기화·정적 비용 검사·Changesets 통과.
+- `pnpm pack:check`: 다섯 실제 tarball의 source 대응 멤버·manifest·내용 일치 및 보안/비용 검사 통과. 해시는 검증 기록 참조.
+- `pnpm check:data --staged`: index 출처·payload 검사 통과 후 커밋한다. CI에도 동일 명령을 추가했다.
+- `pnpm test:web`: Chromium 로드·pan·합성 검색·reload 통과. 외부 HTTP 시도 0, pageerror 0.
+- 정책 CLI의 실제 Linux 네트워크 syscall 0건. 검사 중 API 키·외부 서비스 계정 불필요.
+
+### 4. 실화면 QA 결과
+
+- 로컬 Next fixture 화면의 합성 polygon/point, 한글 UI, MIT 출처 표시를 실제 screenshot으로 확인했다. 제3자 데이터 원본이나 API를 표시한 화면 QA는 수행하지 않았다.
+- Android/iOS 실빌드·실화면은 미검증이다. Expo JS export 성공만 확인했다.
+
+### 5. 라이선스 및 보안 문제
+
+- ODbL 데이터와 MIT 코드를 분리한다. 개별 포털의 제한 없음 표기를 MIT/CC0/공공누리로 재명명하지 않았다.
+- 전국 표준 목록과 메타데이터 제공자의 범위 불일치, VWorld/NGII/주소정보 열람·공급조건 미확인, TourAPI 사진 혼합 권리는 C/D로 제외했다. D는 적힌 용도에 대한 제외이며 모든 사용이 불법이라는 뜻이 아니다.
+- 실제 제3자 payload·API secret·제작자 endpoint를 추가하지 않았다. 정적/해시 검사는 수동 권리 검토를 대신하지 않는다.
+- 기존 dependency high2 출시 차단 유지, 이번 dependency audit 재조회는 미실행이다.
+
+### 6. 남은 작업 또는 차단 요인
+
+- A 원본 파일의 SHA·실제 기준일·필드/개인정보·CRS/품질 확인과 운영자 수집기 구현, B 실 provider 권리 확인 및 어댑터 구현이 남아 있다.
+- C 자료의 개별 약정/출처·미디어별 권리 확인, ODbL 파생 DB 공개/접근 제공 설계, 실제 타일/DB 분리 배포 검증 필요.
+- 검토 만료일 2027-01-17. 자동 승격하지 않으며, 만료 후 공식 근거를 재확인한다.
+- 원격 3 OS CI 결과는 PR 실행 후 별도 기록한다. Native·제품 전체 출시는 여전히 차단된다.
+
+### 7. Git 브랜치와 커밋 해시
+
+- 브랜치: `feat/data-source-policy`, base: `feat/monorepo-foundation`의 `828911bd63ea354ed33eeeb06446cfe085aeeacf`.
+- 커밋 식별: `git log -1 --format='%H %s' --grep='^feat: add data provenance and publication gates$'`.
+- 로컬 검사 통과 후 commit/push, 연결된 GitHub 커넥터로 독립 draft PR을 만든다. 이번 단계 main 병합·운영 배포·npm 발행은 수행하지 않는다.
+
+### 8. 다음 단계 진행 가능 여부
+
+- 승인 범위의 A 데이터에 대한 운영자 수집 파이프라인·파일 QA 및 독립 SDK 개발 진행 가능. C/D 도입, 실제 데이터 공개 배포, MVP 전체 완료 판정은 불가하다.
+
+### 원격 검증과 구조화 데이터 차단 보강
+
+- [PR #4](https://github.com/kasa500000-png/KoreaMap/pull/4)를 연결된 GitHub 커넥터로 생성했다. `ac2d4d209f848c70ab9b49afe05f431623d50ad6`의 [CI 실행](https://github.com/kasa500000-png/KoreaMap/actions/runs/39207562003)은 Linux·Windows·macOS 모두 success다. 각 OS의 check/staged/pack과 Linux E2E가 통과했다.
+- 추가 수동 검토에서 CSV 외 XML/RDF/줄 단위 JSON 등의 형식과 임의 경로의 JSON도 명시적으로 거부하도록 보강했다. 알려진 설정/조사 JSON 경로만 허용하며 그 안의 중첩 GeoJSON도 거부한다. 음성 회귀 사례를 확장한 뒤 `pnpm check`, 실제 tarball 검사, staged 검사를 통과했다.
+- 보강 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: reject unreviewed structured data payloads$'`. 최종 커밋의 원격 결과는 PR checks와 사용자 보고를 따른다. Native 및 외부 데이터 QA 미검증 범위는 동일하다.
