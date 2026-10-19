@@ -175,16 +175,16 @@ importers:
       '@eslint/js':
         specifier: 10.0.1
         version: 10.0.1(eslint@10.13.0(supports-color@8.1.1))
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:packages/core
-      '@korea-map-kit/data-adapters':
+      'korea-map-data-adapters':
         specifier: workspace:*
         version: link:packages/data-adapters
-      '@korea-map-kit/styles':
+      'korea-map-styles':
         specifier: workspace:*
         version: link:packages/styles
-      '@korea-map-kit/web':
+      'korea-map-web':
         specifier: workspace:*
         version: link:packages/web
       '@maplibre/maplibre-gl-style-spec':
@@ -220,19 +220,19 @@ importers:
 
   examples/expo:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@korea-map-kit/data-adapters':
+      'korea-map-data-adapters':
         specifier: workspace:*
         version: link:../../packages/data-adapters
       '@korea-map-kit/example-scenarios':
         specifier: workspace:*
         version: link:../scenarios
-      '@korea-map-kit/native':
+      'korea-map-native':
         specifier: workspace:*
         version: link:../../packages/native
-      '@korea-map-kit/styles':
+      'korea-map-styles':
         specifier: workspace:*
         version: link:../../packages/styles
       '@maplibre/maplibre-react-native':
@@ -266,28 +266,28 @@ importers:
 
   examples/scenarios:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@korea-map-kit/styles':
+      'korea-map-styles':
         specifier: workspace:*
         version: link:../../packages/styles
 
   examples/web:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@korea-map-kit/data-adapters':
+      'korea-map-data-adapters':
         specifier: workspace:*
         version: link:../../packages/data-adapters
       '@korea-map-kit/example-scenarios':
         specifier: workspace:*
         version: link:../scenarios
-      '@korea-map-kit/styles':
+      'korea-map-styles':
         specifier: workspace:*
         version: link:../../packages/styles
-      '@korea-map-kit/web':
+      'korea-map-web':
         specifier: workspace:*
         version: link:../../packages/web
       maplibre-gl:
@@ -314,16 +314,16 @@ importers:
 
   packages/data-adapters:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../core
 
   packages/native:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../core
-      '@korea-map-kit/styles':
+      'korea-map-styles':
         specifier: workspace:*
         version: link:../styles
       '@maplibre/maplibre-gl-style-spec':
@@ -348,7 +348,7 @@ importers:
 
   packages/styles:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../core
       '@maplibre/maplibre-gl-style-spec':
@@ -360,10 +360,10 @@ importers:
 
   packages/web:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../core
-      '@korea-map-kit/styles':
+      'korea-map-styles':
         specifier: workspace:*
         version: link:../styles
       '@types/geojson':
@@ -376,7 +376,7 @@ importers:
 
   services/geo-data:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../../packages/core
       csv-parse:
@@ -395,10 +395,10 @@ importers:
 
   services/routing:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@korea-map-kit/data-adapters':
+      'korea-map-data-adapters':
         specifier: workspace:*
         version: link:../../packages/data-adapters
     devDependencies:
@@ -408,7 +408,7 @@ importers:
 
   services/search:
     dependencies:
-      '@korea-map-kit/core':
+      'korea-map-core':
         specifier: workspace:*
         version: link:../../packages/core
       '@korea-map-kit/service-geo-data':

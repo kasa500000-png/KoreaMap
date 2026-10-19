@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createMap, createMapState, type MapHandle, type MapMarker } from '@korea-map-kit/web';
+import { createMap, createMapState, type MapHandle, type MapMarker } from 'korea-map-web';
 const camera = { center: [126.978, 37.5665] as const, zoom: 13, bearing: 0, pitch: 0 };
 function markers(count: number): MapMarker[] {
   return Array.from({ length: count }, (_, i) => ({

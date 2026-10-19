@@ -1,6 +1,6 @@
-import { parseCustomStyle } from '@korea-map-kit/styles';
+import { parseCustomStyle } from 'korea-map-styles';
 import type { StyleSpecification } from 'maplibre-gl';
-import { KitError, validateMapConfig, type LocalMapConfig } from '@korea-map-kit/core';
+import { KitError, validateMapConfig, type LocalMapConfig } from 'korea-map-core';
 export type WebMapConfig =
   | LocalMapConfig
   | {

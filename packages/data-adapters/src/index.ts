@@ -1,4 +1,4 @@
-import { KitError, type SearchProvider } from '@korea-map-kit/core';
+import { KitError, type SearchProvider } from 'korea-map-core';
 
 /** Explicit opt-in demo adapter. No service discovery, endpoint or network access. */
 export function createFixtureSearchProvider(): SearchProvider {

@@ -20,8 +20,8 @@ import {
   type LocationProvider,
   type PlaceRepository,
   type TileProvider,
-} from '@korea-map-kit/core';
-import type { MapHandle } from '@korea-map-kit/web';
+} from 'korea-map-core';
+import type { MapHandle } from 'korea-map-web';
 /** Compiled with strict/noEmit; this module is not executed. Negative cases must remain errors. */
 export async function consumer(map: MapController, web: MapHandle) {
   const coordinate: Coordinate = [126.978, 37.5665];

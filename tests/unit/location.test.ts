@@ -6,8 +6,8 @@ import {
   type LocationObserver,
   type LocationFix,
   type LocationSubscription,
-} from '@korea-map-kit/core';
-import { createMockLocationProvider } from '@korea-map-kit/data-adapters';
+} from 'korea-map-core';
+import { createMockLocationProvider } from 'korea-map-data-adapters';
 import { createBrowserLocationClient } from '../../packages/web/src/location.js';
 import {
   createExpoLocationClient,

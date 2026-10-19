@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createFixtureStyle } from '@korea-map-kit/styles';
+import { createFixtureStyle } from 'korea-map-styles';
 test('real renderer: camera, 100/1000 markers, selection, resize, disposal and recovery', async ({
   page,
   context,

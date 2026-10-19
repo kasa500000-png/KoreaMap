@@ -4,7 +4,7 @@ import {
   validatePlacesQuery,
   validatePublicPlace,
   type PlacesProvider,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 import { postgisNamespace } from './database.js';
 
 /** Read-only pool with operator-provisioned credentials. Query limit and SQL statement timeout bound work. */

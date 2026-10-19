@@ -8,10 +8,10 @@ const config = {
   poweredByHeader: false,
   transpilePackages: [
     '@korea-map-kit/example-scenarios',
-    '@korea-map-kit/core',
-    '@korea-map-kit/web',
-    '@korea-map-kit/styles',
-    '@korea-map-kit/data-adapters',
+    'korea-map-core',
+    'korea-map-web',
+    'korea-map-styles',
+    'korea-map-data-adapters',
   ],
 };
 export default config;

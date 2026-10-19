@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppState, Button, ScrollView, Switch, Text, TextInput, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MapView, type MapController } from '@korea-map-kit/native';
+import { MapView, type MapController } from 'korea-map-native';
 import {
   createScenarioSession,
   places,

@@ -7,7 +7,7 @@ import {
   type RoutingDataset,
   type RoutingRequest,
   type Scheduler,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 
 export interface ValhallaRequest {
   readonly locations: readonly {

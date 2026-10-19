@@ -335,3 +335,7 @@ npm audit는 기존 high2/exit1이며 공개 출시 차단을 유지한다.
 frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기존 검토된 그래프와 대조한다.
 이 개발용 metadata 요청은 제작자 API/계정을 사용하지 않는다. Web 실행 외부 요청0과 설치 준비 통신을 혼동하지 않는다.
 전체 workspace의 `offline:check`는 기존대로 frozen/offline 전용이다.
+
+## v0.1.0 릴리스 비용 경로 — 2026-10-19
+
+영문/국문·커뮤니티·설치·운영 문서, 5개 비스코프 후보 패키지 이름, 초기 CHANGELOG와 승인 제한 발행 자동화를 로컬 후보로 준비했다. 기능/패키지/실화면 검증은 보고서의 실제 실행 범위에서 통과했으나 공개 발행은 차단 상태다. 상세 구현 파일, 테스트, 실화면, 보안/라이선스, 차단 사항과 다음 단계는 [후보 보고서](releases/v0.1.0.md)를 따른다. 현재 high 취약점과 Native/registry 미검증은 공개 차단으로 유지한다. 브랜치 `release/v0.1.0-preparation`; 커밋은 `git log -1 --format=%H release/v0.1.0-preparation`로 식별한다. 제작자 provider를 추가하지 않았고 공개 npm 메타데이터 조회/의존성 설치만 수행한다. 원격 공개 업로드·배포·npm 발행·GitHub Release는 승인 전 실행하지 않는다.

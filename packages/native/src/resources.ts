@@ -1,4 +1,4 @@
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 import type {
   StyleSpecification,
   VectorSourceSpecification,

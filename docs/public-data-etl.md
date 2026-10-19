@@ -94,8 +94,8 @@ DB URL은 `GEO_DATABASE_URL`로 서버에만 지정한다. 설정 누락 시 안
 `createPlacesClient(provider, scheduler)`의 `getNearbyPlaces`, `getPlacesInBounds`, `getPlacesByCategory`는 Web·React Native 공통이다. core는 DOM·React·DB 의존성이 없다. 기본 limit 20, 최대 100, 반경 최대 50km, 기본 기한 10초. 페이지네이션·전체 DB 다운로드 API는 제공하지 않는다. 같은 bounds/category 결과는 ID 순서, nearby는 거리·ID 순서다.
 
 ```ts
-import { createPlacesClient, publicPlaceToPlace } from '@korea-map-kit/core';
-import { createFixturePlacesProvider } from '@korea-map-kit/data-adapters';
+import { createPlacesClient, publicPlaceToPlace } from 'korea-map-core';
+import { createFixturePlacesProvider } from 'korea-map-data-adapters';
 
 const scheduler = {
   schedule(callback: () => void, delayMs: number) {
@@ -113,7 +113,7 @@ const displayPlaces = nearby.filter(p => p.location !== null).map(publicPlaceToP
 실제 연결은 `createRemotePlacesProvider(request)`에 운영자가 transport를 주입한다. transport는 `POST /places/query`에 `PlacesQuery` JSON을 보내고 응답 `PublicPlace[]`를 반환한다. 예를 들어 운영자 애플리케이션에서:
 
 ```ts
-import { createRemotePlacesProvider } from '@korea-map-kit/data-adapters';
+import { createRemotePlacesProvider } from 'korea-map-data-adapters';
 
 // endpoint는 운영자 앱 설정에서 명시적으로 받는다. 기본값·제작자 키 없음.
 function remoteProvider(endpoint: string) {

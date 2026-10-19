@@ -7,11 +7,8 @@ import {
   validatePublicPlace,
   type PlacesQuery,
   type Scheduler,
-} from '@korea-map-kit/core';
-import {
-  createFixturePlacesProvider,
-  createRemotePlacesProvider,
-} from '@korea-map-kit/data-adapters';
+} from 'korea-map-core';
+import { createFixturePlacesProvider, createRemotePlacesProvider } from 'korea-map-data-adapters';
 const scheduler: Scheduler = {
   schedule(fn, ms) {
     const id = setTimeout(fn, ms);

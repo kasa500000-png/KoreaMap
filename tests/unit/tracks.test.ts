@@ -14,7 +14,7 @@ import {
   validateTrack,
   type Track,
   type LocationFix,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 const epoch = 1700000000000;
 const fix = (x: number, t: number, accuracyMeters = 5): LocationFix => ({
   coordinate: [x, 37.5],

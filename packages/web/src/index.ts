@@ -10,8 +10,8 @@ import {
   type LngLat,
   type MapMarker,
   type MapFeatureCollection,
-} from '@korea-map-kit/core';
-import { createFixtureStyle, parseCustomStyle } from '@korea-map-kit/styles';
+} from 'korea-map-core';
+import { createFixtureStyle, parseCustomStyle } from 'korea-map-styles';
 import type {
   Map as LibreMap,
   Popup as LibrePopup,
@@ -29,7 +29,7 @@ import {
 } from './provider.js';
 export { createMapState, type MapState, type MapSnapshot } from './state.js';
 export type { WebMapConfig } from './provider.js';
-export type { CameraState, MapMarker, MapFeatureCollection } from '@korea-map-kit/core';
+export type { CameraState, MapMarker, MapFeatureCollection } from 'korea-map-core';
 export type MapStatus = 'loading' | 'ready' | 'error' | 'destroyed';
 export interface MapEvents {
   status: MapStatus;

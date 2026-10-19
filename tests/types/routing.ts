@@ -6,11 +6,8 @@ import {
   type Scheduler,
   type MapController,
   type RoutingRequest,
-} from '@korea-map-kit/core';
-import {
-  createValhallaRoutingProvider,
-  type ValhallaTransport,
-} from '@korea-map-kit/data-adapters';
+} from 'korea-map-core';
+import { createValhallaRoutingProvider, type ValhallaTransport } from 'korea-map-data-adapters';
 export async function sharedRoutingExample(
   map: MapController,
   port: RoutingPort,

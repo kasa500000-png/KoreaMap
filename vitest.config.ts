@@ -4,7 +4,7 @@ export default defineConfig({
   resolve: {
     alias: Object.fromEntries(
       ['core', 'styles', 'data-adapters', 'web'].map((name) => [
-        `@korea-map-kit/${name}`,
+        `korea-map-${name}`,
         fileURLToPath(new URL(`./packages/${name}/src/index.ts`, import.meta.url)),
       ]),
     ),

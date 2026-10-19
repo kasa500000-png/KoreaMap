@@ -8,7 +8,7 @@ import {
   type LocationSubscription,
   type OperationOptions,
   type Scheduler,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 /** Structural seam: consumers inject expo-location; it is not a required SDK dependency. */
 export interface ExpoLocationPort {
   requestForegroundPermissionsAsync(): Promise<{ granted: boolean }>;

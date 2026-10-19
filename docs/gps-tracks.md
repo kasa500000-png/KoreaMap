@@ -24,8 +24,8 @@ Android/iOS 실제 기기와 백그라운드 동작은 아직 미검증이며, �
   `onError`는 terminal이며, 재시도는 사용자가 결정한다. 구독의 `stop()`은 반복 호출 가능하다.
 
 ```ts
-import { createTrackRecorder, tracksToFeatureCollection } from '@korea-map-kit/core';
-import { createBrowserLocationClient } from '@korea-map-kit/web';
+import { createTrackRecorder, tracksToFeatureCollection } from 'korea-map-core';
+import { createBrowserLocationClient } from 'korea-map-web';
 
 const gps = createBrowserLocationClient();
 // 앱에서 수집 목적·보관/삭제 방법을 안내하고 사용자가 명시적으로 동의한 뒤 실행한다.

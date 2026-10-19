@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { createFixtureStyle } from '@korea-map-kit/styles';
-import { createFixtureSearchProvider } from '@korea-map-kit/data-adapters';
+import { createFixtureStyle } from 'korea-map-styles';
+import { createFixtureSearchProvider } from 'korea-map-data-adapters';
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 it('creates independent valid styles without remote assets', () => {
   const config = { mode: 'local-fixture', fixtureId: 'synthetic-v1' } as const;

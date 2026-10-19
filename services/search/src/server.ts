@@ -4,7 +4,7 @@ import {
   KitError,
   type KoreanSearchProvider,
   type SearchRequest,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 /** Loopback/proxy-only sample. Authentication and quotas belong to the operator's application gateway. */
 export function createSearchServer(provider: KoreanSearchProvider) {
   let active = 0;

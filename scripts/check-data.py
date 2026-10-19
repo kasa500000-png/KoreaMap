@@ -25,7 +25,7 @@ def main():
         paths = sorted((root / 'artifacts').glob('*.tgz'))
         if len(paths) != len(SDK): raise ValueError('Expected exactly five tarballs')
         for name in SDK:
-            candidates = [p for p in paths if p.name.startswith('korea-map-kit-' + name + '-')]
+            candidates = [p for p in paths if p.name.startswith('korea-map-' + name + '-')]
             if len(candidates) != 1: raise ValueError('Missing/ambiguous tarball')
             digest = check_tarball(candidates[0], expected_package(root, name), name)
             print(f'PASS data publication: {candidates[0].name} sha256={digest}')

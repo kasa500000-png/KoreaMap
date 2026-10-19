@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createMap, createBrowserLocationClient, type MapHandle } from '@korea-map-kit/web';
-import { createMockLocationProvider } from '@korea-map-kit/data-adapters';
+import { createMap, createBrowserLocationClient, type MapHandle } from 'korea-map-web';
+import { createMockLocationProvider } from 'korea-map-data-adapters';
 import {
   createCancellationSource,
   createLocationClient,
@@ -19,7 +19,7 @@ import {
   type LocationSubscription,
   type Track,
   type TrackReplay,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 const scheduler = {
   schedule(fn: () => void, ms: number) {
     const id = setTimeout(fn, ms);

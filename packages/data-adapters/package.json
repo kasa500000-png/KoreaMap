@@ -1,5 +1,5 @@
 {
-  "name": "@korea-map-kit/data-adapters",
+  "name": "korea-map-data-adapters",
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
@@ -27,6 +27,22 @@
     "access": "public"
   },
   "dependencies": {
-    "@korea-map-kit/core": "workspace:*"
-  }
+    "korea-map-core": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kasa500000-png/KoreaMap.git",
+    "directory": "packages/data-adapters"
+  },
+  "homepage": "https://github.com/kasa500000-png/KoreaMap",
+  "bugs": {
+    "url": "https://github.com/kasa500000-png/KoreaMap/issues"
+  },
+  "keywords": [
+    "maplibre",
+    "korea",
+    "map",
+    "typescript",
+    "data-adapters"
+  ]
 }

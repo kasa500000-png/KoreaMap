@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createMap, type MapHandle } from '@korea-map-kit/web';
+import { createMap, type MapHandle } from 'korea-map-web';
 import {
   createCancellationSource,
   createRoadRoutingProvider,
@@ -9,7 +9,7 @@ import {
   roadRouteToGeoJSON,
   type RoadRoute,
   type RoutingRequest,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 
 const start = [127, 37.5] as const,
   finish = [127.004, 37.502] as const;

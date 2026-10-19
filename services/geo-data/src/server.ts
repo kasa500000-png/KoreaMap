@@ -4,7 +4,7 @@ import {
   KitError,
   type PlacesProvider,
   type PlacesQuery,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 
 /** Local/proxy-only HTTP boundary. No public binding, CORS wildcard or logging of bodies/credentials. */
 export function createPlacesServer(provider: PlacesProvider): Server {

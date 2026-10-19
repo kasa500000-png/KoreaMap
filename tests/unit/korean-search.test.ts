@@ -8,11 +8,11 @@ import {
   type SearchProvider,
   type Scheduler,
   type MapController,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 import {
   createFixtureKoreanSearchProvider,
   createRemoteKoreanSearchProvider,
-} from '@korea-map-kit/data-adapters';
+} from 'korea-map-data-adapters';
 const scheduler: Scheduler = {
   schedule(fn, ms) {
     const id = setTimeout(fn, ms);

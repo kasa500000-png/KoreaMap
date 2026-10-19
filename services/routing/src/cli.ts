@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { createLocalRoutingProvider, createRoutingServer } from './index.js';
-import { validateRoutingDataset, type RoutingDataset } from '@korea-map-kit/core';
+import { validateRoutingDataset, type RoutingDataset } from 'korea-map-core';
 try {
   const endpoint = process.env.ROUTING_ENGINE_URL;
   const file = process.env.ROUTING_DATASET_FILE;

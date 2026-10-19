@@ -5,7 +5,8 @@ const root = process.cwd();
 const destination = resolve(root, 'artifacts');
 mkdirSync(destination, { recursive: true });
 for (const name of readdirSync(destination))
-  if (name.endsWith('.tgz')) rmSync(resolve(destination, name));
+  if (/^korea-map-(?:kit-)?(?:core|web|native|styles|data-adapters)-[0-9].*\.tgz$/.test(name))
+    rmSync(resolve(destination, name));
 const cli = process.env.npm_execpath;
 if (!cli) throw new Error('Use pnpm pack:check');
 function run(command, args, cwd = root) {

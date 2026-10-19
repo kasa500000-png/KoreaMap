@@ -5,7 +5,7 @@ import {
   type MapStyle,
   type MapBounds,
   type OperationContext,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 import type { MapHandle } from './index.js';
 /** Web bridge keeps legacy synchronous methods available; api is the portable async surface. */
 export function createWebController(

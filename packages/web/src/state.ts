@@ -4,7 +4,7 @@ import {
   KitError,
   type CameraState,
   type MapMarker,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 
 export interface MapSnapshot {
   readonly camera: CameraState;
@@ -90,4 +90,4 @@ export function createMapState(initial: Partial<MapSnapshot> = {}): MapState {
   return state;
 }
 
-export { validateCamera, validateMarkers } from '@korea-map-kit/core';
+export { validateCamera, validateMarkers } from 'korea-map-core';

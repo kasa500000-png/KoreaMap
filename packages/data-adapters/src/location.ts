@@ -4,7 +4,7 @@ import {
   type LocationFix,
   type LocationObserver,
   type LocationStreamProvider,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 /** Explicit, manually driven mock GPS. No clock, permission prompt or network runs on import. */
 export function createMockLocationProvider() {
   const listeners = new Set<LocationObserver>();

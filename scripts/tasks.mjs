@@ -54,6 +54,7 @@ else if (task === 'check') {
     'check:docs',
     'audit:cost',
     'test:audit',
+    'test:release',
     'changeset:status',
   ])
     pnpm('run', step);

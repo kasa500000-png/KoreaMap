@@ -1,8 +1,5 @@
-import { KitError, type RoutingDataset, type Scheduler } from '@korea-map-kit/core';
-import {
-  createValhallaRoutingProvider,
-  type ValhallaTransport,
-} from '@korea-map-kit/data-adapters';
+import { KitError, type RoutingDataset, type Scheduler } from 'korea-map-core';
+import { createValhallaRoutingProvider, type ValhallaTransport } from 'korea-map-data-adapters';
 export const routingScheduler: Scheduler = {
   schedule(callback, ms) {
     const timer = setTimeout(callback, ms);

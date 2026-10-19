@@ -31,13 +31,15 @@ ENV_VALUE_PATTERN = re.compile(
 )
 URL = re.compile(r'''(?:https?|postgres(?:ql)?|rediss?|mongodb(?:\+srv)?|mysql)://[^\s<>"'`)\]}]+''')
 LOCKFILES = {"package-lock.json", "pnpm-lock.yaml", "yarn.lock"}
+# Reviewed public package metadata identity only; this scanner never requests it.
+PUBLIC_REPO = "https://github.com/kasa500000-png/KoreaMap"
 # Reviewed literal used only to validate local research metadata, not a request.
 OFFLINE_REFERENCE_URLS = {
     "scripts/check-design.py": {"https://registry.npmjs.org/"},
-    "scripts/audit-cost-security.py": {"https://registry.npmjs.org/"},
+    "scripts/audit-cost-security.py": {"https://registry.npmjs.org/", PUBLIC_REPO},
 }
 DOCUMENTATION_HOSTS = {
-    "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
+    "docs.npmjs.com", "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
     "www.w3.org", "www.topografix.com",  # Geolocation / GPX specifications, docs only.
     "www.postgresql.org",  # Reviewed SQL documentation, not a runtime endpoint.
     "csv.js.org",  # Reviewed parser documentation only; never a runtime provider.
@@ -88,7 +90,22 @@ def scan(path, data, scope):
             if not placeholder(match[1]):
                 add("EMBEDDED_CREDENTIAL_OR_BILLING_ID", len(text[:match.start()].encode("utf-8")))
 
-    documentation = path == "data/sources.json" or path.startswith("docs/") or name in {"README.md", "AGENTS.md", "LICENSE", "NOTICE", "LICENSE.md", "NOTICE.md"}
+    documentation = path == "data/sources.json" or path.startswith("docs/") or name in {"README.md", "README.ko.md", "AGENTS.md", "LICENSE", "NOTICE", "LICENSE.md", "NOTICE.md", "THIRD_PARTY_NOTICES.md", "DATA_LICENSES.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "CHANGELOG.md"}
+    metadata_spans = []
+    if name == "package.json":
+        try:
+            pkg = json.loads(text)
+            repo = PUBLIC_REPO
+            fields = {"homepage": repo, "bugs": {"url": repo + "/issues"}}
+            repository = pkg.get("repository", {})
+            if isinstance(repository, dict) and repository.get("url") == repo + ".git" and repository.get("type") == "git" and repository.get("directory") in {"packages/" + n for n in ("core", "web", "native", "styles", "data-adapters")} and set(repository) == {"type", "url", "directory"}:
+                fields["repository"] = repository
+            for field, expected in fields.items():
+                if pkg.get(field) == expected:
+                    fragment = json.dumps({field: expected}, indent=2)[2:-2]
+                    metadata_spans.extend((m.start(), m.end()) for m in re.finditer("^" + re.escape(fragment), text, re.MULTILINE))
+        except (ValueError, AttributeError):
+            pass
     for match in URL.finditer(text):
         try:
             url = urlsplit(match[0]); host = url.hostname or ""
@@ -112,12 +129,13 @@ def scan(path, data, scope):
         if documentation and host and host not in DOCUMENTATION_HOSTS and not local and not reserved:
             add("UNREVIEWED_DOCUMENTATION_URL", pos)
         reviewed_reference = match[0] in OFFLINE_REFERENCE_URLS.get(path, set())
+        reviewed_metadata = any(start <= match.start() < end for start, end in metadata_spans)
         namespace = "http" + "://www.topografix.com/GPX/1/1"
         namespace_line = text.splitlines()[text[:match.start()].count("\n")].strip()
         reviewed_namespace = (path in {"packages/core/src/track-formats.ts", "dist/track-formats.js"}
                               and match[0] == namespace
                               and namespace_line in {f"const GPX_NAMESPACE = '{namespace}';", f'const GPX_NAMESPACE = "{namespace}";'})
-        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_namespace:
+        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_namespace and not reviewed_metadata:
             add("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", pos)
 
     if name == "package.json":

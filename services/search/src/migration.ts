@@ -1,5 +1,5 @@
 import type pg from 'pg';
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 import { migrate } from '@korea-map-kit/service-geo-data';
 export async function extensionNamespace(
   pool: pg.Pool | pg.PoolClient,

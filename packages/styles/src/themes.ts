@@ -7,7 +7,7 @@ import {
   type ExpressionSpecification,
   type SourceSpecification,
 } from '@maplibre/maplibre-gl-style-spec';
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 import { resolveTheme, type ThemeName, type ThemeOverrides } from './tokens.js';
 import { createDesignFixture } from './design-fixture.js';
 import { koreanNameExpression } from './labels.js';

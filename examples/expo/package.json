@@ -12,10 +12,10 @@
     "generate:native": "node ../../scripts/run-tool.mjs expo prebuild --no-install"
   },
   "dependencies": {
-    "@korea-map-kit/core": "workspace:*",
-    "@korea-map-kit/data-adapters": "workspace:*",
-    "@korea-map-kit/native": "workspace:*",
-    "@korea-map-kit/styles": "workspace:*",
+    "korea-map-core": "workspace:*",
+    "korea-map-data-adapters": "workspace:*",
+    "korea-map-native": "workspace:*",
+    "korea-map-styles": "workspace:*",
     "@maplibre/maplibre-react-native": "11.5.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "58.0.14",

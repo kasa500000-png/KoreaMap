@@ -5,7 +5,7 @@ import {
   type OperationContext,
   type SearchPort,
   type Scheduler,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 import { extensionNamespace } from './migration.js';
 const scheduler: Scheduler = {
   schedule(fn, ms) {

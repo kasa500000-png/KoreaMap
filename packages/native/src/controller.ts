@@ -10,7 +10,7 @@ import {
   type MapFeatureCollection,
   type MapStyle,
   type Scheduler,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 import { validateNativeResources, type NativeResourcePolicy } from './resources.js';
 import { validateStyleMin, type StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 

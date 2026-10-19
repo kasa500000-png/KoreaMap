@@ -1,1 +1,1 @@
-export { validateGeoJSON } from '@korea-map-kit/core';
+export { validateGeoJSON } from 'korea-map-core';

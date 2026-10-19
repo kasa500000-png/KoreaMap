@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { inflateSync } from 'node:zlib';
-import { themeNames, designLabelCorpus } from '@korea-map-kit/styles';
+import { themeNames, designLabelCorpus } from 'korea-map-styles';
 test('four themes render Korean labels, icons, zoom rules, overrides and visible attribution without external requests', async ({
   page,
   context,

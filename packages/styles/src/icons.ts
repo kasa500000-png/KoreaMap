@@ -1,4 +1,4 @@
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 export const poiKinds = ['park', 'parking', 'trail', 'facility'] as const;
 export type PoiKind = (typeof poiKinds)[number];
 export interface RgbaIcon {

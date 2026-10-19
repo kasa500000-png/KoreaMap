@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppState, Button, ScrollView, Switch, Text, TextInput, View } from 'react-native';
 import * as Location from 'expo-location';
-import { MapView, createExpoLocationClient } from '@korea-map-kit/native';
+import { MapView, createExpoLocationClient } from 'korea-map-native';
 import {
   KitError,
   createCancellationSource,
@@ -20,7 +20,7 @@ import {
   type MapController,
   type Track,
   type TrackReplay,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 const scheduler = {
   schedule(fn: () => void, ms: number) {
     const id = setTimeout(fn, ms);

@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createMap, type MapHandle } from '@korea-map-kit/web';
-import { createFixtureKoreanSearchProvider } from '@korea-map-kit/data-adapters';
+import { createMap, type MapHandle } from 'korea-map-web';
+import { createFixtureKoreanSearchProvider } from 'korea-map-data-adapters';
 import {
   createCancellationSource,
   focusSearchHit,
@@ -9,7 +9,7 @@ import {
   type KoreanSearchQuery,
   type PoiCategory,
   type SearchHit,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 
 const provider = createFixtureKoreanSearchProvider({
   schedule(callback, milliseconds) {

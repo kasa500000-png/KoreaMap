@@ -50,9 +50,13 @@ for (const [name, edges] of Object.entries(allowed)) {
   };
   if (name === 'core') assert.deepEqual(Object.keys(deps), [], 'core has no dependencies');
   for (const dep of Object.keys(deps)) {
-    if (dep.startsWith('@korea-map-kit/'))
+    assert(
+      !dep.startsWith('@korea-map-kit/'),
+      `${name}: private/obsolete workspace dependency ${dep}`,
+    );
+    if (dep.startsWith('korea-map-'))
       assert(
-        edges.includes(dep.slice('@korea-map-kit/'.length)),
+        edges.includes(dep.slice('korea-map-'.length)),
         `${name}: forbidden dependency ${dep}`,
       );
   }

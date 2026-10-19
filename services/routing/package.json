@@ -9,8 +9,8 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@korea-map-kit/core": "workspace:*",
-    "@korea-map-kit/data-adapters": "workspace:*"
+    "korea-map-core": "workspace:*",
+    "korea-map-data-adapters": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.19.2"

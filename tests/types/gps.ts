@@ -10,7 +10,7 @@ import {
   type MapController,
   type TrackingClock,
   type Scheduler,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 export async function trackConsumer(
   provider: LocationStreamProvider,
   clock: TrackingClock,

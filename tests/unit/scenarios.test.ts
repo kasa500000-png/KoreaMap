@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { boundsFromCoordinates, createMapController, type MapCommand } from '@korea-map-kit/core';
+import { boundsFromCoordinates, createMapController, type MapCommand } from 'korea-map-core';
 import {
   createScenarioSession,
   storageKey,

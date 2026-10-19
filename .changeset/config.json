@@ -3,11 +3,11 @@
   "commit": false,
   "fixed": [
     [
-      "@korea-map-kit/core",
-      "@korea-map-kit/styles",
-      "@korea-map-kit/data-adapters",
-      "@korea-map-kit/web",
-      "@korea-map-kit/native"
+      "korea-map-core",
+      "korea-map-styles",
+      "korea-map-data-adapters",
+      "korea-map-web",
+      "korea-map-native"
     ]
   ],
   "linked": [],

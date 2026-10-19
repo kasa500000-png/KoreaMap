@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { resolve, relative, isAbsolute } from 'node:path';
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 import {
   openDatabase,
   migrate,

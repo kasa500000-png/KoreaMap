@@ -4,7 +4,7 @@ import {
   KitError,
   type RoadRoutingProvider,
   type RoutingRequest,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 /** Local application gateway. Keep behind operator authentication/quotas for remote deployment. */
 export function createRoutingServer(provider: RoadRoutingProvider) {
   let active = 0;

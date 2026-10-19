@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { defineMapStyle } from '@korea-map-kit/core';
+import { defineMapStyle } from 'korea-map-core';
 import {
   createThemeStyle,
   designAttribution,
   koreanNameExpression,
   themeNames,
-} from '@korea-map-kit/styles';
+} from 'korea-map-styles';
 import {
   createNativeMapSession,
   validateNativeStyle,

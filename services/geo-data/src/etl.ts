@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
-import { KitError, validatePublicPlace } from '@korea-map-kit/core';
+import { KitError, validatePublicPlace } from 'korea-map-core';
 import { assertPrepared, type PreparedImport } from './ingestion.js';
 import { postgisNamespace } from './database.js';
 

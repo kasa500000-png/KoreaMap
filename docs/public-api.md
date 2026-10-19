@@ -48,7 +48,7 @@ Web의 기존 `addLayer`로 넣은 임의 레이어는 style 교체 시 제거�
 컨트롤러는 호출마다 옵션을 강제한다. Provider 인터페이스는 계약이므로 임의의 외부 구현이 옵션을 무시할 수 있다. 호출자도 `runOperation()`을 사용하고, Provider는 전달된 signal을 실제 transport의 AbortController 등으로 연결해야 한다. 무응답 구현을 강제 종료하거나 원격 요청 비용을 취소할 수 있다는 의미가 아니다. setStyle 진행 중 취소/timeout은 반쯤 적용된 지도를 남기지 않도록 해당 지도 인스턴스를 종료한다. 새 인스턴스로 복구한다. 초기 지도 로드 제한은 두 어댑터에서 기본 15초다.
 
 ```ts
-import { createCancellationSource, runOperation, type Scheduler, type SearchProvider } from '@korea-map-kit/core';
+import { createCancellationSource, runOperation, type Scheduler, type SearchProvider } from 'korea-map-core';
 
 const scheduler: Scheduler = {
   schedule(callback, delayMs) {
@@ -91,8 +91,8 @@ if (browserAbort.signal.aborted) request.cancel();
 Web (Next.js에서는 기존처럼 클라이언트 컴포넌트 안에서 실행):
 
 ```ts
-import { createMap } from '@korea-map-kit/web';
-import { defineMapStyle, defineMapLayer, type MapController } from '@korea-map-kit/core';
+import { createMap } from 'korea-map-web';
+import { defineMapStyle, defineMapLayer, type MapController } from 'korea-map-core';
 
 const handle = await createMap({ container, workerUrl: '/vendor/maplibre/maplibre-gl-worker.mjs', config: { mode: 'local-fixture', fixtureId: 'synthetic-v1' } });
 await handle.ready;
@@ -131,7 +131,7 @@ Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 R
 
 ## SemVer와 근거
 
-공통 계약은 `@korea-map-kit/core`가 소유하며 다섯 SDK 패키지는 기존 Changesets fixed group을 유지한다. 현재 0.1.0 manifest는 아직 발행하지 않았고 이번 Changeset은 minor다. 기존 메서드/이름을 제거하지 않았지만 KitErrorCode union 확장은 exhaustive switch 사용자의 소스 수정이 필요할 수 있어 0.x minor 릴리스 노트에 명시한다. 안정 1.x 이후 호환성을 깨는 의미·형태·반환값 변경은 major, 호환 API 추가는 minor, 버그 수정은 patch로 관리한다. 0.x에서도 파괴적 변경은 최소 minor와 마이그레이션 설명을 요구한다. 자동 publish는 없다.
+공통 계약은 `korea-map-core`가 소유하며 다섯 SDK 패키지는 기존 Changesets fixed group을 유지한다. 현재 0.1.0 manifest는 아직 발행하지 않았고 이번 Changeset은 minor다. 기존 메서드/이름을 제거하지 않았지만 KitErrorCode union 확장은 exhaustive switch 사용자의 소스 수정이 필요할 수 있어 0.x minor 릴리스 노트에 명시한다. 안정 1.x 이후 호환성을 깨는 의미·형태·반환값 변경은 major, 호환 API 추가는 minor, 버그 수정은 patch로 관리한다. 0.x에서도 파괴적 변경은 최소 minor와 마이그레이션 설명을 요구한다. 자동 publish는 없다.
 
 공통 API 단계에서 엔진 버전과 전이 의존성 그래프는 변경하지 않았다. 이후 Native SDK 단계는 예제에 expo-dev-client를 추가했다. Native는 RN 11.5.0이 이미 정확히 사용하는 Style Spec 26.2.1을 직접 의존성으로 명시해 해당 스키마로 JSON을 검증한다(ISC). Web/styles는 26.4.4를 유지한다. Native TypeScript는 상위 패키지의 extensionless 타입 참조를 올바르게 해석하도록 ESNext/Bundler를 사용하며, `check:native-types`가 component/ref/method의 any 유입을 차단한다. GL JS 6.14.0, RN 11.5.0, 두 Style Spec, TypeScript 6.0.3의 설치 선언과 아래 공식 문서를 2026-10-19에 대조했다. 공식 페이지가 미래 버전으로 바뀔 수 있으므로 lockfile/타입 검사 결과를 함께 본다.
 

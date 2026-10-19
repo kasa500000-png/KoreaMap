@@ -3,7 +3,7 @@ import {
   type PublicPlace,
   type PlacesProvider,
   type Scheduler,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 export function portablePlaces(provider: PlacesProvider, scheduler: Scheduler, place: PublicPlace) {
   const client = createPlacesClient(provider, scheduler);
   void client.getNearbyPlaces({ center: [127, 37], radiusMeters: 500 });

@@ -1,4 +1,4 @@
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 export const themeNames = ['standard', 'dark', 'pastel', 'outdoor'] as const;
 export type ThemeName = (typeof themeNames)[number];
 export interface DesignTokens {

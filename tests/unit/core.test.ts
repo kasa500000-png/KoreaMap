@@ -5,7 +5,7 @@ import {
   validateMapConfig,
   requireSearchProvider,
   KitError,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 describe('platform-free contracts', () => {
   it('accepts WGS84 longitude/latitude without changing input', () => {
     const value = Object.freeze([126.978, 37.5665]);

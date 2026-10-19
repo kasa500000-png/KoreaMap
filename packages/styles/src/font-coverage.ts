@@ -1,4 +1,4 @@
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 import { requiredCodePoints, auditGlyphCoverage } from './labels.js';
 /** Inspect Unicode cmap formats 4/12 in an operator-supplied OpenType/TrueType/TTC file.
  * No fonts are bundled or downloaded. WOFF/WOFF2 and bitmap glyph PBF are not accepted.

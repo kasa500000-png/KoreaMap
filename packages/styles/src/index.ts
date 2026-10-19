@@ -1,7 +1,7 @@
 // Upstream MapLibre declarations use the ambient GeoJSON namespace. Preserve it in published types.
 /// <reference types="geojson" preserve="true" />
 import type { StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import { validateMapConfig, type LocalMapConfig } from '@korea-map-kit/core';
+import { validateMapConfig, type LocalMapConfig } from 'korea-map-core';
 
 /** Original synthetic geometry, MIT. Not OSM or real map/search data. */
 export function createFixtureStyle(config: LocalMapConfig): StyleSpecification {

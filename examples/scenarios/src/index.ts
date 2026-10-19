@@ -17,8 +17,8 @@ import {
   type SearchProvider,
   type Track,
   type TrackingClock,
-} from '@korea-map-kit/core';
-import { createThemeStyle, designAttribution, type ThemeName } from '@korea-map-kit/styles';
+} from 'korea-map-core';
+import { createThemeStyle, designAttribution, type ThemeName } from 'korea-map-styles';
 
 export type ScenarioKind = 'walk' | 'trip';
 export interface DemoStorage {

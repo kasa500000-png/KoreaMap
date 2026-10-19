@@ -1,15 +1,10 @@
 import { View, Text, StyleSheet, Button, ScrollView, Switch } from 'react-native';
 import { useRef, useState } from 'react';
-import { defineMapStyle, normalizeError, type MapController } from '@korea-map-kit/core';
-import {
-  createThemeStyle,
-  designAttribution,
-  themeNames,
-  type ThemeName,
-} from '@korea-map-kit/styles';
+import { defineMapStyle, normalizeError, type MapController } from 'korea-map-core';
+import { createThemeStyle, designAttribution, themeNames, type ThemeName } from 'korea-map-styles';
 import { GpsDemo } from './gps-demo';
 import { ScenarioScreen } from './scenario-screen';
-import { MapView } from '@korea-map-kit/native';
+import { MapView } from 'korea-map-native';
 
 function themeStyle(theme: ThemeName) {
   const document = createThemeStyle({

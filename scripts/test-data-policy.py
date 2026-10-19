@@ -136,7 +136,7 @@ class DataPolicyTest(unittest.TestCase):
         check_inventory(files, inv)
 
     def test_tarball_manifest_cannot_smuggle_extra_fields(self):
-        manifest = {'name': '@korea-map-kit/core', 'license': 'MIT',
+        manifest = {'name': 'korea-map-core', 'license': 'MIT',
                     'files': ['dist/**/*.js', 'dist/**/*.d.ts', 'dist/LICENSE', 'README.md']}
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'package.tgz'

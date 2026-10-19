@@ -17,8 +17,8 @@ import {
   type MapController,
   type MapEvent,
   type MapStyle,
-} from '@korea-map-kit/core';
-import { createFixtureStyle } from '@korea-map-kit/styles';
+} from 'korea-map-core';
+import { createFixtureStyle } from 'korea-map-styles';
 import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 import { Button, ScrollView, Text, View, type NativeSyntheticEvent } from 'react-native';
 import type { NativeResourcePolicy } from './resources.js';
@@ -31,7 +31,7 @@ export {
   type NativeCameraStop,
   type NativeSnapshot,
 } from './controller.js';
-export type { MapController } from '@korea-map-kit/core';
+export type { MapController } from 'korea-map-core';
 export type NativeMapConfig =
   | LocalMapConfig
   | {

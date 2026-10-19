@@ -33,8 +33,8 @@ Valhalla의 `radius`만으로는 거리 상한이 되지 않는다. `search_cuto
 불완전한 OSM을 자동 복구하지 않는다. 응답 원문·URL·좌표·토큰을 오류/로그에 복사하지 않는다.
 
 ```ts
-import { createValhallaRoutingProvider } from '@korea-map-kit/data-adapters';
-import { roadRouteToGeoJSON } from '@korea-map-kit/core';
+import { createValhallaRoutingProvider } from 'korea-map-data-adapters';
+import { roadRouteToGeoJSON } from 'korea-map-core';
 
 // transport와 scheduler는 소비 앱에서 주입한다. 기본 URL/환경변수 탐색은 없다.
 const routing = createValhallaRoutingProvider({

@@ -1,4 +1,4 @@
-# @korea-map-kit/native
+# korea-map-native
 
 React Native MapLibre SDK using the same `MapController` as Web. Unpublished; native device
 certification is incomplete. SDK code and original synthetic fixtures are MIT.
@@ -8,6 +8,9 @@ For Expo, use SDK 58.0.14, the MapLibre config plugin and a **Development Build*
 Build this workspace with `pnpm build:sdk` before using `examples/expo`.
 
 ```tsx
+import { useRef } from 'react';
+import { MapView, type MapController } from 'korea-map-native';
+
 const map = useRef<MapController>(null);
 <MapView
   ref={map}
@@ -26,7 +29,7 @@ Point/Line/Polygon overlays and routes survive style changes. Layers belong in i
 `gesturesEnabled={false}` hands scroll gestures to the parent; coordinate its ScrollView setting.
 Unmount/destroy releases the session and native view. Remount after fatal errors.
 
-Four themes come from `@korea-map-kit/styles`. Korean map labels require an operator glyph
+Four themes come from `korea-map-styles`. Korean map labels require an operator glyph
 endpoint and font stack. Default fixtures use no fonts/tiles/network; RN Text labels are not map
 glyph validation. Attribution stays outside the themed map and the engine control stays enabled.
 

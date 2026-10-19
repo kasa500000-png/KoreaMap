@@ -11,7 +11,7 @@ import sys
 
 def main(root: Path) -> None:
     docs = root / "docs"
-    files = [root / "README.md", root / "AGENTS.md", *sorted(docs.rglob("*.md"))]
+    files = [*sorted(root.glob("*.md")), *sorted(docs.rglob("*.md")), *sorted((root / ".github").rglob("*.md"))]
     link_count = 0
     for path in files:
         text = path.read_text(encoding="utf-8")

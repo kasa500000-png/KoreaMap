@@ -9,7 +9,7 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@korea-map-kit/core": "workspace:*",
+    "korea-map-core": "workspace:*",
     "csv-parse": "7.0.3",
     "pg": "8.23.1"
   },

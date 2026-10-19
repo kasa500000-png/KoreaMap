@@ -7,7 +7,7 @@ import {
   type LocationStreamProvider,
   type LocationSubscription,
   type OperationOptions,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 /** Browser foreground adapter. Construction/import never prompts for permission. */
 export function createBrowserLocationClient(
   options: { geolocation?: Geolocation; document?: Document } = {},

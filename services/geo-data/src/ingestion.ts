@@ -1,11 +1,6 @@
 import { createHash } from 'node:crypto';
 import { parse } from 'csv-parse/sync';
-import {
-  KitError,
-  validatePublicPlace,
-  type PoiCategory,
-  type PublicPlace,
-} from '@korea-map-kit/core';
+import { KitError, validatePublicPlace, type PoiCategory, type PublicPlace } from 'korea-map-core';
 
 export const MAX_DOWNLOAD_BYTES = 10 * 1024 * 1024;
 export interface CsvImportConfig {

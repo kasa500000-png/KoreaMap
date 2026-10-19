@@ -1,4 +1,4 @@
-# @korea-map-kit/data-adapters
+# korea-map-data-adapters
 
 Korea Map Kit foundation package. Unpublished; this is not the complete MVP.
 

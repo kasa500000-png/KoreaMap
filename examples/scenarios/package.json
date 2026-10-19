@@ -8,7 +8,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@korea-map-kit/core": "workspace:*",
-    "@korea-map-kit/styles": "workspace:*"
+    "korea-map-core": "workspace:*",
+    "korea-map-styles": "workspace:*"
   }
 }

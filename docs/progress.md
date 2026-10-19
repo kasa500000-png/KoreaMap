@@ -568,3 +568,7 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 소비 앱 lock을 빈 metadata 캐시에서 공개 registry로 명시적으로 준비한 뒤 frozen/offline 설치하도록 고쳤다.
 기존 검토 그래프 밖의 제3자 버전은 거부한다. 로컬 재검증 뒤 후속 커밋하며 최신 원격 checks로 판정한다.
 이 변경은 검사 준비 절차이며 SDK runtime/타입/타일 endpoint는 변경하지 않는다.
+
+## 릴리스 후보 준비 — 2026-10-19
+
+영문/국문·커뮤니티·설치·운영 문서, 5개 비스코프 후보 패키지 이름, 초기 CHANGELOG와 승인 제한 발행 자동화를 로컬 후보로 준비했다. 기능/패키지/실화면 검증은 보고서의 실제 실행 범위에서 통과했으나 공개 발행은 차단 상태다. 상세 구현 파일, 테스트, 실화면, 보안/라이선스, 차단 사항과 다음 단계는 [후보 보고서](releases/v0.1.0.md)를 따른다. 현재 high 취약점과 Native/registry 미검증은 공개 차단으로 유지한다. 브랜치 `release/v0.1.0-preparation`; 커밋은 `git log -1 --format=%H release/v0.1.0-preparation`로 식별한다. 제작자 provider를 추가하지 않았고 공개 npm 메타데이터 조회/의존성 설치만 수행한다. 원격 공개 업로드·배포·npm 발행·GitHub Release는 승인 전 실행하지 않는다.

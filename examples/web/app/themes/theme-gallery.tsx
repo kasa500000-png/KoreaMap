@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createMap, createMapState, type MapHandle } from '@korea-map-kit/web';
+import { createMap, createMapState, type MapHandle } from 'korea-map-web';
 import {
   themeNames,
   resolveTheme,
@@ -10,7 +10,7 @@ import {
   designAttribution,
   type ThemeName,
   type ThemeOverrides,
-} from '@korea-map-kit/styles';
+} from 'korea-map-styles';
 const details = {
   standard: '일상의 길과 장소를 균형 있게',
   dark: '어두운 바탕에서 차분한 탐색',

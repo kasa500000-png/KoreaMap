@@ -3,8 +3,8 @@ import type {
   SearchProvider,
   GeocodingProvider,
   MapController,
-} from '@korea-map-kit/core';
-import { focusSearchHit } from '@korea-map-kit/core';
+} from 'korea-map-core';
+import { focusSearchHit } from 'korea-map-core';
 /** Strict compile-only contract examples shared by Web and Native. */
 export async function searchConsumer(provider: KoreanSearchProvider, map: MapController) {
   const compatible: SearchProvider = provider;

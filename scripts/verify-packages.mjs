@@ -36,7 +36,7 @@ mkdirSync(directory, { recursive: true });
 const before = new Map(
   names.map((name) => {
     const { version } = JSON.parse(readFileSync(`packages/${name}/package.json`, 'utf8'));
-    const file = `korea-map-kit-${name}-${version}.tgz`;
+    const file = `korea-map-${name}-${version}.tgz`;
     return [file, readFileSync(resolve('artifacts', file))];
   }),
 );
@@ -61,11 +61,8 @@ try {
     names
       .filter((name) => name !== 'native')
       .map((name) => {
-        const file = packages.find((entry) => entry.file.startsWith(`korea-map-kit-${name}-`)).file;
-        return [
-          `@korea-map-kit/${name}`,
-          `file:${resolve('artifacts', file).replaceAll('\\', '/')}`,
-        ];
+        const file = packages.find((entry) => entry.file.startsWith(`korea-map-${name}-`)).file;
+        return [`korea-map-${name}`, `file:${resolve('artifacts', file).replaceAll('\\', '/')}`];
       }),
   );
   writeFileSync(
@@ -124,11 +121,11 @@ try {
         );
     }
   }
-  const source = `import type { Coordinate, MapMarker } from '@korea-map-kit/core';
-import { normalizeSearchText } from '@korea-map-kit/core';
-import { createMapState, createMap } from '@korea-map-kit/web';
-import * as adapters from '@korea-map-kit/data-adapters';
-import { createFixtureStyle } from '@korea-map-kit/styles';
+  const source = `import type { Coordinate, MapMarker } from 'korea-map-core';
+import { normalizeSearchText } from 'korea-map-core';
+import { createMapState, createMap } from 'korea-map-web';
+import * as adapters from 'korea-map-data-adapters';
+import { createFixtureStyle } from 'korea-map-styles';
 const coordinate: Coordinate = [127, 37];
 const marker: MapMarker = { id: 'synthetic', label: '합성 장소', coordinate };
 const state = createMapState(); state.setMarkers([marker]);
@@ -160,7 +157,7 @@ createFixtureStyle({ mode: 'local-fixture', fixtureId: 'synthetic-v1' });
   assert.equal(typed.status, 0, `${typed.stdout}\n${typed.stderr}`);
   writeFileSync(
     resolve(temp, 'core-consumer.ts'),
-    "import { normalizeSearchText, type Coordinate } from '@korea-map-kit/core'; const point: Coordinate = [127, 37]; if (point[0] !== 127 || normalizeSearchText('서 울') !== '서울') throw Error('core');",
+    "import { normalizeSearchText, type Coordinate } from 'korea-map-core'; const point: Coordinate = [127, 37]; if (point[0] !== 127 || normalizeSearchText('서 울') !== '서울') throw Error('core');",
   );
   writeFileSync(
     resolve(temp, 'core-tsconfig.json'),
@@ -221,7 +218,7 @@ createFixtureStyle({ mode: 'local-fixture', fixtureId: 'synthetic-v1' });
   writeFileSync(
     resolve(temp, 'index.html'),
     `<!doctype html><html lang="ko"><meta charset="utf-8"><title>Isolated SDK consumer</title><div id="map" style="height:400px"></div><script type="module">
-import { createMap, createMapState } from '@korea-map-kit/web';
+import { createMap, createMapState } from 'korea-map-web';
 import 'maplibre-gl/dist/maplibre-gl.css';
 const state = createMapState(); state.setMarkers([{ id: 'fixture', label: '합성 장소', coordinate: [126.978, 37.5665] }]);
 const map = await createMap({ container: document.getElementById('map'), state, workerUrl: '/worker.mjs', config: { mode: 'local-fixture', fixtureId: 'synthetic-v1' } });

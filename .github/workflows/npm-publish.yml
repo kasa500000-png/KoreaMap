@@ -1,0 +1,59 @@
+name: Approved npm publication
+on:
+  workflow_dispatch:
+    inputs:
+      approved_commit:
+        description: Full source commit explicitly approved for publication after all release gates
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: npm-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: vars.NPM_PUBLISH_ENABLED == 'true' && inputs.approved_commit == vars.NPM_APPROVED_COMMIT
+    environment: npm-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      KMK_APPROVED_COMMIT: ${{ inputs.approved_commit }}
+      NEXT_TELEMETRY_DISABLED: '1'
+      EXPO_NO_TELEMETRY: '1'
+      EXPO_OFFLINE: '1'
+      EXPO_NO_DOTENV: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ inputs.approved_commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: npm install --global pnpm@12.14.0 --ignore-scripts --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm audit:dependencies
+      - run: pnpm pack:check
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm verify:packages
+      - run: pnpm release:prepare
+      - run: pnpm release:verify
+      # OIDC trusted publishers and required environment reviewers must be configured first.
+      # First publication/bootstrap ownership is a separate approved operator step.
+      - name: Publish verified tarballs in dependency order
+        run: |
+          npm publish artifacts/korea-map-core-0.1.0.tgz --provenance --access public --ignore-scripts
+          npm publish artifacts/korea-map-styles-0.1.0.tgz --provenance --access public --ignore-scripts
+          npm publish artifacts/korea-map-data-adapters-0.1.0.tgz --provenance --access public --ignore-scripts
+          npm publish artifacts/korea-map-web-0.1.0.tgz --provenance --access public --ignore-scripts
+          npm publish artifacts/korea-map-native-0.1.0.tgz --provenance --access public --ignore-scripts

@@ -1,9 +1,9 @@
-# @korea-map-kit/styles
+# korea-map-styles
 
 Independent Korea Map Kit design system: Standard, Dark, Pastel and Outdoor. Code, geometric POI icons and authored synthetic geometry are MIT. No fonts, third-party map data, glyph server or paid account are bundled. MapLibre GL JS 6.14.0 / Style Spec 26.4.4 are the tested exact versions.
 
 ```ts
-import { createThemeStyle, resolveTheme, createPoiIcon, poiKinds } from '@korea-map-kit/styles';
+import { createThemeStyle, resolveTheme, createPoiIcon, poiKinds } from 'korea-map-styles';
 
 const tokens = resolveTheme('outdoor', { colors: { water: '#80b8ce' } });
 const style = createThemeStyle({
@@ -20,7 +20,7 @@ const images = poiKinds.map((kind) => ({
 }));
 ```
 
-Pass `style` and `images` to `@korea-map-kit/web` via `createMap({ ..., config: { mode: 'inline', style, allowedOrigins: [], attribution: 'Korea Map Kit authored design fixture (MIT)', costAcknowledged: true }, images })`. Empty allowedOrigins forbids renderer resource requests. SDK source attribution and the visible attribution control remain independent of theme tokens. Import the MapLibre CSS and provide a local worker as described in the web package README. The `/themes/` example compares all four with the same starting camera.
+Pass `style` and `images` to `korea-map-web` via `createMap({ ..., config: { mode: 'inline', style, allowedOrigins: [], attribution: 'Korea Map Kit authored design fixture (MIT)', costAcknowledged: true }, images })`. Empty allowedOrigins forbids renderer resource requests. SDK source attribution and the visible attribution control remain independent of theme tokens. Import the MapLibre CSS and provide a local worker as described in the web package README. The `/themes/` example compares all four with the same starting camera.
 
 `resolveTheme(theme, overrides)` returns a fresh token tree. Override colors, widths, typography sizes/halo and minimum zooms. Colors accept opaque `#RRGGBB`; label/halo and icon/ink contrast below 4.5 fails. Width/size stops use z10/z14/z18 with linear interpolation; malformed, decreasing or oversized values fail. These checks are not a full accessibility certification.
 

@@ -1,13 +1,13 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { createMap, type MapHandle } from '@korea-map-kit/web';
+import { createMap, type MapHandle } from 'korea-map-web';
 import {
   createCancellationSource,
   defineMapStyle,
   normalizeError,
   type MapController,
-} from '@korea-map-kit/core';
-import { createThemeStyle } from '@korea-map-kit/styles';
+} from 'korea-map-core';
+import { createThemeStyle } from 'korea-map-styles';
 /** This function accepts the same type as the React Native MapView ref. */
 async function runExample(map: MapController) {
   await map.setCenter([126.978, 37.5665]);

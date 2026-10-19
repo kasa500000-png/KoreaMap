@@ -1,5 +1,5 @@
 import pg from 'pg';
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 
 export function openDatabase(
   connection: string | undefined,

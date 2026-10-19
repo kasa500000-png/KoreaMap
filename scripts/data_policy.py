@@ -238,8 +238,8 @@ def expected_package(root, name):
     for group in ('dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'):
         for dependency, version in manifest.get(group, {}).items():
             if version.startswith('workspace:'):
-                require(version == 'workspace:*' and dependency.startswith('@korea-map-kit/'), 'Unreviewed workspace resolution')
-                other = dependency.split('/')[-1]
+                require(version == 'workspace:*' and dependency.startswith('korea-map-'), 'Unreviewed workspace resolution')
+                other = dependency.removeprefix('korea-map-')
                 require(other in SDK, 'Unknown workspace package')
                 manifest[group][dependency] = json.loads((root / 'packages' / other / 'package.json').read_text(encoding='utf-8'))['version']
     expected = {'package/package.json': manifest, 'package/README.md': (base / 'README.md').read_bytes(),
@@ -267,7 +267,7 @@ def check_tarball(path, expected, name):
             if member.name == 'package/package.json':
                 package = json.loads(data)
                 require(package == expected[member.name], 'Package manifest differs from reviewed workspace')
-                require(package['name'] == '@korea-map-kit/' + name and package['license'] == 'MIT', 'Package identity/license')
+                require(package['name'] == 'korea-map-' + name and package['license'] == 'MIT', 'Package identity/license')
                 require(package.get('files') == ['dist/**/*.js', 'dist/**/*.d.ts', 'dist/LICENSE', 'README.md'], 'Publish allowlist changed')
                 require(not any(h in package.get('scripts', {}) for h in ('preinstall', 'install', 'postinstall', 'prepare')), 'Package lifecycle hook')
             else:

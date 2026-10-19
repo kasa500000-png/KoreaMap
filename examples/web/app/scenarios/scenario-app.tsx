@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { parseCustomStyle } from '@korea-map-kit/styles';
-import { createMap, type MapHandle } from '@korea-map-kit/web';
+import { parseCustomStyle } from 'korea-map-styles';
+import { createMap, type MapHandle } from 'korea-map-web';
 import {
   createScenarioSession,
   scenarioActions,

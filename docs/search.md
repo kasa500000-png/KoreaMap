@@ -19,8 +19,8 @@ DB·fetch·UI 의존성 없이 `core`에서 독립 실행된다. 웹/React Nativ
 ## SDK 예제
 
 ```ts
-import { createCancellationSource, focusSearchHit } from '@korea-map-kit/core';
-import { createFixtureKoreanSearchProvider } from '@korea-map-kit/data-adapters';
+import { createCancellationSource, focusSearchHit } from 'korea-map-core';
+import { createFixtureKoreanSearchProvider } from 'korea-map-data-adapters';
 
 const scheduler = {
   schedule(callback: () => void, ms: number) {

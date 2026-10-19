@@ -8,11 +8,8 @@ import {
   type RoadRoute,
   type RoutingRequest,
   type Scheduler,
-} from '@korea-map-kit/core';
-import {
-  createValhallaRoutingProvider,
-  type ValhallaTransport,
-} from '@korea-map-kit/data-adapters';
+} from 'korea-map-core';
+import { createValhallaRoutingProvider, type ValhallaTransport } from 'korea-map-data-adapters';
 const scheduler: Scheduler = {
   schedule(f, ms) {
     const t = setTimeout(f, ms);

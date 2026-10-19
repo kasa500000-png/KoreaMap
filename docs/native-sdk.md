@@ -56,7 +56,7 @@ USB Android는 `adb reverse tcp:8081 tcp:8081` 후 로컬 Metro에 연결할 수
 
 ```tsx
 import { useRef } from 'react';
-import { MapView, type MapController } from '@korea-map-kit/native';
+import { MapView, type MapController } from 'korea-map-native';
 
 function MapScreen() {
   const map = useRef<MapController>(null);
@@ -90,16 +90,16 @@ ScrollView와 지도 제스처를 함께 전환한다. Android texture view와 f
 
 ## 4종 테마·한글·레이어
 
-`@korea-map-kit/styles`의 `createThemeStyle`로 standard/dark/pastel/outdoor를 생성하고
+`korea-map-styles`의 `createThemeStyle`로 standard/dark/pastel/outdoor를 생성하고
 `defineMapStyle(document, attribution)` 후 `map.current.setStyle(...)`로 적용한다.
 `overrides`로 색상·도로 폭을 변경한다. 임의 레이어는 유효한 Style Spec의 sources/layers에
 추가하고 전체 style을 교체한다. `kmk-`는 SDK 마커·overlay 예약 prefix다.
 커스텀 레이어를 유지하려면 다음 스타일에도 포함해야 한다.
 
 ```ts
-import { defineMapStyle } from '@korea-map-kit/core';
-import { createThemeStyle } from '@korea-map-kit/styles';
-import { createNativeVectorSource } from '@korea-map-kit/native';
+import { defineMapStyle } from 'korea-map-core';
+import { createThemeStyle } from 'korea-map-styles';
+import { createNativeVectorSource } from 'korea-map-native';
 
 // 모두 운영자 입력. example.invalid는 실행 가능한 기본 서버가 아니다.
 const origin = 'https://tiles.example.invalid';

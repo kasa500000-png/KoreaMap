@@ -7,7 +7,7 @@ import {
   type Scheduler,
   type SearchPort,
   type SearchHit,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 /** Authored test facilities at approximate city locations, not real public POIs or official addresses. */
 export function createKoreanSearchFixturePlaces(): readonly PublicPlace[] {
   const rows = [

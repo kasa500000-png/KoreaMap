@@ -1,5 +1,5 @@
 {
-  "name": "@korea-map-kit/core",
+  "name": "korea-map-core",
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
@@ -25,5 +25,21 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kasa500000-png/KoreaMap.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/kasa500000-png/KoreaMap",
+  "bugs": {
+    "url": "https://github.com/kasa500000-png/KoreaMap/issues"
+  },
+  "keywords": [
+    "maplibre",
+    "korea",
+    "map",
+    "typescript",
+    "core"
+  ]
 }

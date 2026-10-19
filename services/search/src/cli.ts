@@ -1,5 +1,5 @@
 import { openDatabase } from '@korea-map-kit/service-geo-data';
-import { KitError } from '@korea-map-kit/core';
+import { KitError } from 'korea-map-core';
 import { migrateSearch } from './migration.js';
 import { createPostgisSearchProvider } from './provider.js';
 import { createSearchServer } from './server.js';

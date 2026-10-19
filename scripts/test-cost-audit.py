@@ -43,6 +43,23 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(report["status"], "PASS_STATIC_ONLY")
         self.assertFalse(report["runtime_verified"])
 
+    def test_repository_metadata_does_not_exempt_runtime_script_urls(self):
+        repo = "https:" + "//github.com/kasa500000-png/KoreaMap"
+        package = {"private": True, "homepage": repo, "bugs": {"url": repo + "/issues"},
+                   "repository": {"type": "git", "url": repo + ".git", "directory": "packages/core"}}
+        self.write("package.json", json.dumps(package, indent=2))
+        process, _, _ = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        package["scripts"] = {"demo": "curl " + repo}
+        self.write("package.json", json.dumps(package, indent=2))
+        _, _, rules = self.run_audit()
+        self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+        package.pop("scripts")
+        package["other"] = {"url": repo + "/issues"}
+        self.write("package.json", json.dumps(package, indent=2))
+        _, _, rules = self.run_audit()
+        self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+
     def test_android_sdk_docs_are_not_a_runtime_provider(self):
         self.write("docs/native.md", "https://" + "developer.android.com/studio\n")
         process, _, _ = self.run_audit()

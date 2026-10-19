@@ -6,7 +6,7 @@ import {
   type PlacesQuery,
   type OperationContext,
   type PublicPlace,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 
 /** Inject an authenticated operator transport. The SDK supplies no endpoint, credential or fetch implementation. */
 export function createRemotePlacesProvider(

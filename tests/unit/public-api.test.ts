@@ -16,7 +16,7 @@ import {
   type MapCommand,
   type MapPort,
   type Scheduler,
-} from '@korea-map-kit/core';
+} from 'korea-map-core';
 import {
   createNativeMapSession,
   validateNativeStyle,

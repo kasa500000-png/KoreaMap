@@ -1,5 +1,5 @@
 {
-  "name": "@korea-map-kit/web",
+  "name": "korea-map-web",
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
@@ -27,8 +27,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@korea-map-kit/core": "workspace:*",
-    "@korea-map-kit/styles": "workspace:*",
+    "korea-map-core": "workspace:*",
+    "korea-map-styles": "workspace:*",
     "@types/geojson": "7946.0.16"
   },
   "devDependencies": {
@@ -36,5 +36,21 @@
   },
   "peerDependencies": {
     "maplibre-gl": "6.14.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kasa500000-png/KoreaMap.git",
+    "directory": "packages/web"
+  },
+  "homepage": "https://github.com/kasa500000-png/KoreaMap",
+  "bugs": {
+    "url": "https://github.com/kasa500000-png/KoreaMap/issues"
+  },
+  "keywords": [
+    "maplibre",
+    "korea",
+    "map",
+    "typescript",
+    "web"
+  ]
 }

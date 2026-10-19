@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { themeNames } from '@korea-map-kit/styles';
+import { themeNames } from 'korea-map-styles';
 
 for (const width of [390, 768, 1440]) {
   test(`quality matrix ${width}px: renderer, large markers, camera, themes, recovery`, async ({

@@ -13,7 +13,7 @@ import {
   inspectFontCoverage,
   createPoiIcon,
   poiKinds,
-} from '@korea-map-kit/styles';
+} from 'korea-map-styles';
 const fixture = {
   target: 'web',
   data: { mode: 'fixture' },

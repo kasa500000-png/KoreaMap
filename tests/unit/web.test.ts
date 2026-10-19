@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { createMap, createMapState } from '@korea-map-kit/web';
+import { createMap, createMapState } from 'korea-map-web';
 import {
   validateWebConfig,
   resourceUrl,
