@@ -45,6 +45,7 @@ else if (task === 'check') {
     'lint',
     'format:check',
     'typecheck',
+    'check:native-types',
     'test',
     'test:core',
     'check:api-docs',

@@ -26,7 +26,7 @@
 - core 독립 테스트는 복사한 compiled core를 실행한다. npm 실제 발행/설치를 의미하지 않는다. 다섯 실제 tarball의 allowlist/bytes/라이선스·비용 경로는 별도 pack 검사에서 확인한다.
 - Native 외부 리소스/symbol 스타일은 의도적으로 거부한다. Web origin 정책은 초기 설정을 유지하며 arbitrary custom JavaScript/redirect에 대한 네트워크 sandbox를 보장하지 않는다.
 - provider 실 구현, 외부 서비스 비용 한도, GPS permission UX, 실제 공공데이터/tiles/glyph, Safari/Firefox, 장시간 GPU/heap와 이전 MapLibre singleton worker 제약은 남아 있다.
-- 기존 전이 dependency high2 출시 차단 유지. 이번에는 버전 변경이나 신규 advisory 조회를 하지 않았다.
+- 기존 전이 dependency high2 출시 차단 유지. 엔진/전이 그래프 버전 변경이나 신규 advisory 조회는 하지 않았다. Native 직접 의존성은 기존 RN 내부 버전인 Style Spec 26.2.1(ISC)로 명시했다.
 
 ## 재현
 
@@ -50,7 +50,15 @@ Linux 로컬은 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium`을 사�
 | --- | --- |
 | korea-map-kit-core-0.1.0.tgz | `ac7ff54ffd2cf229a8b8b01b3e5d822a41fd8569b4601154a01ceee1f839303b` |
 | korea-map-kit-data-adapters-0.1.0.tgz | `8d13a03c440ed00a1e02e856d147b8ec185cf450ca6321fa14f95549b88de48f` |
-| korea-map-kit-native-0.1.0.tgz | `c5c3aadca81c1fdf2b2ffcd3c2e173d80aef9501321d66f9a14a1656b6cafe0f` |
+| korea-map-kit-native-0.1.0.tgz | `d026392123c4b276f59b6dea0329bd0565e2b5c9fb082c1049575c10d5a73505` |
 | korea-map-kit-styles-0.1.0.tgz | `2deb1e5dfb44706ab07a4c04110f54d826df9168f8ddd46ce9b6ee2b5897f8d6` |
 | korea-map-kit-web-0.1.0.tgz | `6c324bf1e5f759992e795ce86af36450b01ef3f9ec465b7254b780c55ae8115f` |
 | ignored public-api.png | `ad26ec8ab04930ce534f7df1d1de695d6fe8343f5e154218e06cc6ca20e35b54` |
+
+## Native 타입 해석·원격 회귀 보강
+
+초기 커밋 `1c86947`의 원격 CI에서 Windows/macOS check·pack은 통과했지만 Linux의 기존 font-probe KR face 단발 조회가 실패했다. 해당 실행을 전체 CI 합격으로 표시하지 않는다. probe를 실제 표시하고 document.fonts.ready/레이아웃 이후 정확한 KR family와 glyphCount를 기다리도록 보강했다. 허용 폰트를 넓히거나 검사를 생략하지 않았다. 최종 후속 커밋의 원격 결과는 PR checks를 따른다.
+
+별도 타입 심층 검사에서 Native의 NodeNext 해석이 상위 RN의 extensionless 선언 import를 any로 처리함을 확인했다. Native를 ESNext/Bundler로 변경하고 실제 CameraStop union을 만족하도록 center/bounds 상호 배제 구조를 적용했다. RN의 고정 Style Spec 26.2.1과 Web/styles 26.4.4의 타입 차이는 무조건 캐스팅하지 않고 Native 전용 26.2.1 validator로 확인한다. 새 직접 의존성은 이미 lockfile에 존재하던 동일 버전이며 ISC 조건을 유지한다. `pnpm check:native-types`가 실제 component/ref/method 해석에서 any/unknown을 발견하면 CI를 실패시킨다.
+
+보강 후 로컬 전체 `pnpm check`(새 Native 타입 해석 검사 포함), `pnpm pack:check`, 최종 Playwright 6개를 다시 통과했다. 위 tarball SHA는 보강 후 산출물이다. 원격 결과는 후속 커밋에 연결된 PR checks로 확인한다.

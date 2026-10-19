@@ -11,32 +11,37 @@ import {
   type MapStyle,
   type Scheduler,
 } from '@korea-map-kit/core';
-import { parseCustomStyle } from '@korea-map-kit/styles';
+import { validateStyleMin, type StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 
 /** Minimal native bridge, checked against installed MapLibre CameraRef/MapRef by MapView. */
+export type NativeCameraStop = {
+  zoom?: number;
+  bearing?: number;
+  pitch?: number;
+  padding?: { top: number; right: number; bottom: number; left: number };
+  duration: number;
+} & (
+  | { center: [number, number]; bounds?: never }
+  | { bounds: [number, number, number, number]; center?: never }
+  | { center?: never; bounds?: never }
+);
 export interface NativeBridge {
-  setCamera(stop: {
-    center?: [number, number];
-    zoom?: number;
-    bearing?: number;
-    pitch?: number;
-    bounds?: [number, number, number, number];
-    padding?: { top: number; right: number; bottom: number; left: number };
-    duration: number;
-  }): Promise<void>;
+  setCamera(stop: NativeCameraStop): Promise<void>;
   getBounds(): Promise<[number, number, number, number]>;
 }
 export interface NativeSnapshot {
-  readonly style: ReturnType<typeof parseCustomStyle>;
+  readonly style: StyleSpecification;
   readonly attribution: string;
   readonly markers: readonly MapMarker[];
   readonly overlays: ReadonlyMap<string, MapFeatureCollection>;
   readonly destroyed: boolean;
 }
 /** Until a native resource interceptor is implemented, external resources fail closed. */
-export function validateNativeStyle(input: MapStyle): ReturnType<typeof parseCustomStyle> {
+export function validateNativeStyle(input: MapStyle): StyleSpecification {
   const envelope = defineMapStyle(input.document, input.attribution);
-  const style = parseCustomStyle(envelope.document);
+  const style = envelope.document as unknown as StyleSpecification;
+  if (validateStyleMin(style).length)
+    throw new KitError('INVALID_ARGUMENT', 'INVALID_NATIVE_STYLE');
   if (
     style.glyphs ||
     style.sprite ||

@@ -109,12 +109,12 @@
       "license": "MIT"
     },
     "packages/native/src/controller.ts": {
-      "sha256": "59af8c7fc07f17c536277b8e7a4557fbadb79b5028c84e67a4e2983ef3197dff",
+      "sha256": "bd67c911d27865db414b0f02a0003fa22ef8cede440631fc1c3ca7a06da4f7c8",
       "origin": "project-authored",
       "license": "MIT"
     },
     "packages/native/src/index.tsx": {
-      "sha256": "1f51d00a5349d7d611057dcf851867d888110450285c0b30be5167acb8aceba5",
+      "sha256": "f773ad3352af672c7cf28d6dfd3ee91d0929d38f5b158baa878208529abc1f33",
       "origin": "project-authored",
       "license": "MIT"
     },

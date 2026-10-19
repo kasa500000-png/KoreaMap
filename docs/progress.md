@@ -442,3 +442,7 @@
 ### 최종 로컬 검사 확정
 
 `pnpm check`(Vitest 41·core 독립 Node 1·데이터 정책 17·비용 검사 12), `pnpm pack:check`(5 SDK tarball), 최종 Next 배포물 Playwright 6개가 통과했다. 타입 음성 사례, API 선언 문서 일치, core 외부 의존성/DOM 금지, 실제 Web 스타일 교체·카메라·overlay·선택·취소·종료·출처를 검증했다. 외부 HTTP 시도 0. staged 검사를 통과한 뒤 커밋하며 원격 결과는 PR checks를 따른다. Native 실기기/실빌드 및 기존 high2 출시 차단을 유지한다.
+
+### Native 타입 및 CI 회귀 보강
+
+Native의 실제 MapLibre 선언 해석을 검사해 NodeNext의 암묵적 any를 발견하고 Bundler로 수정했다. CameraStop union과 RN 고정 Style Spec 26.2.1(ISC) validator를 적용하고 `check:native-types`를 CI 필수 단계로 추가했다. pnpm lockfile에는 기존 전이 버전을 Native 직접 의존성으로만 연결했다. 첫 원격 CI는 Windows/macOS 통과, Linux 기존 font-probe 조회 실패였다. 폰트 준비·레이아웃 후 동일 KR face 조건을 검사하도록 보강하고 전체 check/pack/브라우저 6개를 다시 통과했다. 후속 커밋의 원격 CI 결과는 PR checks로 구분한다. 후속 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: enforce resolved native API types and font readiness$'`.

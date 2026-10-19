@@ -133,11 +133,13 @@ Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 R
 
 공통 계약은 `@korea-map-kit/core`가 소유하며 다섯 SDK 패키지는 기존 Changesets fixed group을 유지한다. 현재 0.1.0 manifest는 아직 발행하지 않았고 이번 Changeset은 minor다. 기존 메서드/이름을 제거하지 않았지만 KitErrorCode union 확장은 exhaustive switch 사용자의 소스 수정이 필요할 수 있어 0.x minor 릴리스 노트에 명시한다. 안정 1.x 이후 호환성을 깨는 의미·형태·반환값 변경은 major, 호환 API 추가는 minor, 버그 수정은 patch로 관리한다. 0.x에서도 파괴적 변경은 최소 minor와 마이그레이션 설명을 요구한다. 자동 publish는 없다.
 
-의존성 추가·버전 변경은 없다. 기존 고정 버전 GL JS 6.14.0, RN 11.5.0, Style Spec 26.4.4, TypeScript 6.0.3의 설치 선언과 아래 공식 문서를 2026-10-19에 대조했다. 공식 페이지가 미래 버전으로 바뀔 수 있으므로 lockfile/타입 검사 결과를 함께 본다.
+엔진 버전과 전이 의존성 그래프 변경은 없다. Native는 RN 11.5.0이 이미 정확히 사용하는 Style Spec 26.2.1을 직접 의존성으로 명시해 해당 스키마로 JSON을 검증한다(ISC). Web/styles는 26.4.4를 유지한다. Native TypeScript는 상위 패키지의 extensionless 타입 참조를 올바르게 해석하도록 ESNext/Bundler를 사용하며, `check:native-types`가 component/ref/method의 any 유입을 차단한다. GL JS 6.14.0, RN 11.5.0, 두 Style Spec, TypeScript 6.0.3의 설치 선언과 아래 공식 문서를 2026-10-19에 대조했다. 공식 페이지가 미래 버전으로 바뀔 수 있으므로 lockfile/타입 검사 결과를 함께 본다.
 
 - [MapLibre GL JS Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/): setStyle, fitBounds, getBounds.
 - [MapLibre React Native Camera](https://maplibre.org/maplibre-react-native/docs/components/camera): setStop, bounds 순서, duration.
 - [MapLibre React Native Map](https://maplibre.org/maplibre-react-native/docs/components/map): getBounds, onDidFinishLoadingStyle, region/press 이벤트.
 - [MapLibre Style Spec](https://maplibre.org/maplibre-style-spec/): JSON layer/source 의미.
+- [RN 11.5.0 공식 npm metadata](https://registry.npmjs.org/@maplibre/maplibre-react-native/11.5.0): Style Spec 26.2.1 정확 의존성 확인.
+- [Style Spec 26.2.1 metadata](https://registry.npmjs.org/@maplibre/maplibre-gl-style-spec/26.2.1): ISC 라이선스 및 버전 확인.
 
 Native 재현: 기존 개발 가이드에 따라 `pnpm --filter @korea-map-kit/example-expo android` 또는 macOS에서 `ios` 실행 후 ready, marker 선택, route, bounds, style 교체, 취소/종료, 회전·백그라운드 복귀를 확인한다. 실제 native toolchain/device와 glyph provider가 필요한 검증은 아직 완료되지 않았다.

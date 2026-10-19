@@ -26,6 +26,7 @@ export {
   createNativeMapSession,
   validateNativeStyle,
   type NativeBridge,
+  type NativeCameraStop,
   type NativeSnapshot,
 } from './controller.js';
 export type { MapController } from '@korea-map-kit/core';

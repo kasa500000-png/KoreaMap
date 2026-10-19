@@ -210,6 +210,6 @@ Web `/api/`는 직접 작성한 합성 데이터만 inline으로 사용한다. �
 
 새 데이터·아이콘·폰트 payload나 credentials, paid endpoint, install hook, 유료 CI 기능을 추가하지 않았다. 17개 변경/추가 runtime source는 자체 계약/로컬 합성 예제/bridge 구현으로 검토하고 publication 해시를 갱신했다. API 화면 캡처는 ignored test-results에만 보관하며 승인된 테마 screenshot 예외를 확대하지 않는다. 실제 5개 SDK tarball/배포 JS 정적 검사와 Git worktree/index/도달 가능한 이력 검사는 최종 확정 기록을 따른다. 이 정적 검사는 숨겨진 비밀이나 운영자 과금 설정의 완전한 증명이 아니다.
 
-기존 dependency high2, Android/iOS 실제 compile·런타임 네트워크/메모리/권한 QA가 남아 있어 제품 출시는 차단된다. 신규 registry advisory 조회는 이번 범위에서 실행하지 않았고 신규 의존성·버전 변경도 없다. main 병합·운영 배포·공개 전환·npm 발행을 수행하지 않는다.
+기존 dependency high2, Android/iOS 실제 compile·런타임 네트워크/메모리/권한 QA가 남아 있어 제품 출시는 차단된다. 신규 registry advisory 조회는 이번 범위에서 실행하지 않았다. Native가 이미 포함하던 Style Spec 26.2.1(ISC)을 직접 의존성으로 고정했으며 엔진/전이 그래프 버전은 바뀌지 않았다. main 병합·운영 배포·공개 전환·npm 발행을 수행하지 않는다.
 
 최종 로컬 판정: check/5개 실제 tarball/최종 Playwright 6개 통과, static findings 0, 로컬 브라우저 외부 HTTP 시도 0. artifact SHA는 [Public API 검증](research/public-api-validation.md)에 기록했다. staged index는 커밋 직전 별도 검사한다. 비용 없는 모든 운영 환경이나 Native 런타임 검증 완료를 뜻하지 않는다.

@@ -57,13 +57,15 @@ test('four themes render Korean labels, icons, zoom rules, overrides and visible
     await card.screenshot({ path: testInfo.outputPath(`${theme}.png`) });
   }
   // Browser font resolution + actual raster output; cmap coverage is checked separately.
-  await page.evaluate((text) => {
+  await page.evaluate(async (text) => {
     const el = document.createElement('p');
     el.id = 'font-probe';
     el.textContent = text;
     el.style.cssText =
-      'font:24px "Noto Sans CJK KR";position:absolute;left:0;top:0;color:transparent';
+      'font:24px "Noto Sans CJK KR";position:absolute;left:0;top:0;color:#111;background:#fff;z-index:1000';
     document.body.append(el);
+    await document.fonts.ready;
+    el.getBoundingClientRect();
   }, designLabelCorpus.join(''));
   const cdp = await context.newCDPSession(page);
   await cdp.send('DOM.enable');
@@ -73,10 +75,14 @@ test('four themes render Korean labels, icons, zoom rules, overrides and visible
     nodeId: root.nodeId,
     selector: '#font-probe',
   });
-  const fontReport = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
-  expect(
-    fontReport.fonts.some((font) => font.familyName === 'Noto Sans CJK KR' && font.glyphCount > 0),
-  ).toBe(true);
+  let fontReport = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
+  // Wait for actual text shaping after inserting the probe; keep the exact KR-face assertion.
+  await expect
+    .poll(async () => {
+      fontReport = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
+      return fontReport.fonts.filter((font) => font.glyphCount > 0).map((font) => font.familyName);
+    })
+    .toContain('Noto Sans CJK KR');
   const glyphs = await page.evaluate(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 80;
