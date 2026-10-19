@@ -1,0 +1,12 @@
+# Expo example
+
+Private Expo consumer with the MapLibre config plugin. Expo Go is unsupported.
+Run `pnpm dev:expo` from the root to start Metro in offline/localhost mode.
+Use `pnpm --filter @korea-map-kit/example-expo android` with a local Android SDK/device,
+or `pnpm --filter @korea-map-kit/example-expo ios` on macOS with Xcode.
+Build the SDK first with `pnpm build:sdk`.
+
+`pnpm build` exports Android and iOS JavaScript bundles with local assets. It does **not** compile
+Gradle/CocoaPods, produce APK/IPA, sign, install or prove native rendering.
+No EAS account, paid API, cloud build, OTA service or environment file is required.
+All displayed geometry is original synthetic fixture data, not a real basemap.

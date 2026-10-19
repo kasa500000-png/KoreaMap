@@ -41,6 +41,7 @@ DOCUMENTATION_HOSTS = {
     "www.rfc-editor.org", "postgis.net", "docs.protomaps.com", "nominatim.org",
     "operations.osmfoundation.org", "project-osrm.org", "supabase.com",
     "www.openstreetmap.org", "www.kogl.or.kr", "www.data.go.kr",
+    "pnpm.io", "typescript-eslint.io", "vitest.dev", "prettier.io",
     "registry.npmjs.org", "nodejs.org", "www.juso.go.kr", "valhalla.github.io",
 }
 STANDARD_RUNNERS = {

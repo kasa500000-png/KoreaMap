@@ -15,7 +15,7 @@
 | 단계 | 범위/우선순위 | 요구사항 | 완료 조건 | 상태 |
 | --- | --- | --- | --- | --- |
 | M0 | 기술 조사·설계 | 모든 요구사항의 설계 근거 | 링크·추적성·상호 일관성 검사 및 수동 리뷰, 문서 커밋 | 설계 검증 통과; 커밋은 진행 기록의 식별 명령 참조 |
-| M1 | 코어·버전 잠금·모바일 spike / P0 | R01 R02 R03 R12 Z01 Z02 Z03 Z07 Z08 Z09 Z12 | exact version/lockfile, core tests, Web 최소 지도, Expo Android/iOS 최소 지도 실제 실행, 장비·메모리 예산 확정 | 미착수 |
+| M1 | 코어·버전 잠금·모바일 spike / P0 | R01 R02 R03 R12 Z01 Z02 Z03 Z07 Z08 Z09 Z12 | exact version/lockfile, core tests, Web 최소 지도, Expo Android/iOS 최소 지도 실제 실행, 장비·메모리 예산 확정 | 진행 중: 모노레포/로컬 Web/JS export 검증, Native 실빌드·화면/예산 미완료 |
 | M2 | Web SDK·React/Next 예제 / P0 | R04 R05 R06 R07 Z05 | 브라우저 카메라·피처·스타일·SSR/lifecycle 테스트; fixture 검색/경로를 실서비스로 표시하지 않음 | 미착수 |
 | M3 | 한국 타일·한글·자체 호스팅 / P0 | R08 R09 R10 R11 R17 Z06 | 시범 bbox 배치·schema·글리프·라이선스·서버 smoke·rollback, 키 없는 별도 환경 재현 | 미착수 |
 | M4 | 모바일 parity·성능·MVP 패키징 / P0 | R13 R14 R15 R16 Z04 Z10 Z11 | 모든 P0의 Android/iOS 수락 기준, 실화면/접근성·성능, dry-run package 소비 검증 | 미착수 |
@@ -53,3 +53,9 @@ M4 후 0.x release candidate를 만들 수 있지만 main 병합·운영 배포�
 [비용 감사](cost-audit.md)와 [ADR-009](decisions/009-zero-publisher-cost.md)를 M1~M7 전체에 적용한다. 기존 아키텍처 PR 위의 `docs/zero-publisher-cost` 브랜치에서 정책·정적 감사 도구를 추가한다. 제품 설치·실행 네트워크 감사가 완료되기 전에는 Zero Publisher Cost 런타임 합격이나 발행 가능으로 표시하지 않는다.
 
 M1은 명시적 provider/설정 누락 실패/유료 계정 없는 기본 테스트, M2는 클라이언트 노출, M3는 로컬 fixture 데모, M4는 실제 npm·Web·Native 배포물과 설치/실행/테스트 요청 감사를 검증한다. P1 서비스와 공공데이터 수집도 운영자가 설정한 계정·인프라만 사용한다. SDK 이용자 수에 따라 제작자 서비스 API 사용량이 늘어나는 기본 경로는 허용하지 않는다.
+
+## 모노레포 foundation 후속
+
+`feat/monorepo-foundation`에서 사용자 지정 5 SDK / 2 예제 / 3 private 서비스 경계와 개발 도구를 구축한다. 실제 엔진 서비스는 아직 미구현이다. [개발 가이드](development.md), [도구 검증](research/monorepo-toolchain.md), [진행 기록](progress.md), [비용 감사](cost-audit.md)를 따른다. 아키텍처/비용 정책 PR이 미병합이라 이번 PR은 비용 정책 브랜치를 기준으로 비교한다.
+
+Native 실기기/시뮬레이터, 수정 버전이 없는 전이 취약점, 실제 공공/OSM 데이터와 한글 glyph 검증은 남아 있다. foundation 기능 테스트와 M1/MVP 전체 완료 또는 출시 승인을 구분한다.

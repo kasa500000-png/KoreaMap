@@ -1,0 +1,29 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/styles"
+    },
+    {
+      "path": "packages/data-adapters"
+    },
+    {
+      "path": "packages/web"
+    },
+    {
+      "path": "packages/native"
+    },
+    {
+      "path": "services/geo-data"
+    },
+    {
+      "path": "services/search"
+    },
+    {
+      "path": "services/routing"
+    }
+  ]
+}

@@ -86,3 +86,11 @@
 8. 다음 단계 진행 가능 여부
 
 동일 커밋에 자기 자신의 해시를 기록할 수 없으므로, 진행 문서에는 해당 단계 커밋을 식별할 명령을 남기고 커밋 직후 사용자 보고에서 실제 해시를 제공할 수 있다.
+
+## 모노레포 운영 기준
+
+- SDK는 `packages/core`, `packages/web`, `packages/native`, `packages/styles`, `packages/data-adapters`; 소비 앱은 `examples/web`, `examples/expo`; 서버는 `services/*`에 둔다. root/예제/서비스는 private다.
+- core는 외부 의존성 및 DOM/React Native/Supabase 타입·runtime import를 갖지 않는다. 경계 검사와 TypeScript strict 설정을 유지한다.
+- Node/pnpm 버전과 exact 의존성·lockfile을 함께 관리한다. 의존성 install hook은 기본 차단하며 이유 없이 해제하지 않는다.
+- 변경 후 `pnpm check`를 실행하고 패키지 변경은 `pnpm pack:check`, Web 동작 변경은 `pnpm test:web`으로 확인한다. Expo JS export를 Native 앱 컴파일/QA로 보고하지 않는다.
+- 자체 코드와 합성 fixture는 루트 LICENSE의 MIT를 적용한다. 외부 데이터/라이브러리는 별도 조건을 유지한다.

@@ -1,0 +1,32 @@
+{
+  "name": "@korea-map-kit/data-adapters",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Korea Map Kit data-adapters foundation",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/LICENSE",
+    "README.md"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@korea-map-kit/core": "workspace:*"
+  }
+}

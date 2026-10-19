@@ -4,7 +4,7 @@
 
 ## 결정
 
-pnpm workspace/TypeScript로 시작하고 core/web/react/react-native를 초기 동일 SDK 버전으로 관리한다. API SemVer, tileset schema, style assets와 데이터 snapshot은 별도 versioning한다. exact runtime/dev 의존·lockfile, Native 잠금·CI 이미지 digest를 설치 단계에 기록한다.
+pnpm workspace/TypeScript로 시작하고 core/web/native/styles/data-adapters를 초기 동일 SDK 버전으로 관리한다. 사용자 지정 packages/examples/services 디렉터리로 구현하며 별도 React 패키지는 필요 시 분리한다. API SemVer, tileset schema, style assets와 데이터 snapshot은 별도 versioning한다. exact runtime/dev 의존·lockfile, Native 잠금·CI 이미지 digest를 설치 단계에 기록한다.
 
 ## 이유와 대안
 

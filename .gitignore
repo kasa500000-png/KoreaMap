@@ -27,3 +27,12 @@ test-results/
 *.pmtiles
 *.mbtiles
 *.osm.pbf
+
+# Workspace-generated local artifacts.
+artifacts/
+**/out/
+*.tsbuildinfo
+examples/expo/android/
+examples/expo/ios/
+**/next-env.d.ts
+examples/web/public/vendor/

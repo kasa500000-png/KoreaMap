@@ -270,3 +270,72 @@
 ### 8. 다음 단계 진행 가능 여부
 
 - 정책과 정적 검사를 기반으로 M1 구현 진행 가능. 현재 결과는 제품 Zero Publisher Cost 런타임 검증 완료나 출시 승인이 아니다.
+
+## STEP 01 / M1 진행 — 모노레포 foundation
+
+기준일: 2026-10-19 (UTC). 사용자 요청의 실제 workspace와 개발 도구 구축 범위다. M1 전체와 제품 출시 완료가 아니다. 비용 정책 PR #2 위에 독립 브랜치로 작업한다.
+
+### 1. 구현 완료 기능
+
+- TypeScript strict/project references, pnpm 11 workspace projects, ESLint/Prettier, Vitest, Changesets, cross-platform Node/Python scripts, 환경 예제와 MIT LICENSE를 구성했다.
+- core/web/native/styles/data-adapters 5개 SDK, Next/Expo private 소비 앱, geo-data/search/routing private 서비스 경계를 분리했다. 서비스 엔진은 descriptor만 가진 미구현 상태다.
+- core의 외부/DOM/React Native/Supabase 의존성 차단 검사, 명시적 fixture 설정·실패 계약, 원본 합성 스타일/검색과 최소 Web/Native wrapper를 구현했다.
+- 무료 표준 3 OS GitHub Actions workflow를 구성했다. cache/artifact/deploy/publish는 활성화하지 않았다.
+
+### 2. 생성/수정 파일
+
+- root: package.json, pnpm-workspace.yaml, pnpm-lock.yaml, tsconfig.base/build, ESLint/Prettier/Vitest/Playwright, .node-version/.npmrc/.gitattributes/.env.example/LICENSE, .changeset, .github/workflows/ci.yml.
+- packages 5개, examples 2개, services 3개의 manifest/tsconfig/source/README 및 환경 예제.
+- scripts: task runner, tool wrapper, 경계 검사, Python launcher, pack 검사, offline install 검사, 로컬 static QA 서버. tests: 단위 3파일 및 Web E2E.
+- 정책·README·architecture·ADR-008·roadmap·progress·cost-audit 수정, development/toolchain/foundation validation 기록 추가. 정확한 파일 목록은 이 단계 commit diff를 따른다.
+
+### 3. 실행한 테스트와 결과
+
+- `pnpm check`: 경계·ESLint·Prettier·strict typecheck·Vitest16·SDK/services/Next/Expo JS build·문서·정적 감사·Python 회귀11·Changesets status 통과.
+- `pnpm pack:check`: 실제 SDK tarball 5개 내용과 secret/endpoint 규칙 검사 통과. `.env`, 소스맵, tsbuildinfo, 예제/서비스 제외.
+- `pnpm offline:check`: 새 임시 workspace에 캐시만으로 설치 성공, dependency hook 비활성. Linux trace에서 인터넷 connect 0건.
+- `pnpm test:web`: Chromium에서 로드·pan·합성검색·reload 통과. 관측 외부 HTTP 시도 0건, pageerror 0.
+- `pnpm audit --json`: **미통과, high 2건**. 수정 버전이 없는 Expo/Metro 전이 의존성으로 제품 출시 차단. 상세는 비용 감사 참조.
+- 초기 오류: pnpm12 실행 파일 방식, RN11 API 이름, 테스트 모듈 mock 해석, worker 경로/MIME, screenshot idle 조건을 실제 실행으로 수정했다. offline 재설치는 다른 filesystem의 캐시 경로 문제를 명시적 store/copy로 해결했다.
+- 최종 Linux pnpm check syscall 추적: 외부 TCP connect 0, Expo 로컬 경로 탐색용 UDP connect 1, 인터넷 send 계열 호출 0. probe까지 0으로 표현하지 않는다.
+- 원격 CI 3 OS 결과는 PR checks로 확인한 뒤 사용자에게 보고한다. 로컬 Linux 결과를 Windows/macOS 실행 결과로 대체하지 않는다.
+
+### 4. 실화면 QA 결과
+
+- 자체 Next.js 정적 예제를 실제 Chromium에서 열어 합성 polygon/point·한글 앱 UI·MIT 출처 표시를 관찰했다. pan 이후 idle screenshot을 확인하며 실제 지리 데이터나 한글 map glyph QA는 아니다.
+- Android/iOS: JavaScript 번들 생성만 성공. 네이티브 컴파일·설치·실화면·Native 네트워크는 도구/기기 부재로 미검증이다.
+
+### 5. 라이선스 및 보안 문제
+
+- 자체 코드·합성 fixture에 MIT LICENSE 적용. OSM/공공데이터/외부 폰트는 도입하지 않았다. MapLibre worker의 BSD LICENSE는 로컬 자산과 함께 복사한다.
+- API 키·제작자 endpoint·결제 설정·클라우드 계정 없음. 클라이언트 환경값 공개 가능성을 문서화했다. 정적 감사는 heuristic이며 실제 Native/network 전체 검증을 대체하지 않는다.
+- node-forge/braces high2 미해결을 숨기지 않고 출시 gate로 유지한다. uuid 경고는 한정 override와 합성 xcode ID smoke로 해소했다.
+
+### 6. 남은 작업 또는 차단 요인
+
+- Android/iOS 실제 로컬 빌드·Gradle/Pods 잠금·기기/시뮬레이터 QA·성능 예산, 전체 공통 API 및 네트워크 provider 구현이 남아 있다.
+- 전국/한국 실제 타일·glyph·공공데이터·검색/라우팅 엔진은 후속 milestone이다. backend descriptor를 실행 서비스로 표시하지 않는다.
+- 의존성 보안 high2로 제품 출시는 차단된다. npm scope 소유권·최종 데이터/의존 라이선스/SBOM·전체 배포물 감사도 필요하다.
+
+### 7. Git 브랜치와 커밋 해시
+
+- 브랜치: `feat/monorepo-foundation`, base: `docs/zero-publisher-cost`의 `131a1789231745d1dc791597d0a9844f384a2bb5`.
+- 커밋 식별: `git log -1 --format='%H %s' --grep='^feat: bootstrap Korea Map Kit monorepo$'`.
+- 기능 테스트/타입/빌드 통과 후 commit/push, 연결된 GitHub 커넥터로 draft PR을 생성한다. 보안 audit 실패는 명시적으로 남긴다. main 병합·운영 배포·npm 발행은 하지 않는다.
+
+### 8. 다음 단계 진행 가능 여부
+
+- M1 남은 Native 호환성/실화면과 M2 SDK 계약 구현을 계속 진행할 수 있다. 모노레포 기능 검증 통과이며 M1/MVP 전체 완료 또는 보안/출시 합격이 아니다.
+
+### CI 최초 실행과 수정
+
+- [최초 CI 실행](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205075633): Windows 전체 통과. Linux/macOS는 build·unit·문서·감사까지 통과했으나 마지막 Changesets에서 로컬 main ref가 없어 실패했다.
+- changeset:status에 `--since=origin/main`을 명시해 detached checkout에서도 비교할 수 있게 수정했다. 로컬 main이 없는 임시 clone의 detached HEAD에서 실제 재현 검사 통과. 수정 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: resolve Changesets base in detached CI checkouts$'`. 원격 재실행 결과는 PR #3 checks와 사용자 보고로 확인한다.
+- 실제 core tarball을 새 임시 소비 프로젝트에 `npm install --offline --ignore-scripts --no-audit --no-fund`로 설치하고 Node에서 import·좌표 검사·CONFIG_REQUIRED 실패를 확인했다.
+- GitHub Actions 권한 설정 조회는 연동 API 권한 부족 HTTP403이었다. 실제 workflow 실행 조회는 가능하며 과금/권한 설정을 변경하지 않았다.
+
+### 원격 CI 재실행 결과
+
+- [https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205327239): 코드/CI 수정 커밋 `b538e9506fb6e238f60421a6751100c822fc3320`에서 Linux·Windows·macOS **모두 success**. 각 OS의 pnpm check와 pack 검사, Linux Chromium E2E까지 통과했다.
+- 이 결과는 3 OS에서 JavaScript/TypeScript 개발 경로를 검증한 것이다. macOS runner 사용 자체를 iOS 앱 컴파일·시뮬레이터 QA로 해석하지 않는다. Native 실빌드/기기 QA와 high2 출시 차단은 그대로 남는다.
+- 최종 문서 기록 커밋 식별: `git log -1 --format='%H %s' --grep='^docs: record foundation CI verification$'`. 문서 갱신 후 문서/감사/format/diff 검사를 통과한 뒤 커밋한다.
