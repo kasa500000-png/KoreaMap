@@ -454,6 +454,62 @@ export interface TileProvider {
 export declare function createMapController(port: MapPort, scheduler: Scheduler): MapController;
 ```
 
+## LocationObserver
+
+```ts
+export interface LocationObserver {
+    onLocation(fix: LocationFix): void;
+    /** Terminal error: the subscription is stopped before this callback. No raw OS message. */
+    onError(error: LocationError): void;
+}
+```
+
+## LocationSubscription
+
+```ts
+export interface LocationSubscription {
+    stop(): void;
+}
+```
+
+## LocationStreamProvider
+
+```ts
+export interface LocationStreamProvider extends LocationProvider {
+    watchPosition(observer: LocationObserver, options?: OperationOptions): Promise<LocationSubscription>;
+}
+```
+
+## LocationClient
+
+```ts
+export interface LocationClient extends LocationStreamProvider {
+    setConsent(granted: boolean): void;
+    /** Foreground only. Returning to the foreground never restarts collection automatically. */
+    setForeground(active: boolean): void;
+    dispose(): void;
+}
+```
+
+## validateLocationFix
+
+```ts
+export declare function validateLocationFix(fix: LocationFix): LocationFix;
+```
+
+## toLocationError
+
+```ts
+export declare function toLocationError(error: unknown): LocationError;
+```
+
+## createLocationClient
+
+```ts
+/** Consent is per client lifetime. No persistence, telemetry or OS access is performed here. */
+export declare function createLocationClient(provider: LocationStreamProvider, scheduler: Scheduler): LocationClient;
+```
+
 ## normalizeError
 
 ```ts
@@ -620,6 +676,46 @@ export declare function publicPlaceToPlace(value: PublicPlace): Place;
 export declare function createPlacesClient(provider: PlacesProvider, scheduler: Scheduler): PlacesClient;
 ```
 
+## ReplayFrame
+
+```ts
+export interface ReplayFrame {
+    readonly coordinate: Coordinate | null;
+    readonly elapsedMs: number;
+    readonly durationMs: number;
+    readonly segmentIndex: number;
+    readonly finished: boolean;
+}
+```
+
+## TrackReplay
+
+```ts
+export interface TrackReplay {
+    play(): void;
+    pause(): void;
+    stop(): void;
+    seek(elapsedMs: number): void;
+    destroy(): void;
+}
+```
+
+## replayFrameAt
+
+```ts
+/** Missing timestamps use 1 second per edge; pause/gap segments jump without interpolation. */
+export declare function replayFrameAt(track: Track, elapsedMs: number): ReplayFrame;
+```
+
+## createTrackReplay
+
+```ts
+export declare function createTrackReplay(track: Track, clock: Pick<TrackingClock, 'monotonicMs'>, scheduler: Scheduler, onFrame: (frame: ReplayFrame) => void, options?: {
+    speed?: number;
+    tickMs?: number;
+}): TrackReplay;
+```
+
 ## KoreanSearchQuery
 
 ```ts
@@ -735,6 +831,163 @@ export declare function createKoreanSearchProvider(port: SearchPort, scheduler: 
 ```ts
 /** Map selection helper; null-location results cannot move the camera. */
 export declare function focusSearchHit(map: MapController, hit: SearchHit, options?: OperationOptions): Promise<void>;
+```
+
+## exportTracksGeoJSON
+
+```ts
+/** Text only; apps choose whether/where to persist. Exported files contain sensitive coordinates/times. */
+export declare function exportTracksGeoJSON(values: readonly Track[]): string;
+```
+
+## importTracksGeoJSON
+
+```ts
+/** FeatureCollection Point/LineString/MultiLineString. Unknown properties are discarded. */
+export declare function importTracksGeoJSON(text: string): readonly Track[];
+```
+
+## importTracksGPX
+
+```ts
+/** GPX 1.1 tracks only. Names/extensions/links/elevation are omitted; no XML resource is fetched. */
+export declare function importTracksGPX(text: string): readonly Track[];
+```
+
+## exportTracksGPX
+
+```ts
+export declare function exportTracksGPX(values: readonly Track[]): string;
+```
+
+## TrackPoint
+
+```ts
+export interface TrackPoint {
+    readonly coordinate: Coordinate;
+    readonly timestampMs: number | null;
+    /** Null means the imported format did not provide accuracy; never infer it from GPX HDOP. */
+    readonly accuracyMeters: number | null;
+}
+```
+
+## Track
+
+```ts
+export interface Track {
+    readonly version: 1;
+    readonly id: string;
+    /** Separate segments never contribute a connecting distance. */
+    readonly segments: readonly (readonly TrackPoint[])[];
+    /** Active recording time, including stationary time and excluding explicit pauses. */
+    readonly durationMs: number | null;
+}
+```
+
+## TrackingClock
+
+```ts
+export interface TrackingClock {
+    monotonicMs(): number;
+    epochMs(): number;
+}
+```
+
+## GpsFilterOptions
+
+```ts
+export interface GpsFilterOptions {
+    readonly maxAccuracyMeters?: number;
+    readonly maxSpeedMetersPerSecond?: number;
+    readonly minDistanceMeters?: number;
+    readonly maxGapMs?: number;
+    readonly maxAgeMs?: number;
+    readonly maxPoints?: number;
+}
+```
+
+## FixRejection
+
+```ts
+export type FixRejection = 'inactive' | 'invalid' | 'poor-accuracy' | 'stale' | 'future' | 'time-reversal' | 'duplicate' | 'jitter' | 'too-fast' | 'capacity';
+```
+
+## FixDecision
+
+```ts
+export type FixDecision = {
+    readonly accepted: true;
+} | {
+    readonly accepted: false;
+    readonly reason: FixRejection;
+};
+```
+
+## TrackSnapshot
+
+```ts
+export interface TrackSnapshot {
+    readonly state: 'idle' | 'recording' | 'paused' | 'stopped';
+    readonly track: Track;
+    readonly distanceMeters: number;
+    readonly pointCount: number;
+    readonly rejectedCount: number;
+    readonly accuracyMeters: number | null;
+}
+```
+
+## TrackRecorder
+
+```ts
+export interface TrackRecorder {
+    start(): void;
+    pause(): void;
+    resume(): void;
+    stop(): TrackSnapshot;
+    ingest(fix: LocationFix): FixDecision;
+    getSnapshot(): TrackSnapshot;
+    /** Removes the recorder's copies. Apps must separately delete their persistence/export copies. */
+    clear(): void;
+}
+```
+
+## distanceMeters
+
+```ts
+/** Spherical great-circle surface distance in meters, not 3D/elevation distance. */
+export declare function distanceMeters(a: Coordinate, b: Coordinate): number;
+```
+
+## validateTrack
+
+```ts
+export declare function validateTrack(value: Track): Track;
+```
+
+## trackDistanceMeters
+
+```ts
+export declare function trackDistanceMeters(value: Track): number;
+```
+
+## createTrackRecorder
+
+```ts
+export declare function createTrackRecorder(id: string, clock: TrackingClock, options?: GpsFilterOptions): TrackRecorder;
+```
+
+## tracksToFeatureCollection
+
+```ts
+/** Render one or many tracks without connecting pause/gap boundaries. Single-point segments stay visible. */
+export declare function tracksToFeatureCollection(values: readonly Track[]): FeatureCollection;
+```
+
+## locationAccuracyFeature
+
+```ts
+/** Approximate horizontal uncertainty, not a confidence guarantee or an altitude accuracy. */
+export declare function locationAccuracyFeature(value: LocationFix): FeatureCollection;
 ```
 
 ## copyJson

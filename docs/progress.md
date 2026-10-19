@@ -480,3 +480,23 @@ Vitest57·독립 core1·데이터정책17·비용감사14개이며 생략/재시
 `pnpm search` 내장 명령 충돌은 search:service/search:migrate/search:serve로 수정했고 전체 검사를 다시 통과했다.
 SDK tarball의 서버/원본/비밀 제외와 빌드 바이트 일치도 검사했다. staged 데이터·비용 검사는 커밋 직전 별도로 실행한다.
 원격 Linux/Windows/macOS CI는 해당 PR checks의 실제 결과를 따른다. Native/전국 실주소/대규모 품질·기존 high2는 잔여다.
+
+## 공통 GPS·이동 경로 — 2026-10-19
+
+1. **구현:** 동의 기반 현재 위치/구독·수평 정확도, Web/Expo foreground 어댑터·권한 오류/취소·수명 정리, 순수 메모리 경로 recorder와 이상값/시각/중복/속도/공백 필터, 거리·활성 시간, pause/resume/stop/clear, GeoJSON/GPX 교환·다중 표시·리플레이. 앱별 장기 보관은 분리했다.
+2. **파일:** core/src의 location/tracks/track-formats/replay 및 index, web/native 위치 어댑터·exports, data-adapters mock GPS, Web /gps와 Expo GPS 화면/설정/exact dependency·lockfile, 단위·타입·독립 core·E2E, API/가이드/검증/README·roadmap·cost-audit, Changeset·출처 해시·namespace 비용 회귀 검사.
+3. **테스트:** 새 Vitest17개와 Chromium GPS2개 통과. 거리 기준값·필터·pause/지연/취소·파일 왕복/잘못된 입력·리플레이, 실제 브라우저 Geolocation 권한 허용/거절과 모의 위치를 검증했다. Expo config introspect에서 foreground 권한만 확인. 최종 전체 check/pack/staged/회귀 결과는 아래에 확정한다.
+4. **실화면 QA:** Web 실제 Chromium에서 합성 GPS·정확도·경로/리플레이·출처·내보내기/불러오기·삭제 화면 확인. 권한 허용/거절은 브라우저 API, visibility와 Expo AppState는 모의다. **Android 실제 기기·OS background·iOS는 미검증**이며 JS export/타입/모의를 해당 통과로 표시하지 않는다.
+5. **라이선스·보안:** 자체 코드/합성 경로 MIT, Expo Location MIT는 예제 의존성만 추가. 기본 외부 전송/제작자 키/endpoint·장기 저장·민감 위치 로그 없음. GPX namespace는 네트워크 URI로 사용하지 않는다. 기존 high2 취약점 재확인·출시 차단 유지.
+6. **잔여/차단:** ADB·Android SDK·USB/기기·에뮬레이터 부재로 실기기 검증 미실행. 실제 이동거리/센서 정확도·배터리·잠금/백그라운드/권한 전환·장시간·Safari/Firefox와 iOS QA 필요. background 지속 기록 미지원; Native 파일 선택/암호화 보관·영구 삭제/동기화는 앱 책임이다.
+7. **Git:** `feat/gps-tracks`, base `feat/korean-search` (`2c3e14994dbb5d3e3430b8724b52706bb0ece337`). 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: add consent-gated GPS tracking and route exchange$'`. 검사 후 commit/push 및 연결 GitHub 커넥터로 draft PR 생성. main/배포/npm 발행 없음.
+8. **다음 단계:** 권한 있는 실제 Android 기기에서 [재현 절차](research/gps-validation.md)의 센서/권한/비활성 검증 진행 가능. 기기 QA를 포함한 이번 단계 전체 검증·제품 출시 완료 판정은 아직 불가하다. [사용 가이드](gps-tracks.md) 참조.
+
+### 최종 로컬 검사 확정
+
+`pnpm check` 통과: Vitest74·독립 core1·데이터정책18·비용감사15, strict/native 타입·lint·format·API/설계,
+Next production build·Expo Android/iOS JS export. `pnpm pack:check` SDK5개 실제 tarball과 Chromium 전체9개 E2E 통과.
+합성 경로 화면에서 pause 구간의 끊어진 선·평행한 다중 경로·정확도 원·리플레이 마커를 직접 확인했다.
+외부 HTTP 시도0, 정적 findings0. 파일 내용 입력란의 자동 교정/맞춤법 검사를 꺼 불필요한 플랫폼 처리를 줄였다.
+이 변경 후 전체 check를 다시 통과했다. staged 데이터/비용 검사는 커밋 직전 수행하며 원격 CI는 PR checks에서 확인한다.
+실제 Android 기기와 OS background 검증은 도구/기기 부재로 **미실행·차단**이며, 해당 항목은 완료 처리하지 않는다.

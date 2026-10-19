@@ -184,3 +184,9 @@ export function MapView({ config, ref, onEvent }: MapViewProps) {
     </View>
   );
 }
+
+export {
+  createExpoLocationClient,
+  type ExpoLocationPort,
+  type NativeAppLifecycle,
+} from './location.js';

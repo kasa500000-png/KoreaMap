@@ -37,6 +37,7 @@ OFFLINE_REFERENCE_URLS = {
     "scripts/audit-cost-security.py": {"https://registry.npmjs.org/"},
 }
 DOCUMENTATION_HOSTS = {
+    "www.w3.org", "www.topografix.com",  # Geolocation / GPX specifications, docs only.
     "www.postgresql.org",  # Reviewed SQL documentation, not a runtime endpoint.
     "csv.js.org",  # Reviewed parser documentation only; never a runtime provider.
     "raw.githubusercontent.com", "openfontlicense.org",  # Reviewed Noto/OFL documentation only.
@@ -110,7 +111,12 @@ def scan(path, data, scope):
         if documentation and host and host not in DOCUMENTATION_HOSTS and not local and not reserved:
             add("UNREVIEWED_DOCUMENTATION_URL", pos)
         reviewed_reference = match[0] in OFFLINE_REFERENCE_URLS.get(path, set())
-        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference:
+        namespace = "http" + "://www.topografix.com/GPX/1/1"
+        namespace_line = text.splitlines()[text[:match.start()].count("\n")].strip()
+        reviewed_namespace = (path in {"packages/core/src/track-formats.ts", "dist/track-formats.js"}
+                              and match[0] == namespace
+                              and namespace_line in {f"const GPX_NAMESPACE = '{namespace}';", f'const GPX_NAMESPACE = "{namespace}";'})
+        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_namespace:
             add("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", pos)
 
     if name == "package.json":

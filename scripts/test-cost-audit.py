@@ -143,6 +143,19 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit()
         self.assertIn('EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW', rules)
 
+    def test_gpx_namespace_is_only_a_scoped_identifier_not_an_endpoint_exception(self):
+        uri = 'http' + '://' + 'www.topografix.com/GPX/1/1'
+        self.write('packages/core/src/track-formats.ts', "const GPX_NAMESPACE = '" + uri + "';\n")
+        process, _, _ = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        self.write('packages/core/src/track-formats.ts', "fetch('" + uri + "');\n")
+        _, _, rules = self.run_audit()
+        self.assertIn('EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW', rules)
+        self.write('packages/core/src/track-formats.ts', '')
+        self.write('packages/core/src/unreviewed.ts', "const GPX_NAMESPACE = '" + uri + "';\n")
+        _, _, rules = self.run_audit()
+        self.assertIn('EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW', rules)
+
     def test_parser_documentation_does_not_enable_sdk_network(self):
         url = 'https' + '://' + 'csv.js.org/parse/options/'
         self.write('docs/parser.md', url + '\n')

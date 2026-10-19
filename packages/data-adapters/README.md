@@ -17,3 +17,7 @@ Actual public-source data and native device QA remain unverified.
 paginated search, prefix autocomplete and nearby-POI reverse results with portable cancellation.
 No fetch/default URL or public Nominatim is embedded. Full geocoding is a separate contract.
 See `docs/search.md` in the repository for PostGIS setup and working consumer examples.
+
+`createMockLocationProvider()` is a manually driven, network-free GPS fixture for tests. Call
+`push(fix)` to deliver a synthetic update, wrap its provider with core `createLocationClient()`,
+and explicitly grant simulated consent. `clear()` removes its latest fix; the client owns watchers.

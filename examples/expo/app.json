@@ -4,7 +4,20 @@
     "slug": "korea-map-kit-local",
     "version": "0.1.0",
     "platforms": ["android", "ios"],
-    "plugins": ["@maplibre/maplibre-react-native"],
+    "plugins": [
+      "@maplibre/maplibre-react-native",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "선택한 GPS 기능에서만 위치와 이동 경로를 기기 메모리에 기록합니다.",
+          "locationAlwaysPermission": false,
+          "locationAlwaysAndWhenInUsePermission": false,
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false
+        }
+      ]
+    ],
     "android": {
       "package": "org.koreamapkit.example"
     },
