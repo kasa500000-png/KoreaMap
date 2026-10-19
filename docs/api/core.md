@@ -716,6 +716,80 @@ export declare function createTrackReplay(track: Track, clock: Pick<TrackingCloc
 }): TrackReplay;
 ```
 
+## RoutingDataset
+
+```ts
+export interface RoutingDataset {
+    readonly id: string;
+    readonly version: string;
+    readonly source: 'osm-geofabrik-kr' | 'synthetic-routing-v1';
+    readonly attribution: string;
+    readonly license: 'ODbL-1.0' | 'MIT';
+}
+```
+
+## RoadRoute
+
+```ts
+/** A road-network result. Estimated duration has no live traffic/safety guarantee. */
+export interface RoadRoute extends MapRoute {
+    readonly kind: 'road-route';
+    readonly mode: RoutingRequest['mode'];
+    readonly distanceMeters: number;
+    readonly durationSeconds: number;
+    /** Matched coordinates in requested order. Never draw input-to-match connectors as roads. */
+    readonly matchedWaypoints: readonly Coordinate[];
+    readonly dataset: RoutingDataset;
+}
+```
+
+## RoadRoutingProvider
+
+```ts
+export interface RoadRoutingProvider extends RoutingProvider {
+    route(request: RoutingRequest, options?: OperationOptions): Promise<readonly RoadRoute[]>;
+}
+```
+
+## RoutingPort
+
+```ts
+export interface RoutingPort {
+    request(request: RoutingRequest, context: OperationContext): Promise<unknown>;
+}
+```
+
+## validateRoutingRequest
+
+```ts
+export declare function validateRoutingRequest(value: RoutingRequest): RoutingRequest;
+```
+
+## validateRoutingDataset
+
+```ts
+export declare function validateRoutingDataset(value: RoutingDataset): RoutingDataset;
+```
+
+## validateRoadRoute
+
+```ts
+export declare function validateRoadRoute(raw: unknown, request: RoutingRequest, maxSnapMeters?: number): RoadRoute;
+```
+
+## createRoadRoutingProvider
+
+```ts
+/** Transport is explicitly injected; core never discovers an endpoint or sends a request itself. */
+export declare function createRoadRoutingProvider(port: RoutingPort, scheduler: Scheduler, maxSnapMeters?: number): RoadRoutingProvider;
+```
+
+## roadRouteToGeoJSON
+
+```ts
+export declare function roadRouteToGeoJSON(route: RoadRoute): FeatureCollection;
+```
+
 ## KoreanSearchQuery
 
 ```ts

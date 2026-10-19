@@ -363,7 +363,18 @@ importers:
         specifier: 8.23.1
         version: 8.23.1
 
-  services/routing: {}
+  services/routing:
+    dependencies:
+      '@korea-map-kit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@korea-map-kit/data-adapters':
+        specifier: workspace:*
+        version: link:../../packages/data-adapters
+    devDependencies:
+      '@types/node':
+        specifier: 24.19.2
+        version: 24.19.2
 
   services/search:
     dependencies:

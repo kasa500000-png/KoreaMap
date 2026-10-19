@@ -127,7 +127,7 @@ Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 R
 | MapEvent | 실제 카메라·선택·종료 연결 | event props 연결, 화면 미검증 | event props 연결, 화면 미검증 |
 | 선택 UI/접근성 | 키보드 selector/팝업 검증 | 터치 선택·Text 표시 구현; 접근성 QA 미검증 | 터치 선택·Text 표시 구현; 접근성 QA 미검증 |
 | 취소/timeout/종료 | core 단위 + 실제 pre-cancel/종료 | core·mock bridge 통과, 기기 lifecycle 미검증 | core·mock bridge 통과, 기기 lifecycle 미검증 |
-| 검색/지오코딩/경로 계산/GPS/DB | 계약과 로컬 fixture 검색만 제공 | 동일; 실제 서비스 미구현 | 동일; 실제 서비스 미구현 |
+| 검색/라우팅/GPS/POI | 선택형 PostGIS/Valhalla·foreground GPS 및 Web 검증. 별도 가이드 참조 | 같은 Provider·foreground Expo 어댑터. 실제 기기 통합 미검증 | 같은 Provider·foreground Expo 어댑터. 실제 기기 통합 미검증 |
 
 ## SemVer와 근거
 
@@ -183,3 +183,13 @@ GeoJSON/GPX codec과 TrackReplay를 추가했다. [GPS 가이드](gps-tracks.md)
 | 저장/불러오기 | 명시적 파일 다운로드/선택/문자열 | 문자열 복사·붙여넣기 예제; 파일 선택/보관은 앱 책임 |
 | 비활성화 중단 | visibility 이벤트 모의 검사 | AppState 모의 검사; OS background 미검증 |
 | 지속 background 수집 | 미지원 | 미지원·권한/서비스 기본 비활성 |
+
+## 선택형 도로 라우팅 추가
+
+`RoadRoute`는 `MapRoute`를 확장해 mode·매칭 지점·미터/초·데이터 출처를 제공한다.
+`RoadRoutingProvider extends RoutingProvider`, `createRoadRoutingProvider`, `validateRoutingRequest`,
+`validateRoadRoute`, `roadRouteToGeoJSON`은 core의 순수/주입형 API다.
+`createValhallaRoutingProvider`는 data-adapters에 있으며 HTTP/URL을 소비 앱이 주입한다.
+기존 `showRoute`와 `routeToGeoJSON`은 일반 경로 표시 용도로 유지한다.
+[타입 예제](../tests/types/routing.ts), [사용·오류·제약](routing.md), [생성 API](api/core.md).
+공통 TS 단위/실제 Linux 엔진 검증은 Native 실기기 HTTP/지도 검증을 대신하지 않는다.

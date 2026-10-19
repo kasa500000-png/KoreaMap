@@ -500,3 +500,26 @@ Next production build·Expo Android/iOS JS export. `pnpm pack:check` SDK5개 실
 외부 HTTP 시도0, 정적 findings0. 파일 내용 입력란의 자동 교정/맞춤법 검사를 꺼 불필요한 플랫폼 처리를 줄였다.
 이 변경 후 전체 check를 다시 통과했다. staged 데이터/비용 검사는 커밋 직전 수행하며 원격 CI는 PR checks에서 확인한다.
 실제 Android 기기와 OS background 검증은 도구/기기 부재로 **미실행·차단**이며, 해당 항목은 완료 처리하지 않는다.
+
+## 선택형 자체 길찾기 — 2026-10-19
+
+1. **구현:** Valhalla 3.9.1의 walking/cycling/driving, 출발·도착·순서 있는 경유지, 미터/예상 초·GeoJSON·공통 showRoute, 입력/스냅/geometry/출처 검증·오류/취소. 검색/DB와 독립인 Docker engine·private Node gateway, 지역별 전체 rebuild·smoke 후 선택·이전 세대 rollback. 공급자 없는 지도 유지, 직선 fallback 없음.
+2. **파일:** core/routing, data-adapters/routing, services/routing, Docker/PBF 생성 스크립트, Web /routing, 단위/타입/실제 엔진/지역 운영/한국 OSM/E2E 검사, CI·환경 예제·Changeset·출처 해시, API/architecture/ADR-005/가이드/검증/README·roadmap·cost-audit·AGENTS.
+3. **테스트:** 실제 Docker 합성 그래프/HTTP/운영 정책 8개, 실제 한국 공개 PBF 빌드 및 한국 도로 5개 통과. 서울 차량 1578.189m/114.260s, 도보 762.720m/557.391s, 자전거 1253.431m/303.486s. 경유지·단절 graph·island/no-segment·거리 상한·실패 active 보존·취소/지연을 구분 검증했다. 전체 최종 check/pack/staged/E2E 결과는 아래 기록을 따른다.
+4. **실화면 QA:** Chromium /routing에서 합성 경로 꺾임·마커·경유지·거리/시간/출처·오류 후 제거와 미설정 지도 유지를 실제 캡처 확인했다. 배경은 해당 fixture 범위의 단색이며 실제 한국 도로 지도 화면 검증으로 표시하지 않는다. Android/iOS/Safari/Firefox와 현장 통행 검증은 미검증이다.
+5. **라이선스/보안:** SDK·자체 PBF fixture MIT, Valhalla MIT 및 이미지 내 구성 요소 별도 조건, OSM/파생 graph ODbL. 한국 PBF/DB/graph는 ignored artifacts에만 보존한다. 제작자 URL/키·공용 routing demo·자동 다운로드 없음. 기존 npm high2는 audit 종료1로 재확인했으며 출시 차단 유지.
+6. **잔여/차단:** 전국 정답/현장 통행·부하·안전·image 전체 CVE 감사·Native 통합, Windows/macOS Docker 실실행은 미검증. 자동 clipping/증분 갱신/무중단 운영·교통·내비게이션은 미구현. 공개 서비스는 인증·TLS·쿼터를 운영자가 별도 구성해야 한다.
+7. **Git:** `feat/self-hosted-routing`, base `feat/gps-tracks` (`dc6621704483a6b3406e51207f9adf1fcc46cbf9`). 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: add optional self-hosted Valhalla routing$'`. 검사 후 commit/push 및 연결 GitHub 커넥터로 draft PR 생성. 이번 main 병합·운영 배포·npm 발행은 수행하지 않는다.
+8. **다음 단계:** 운영자 지역 품질/경계·부하·Native 기기 검증으로 진행 가능. 전국 품질 보장·M5 전체·공개 출시 완료 판정은 불가하다. [가이드](routing.md), [검증 기록](research/routing-validation.md).
+
+### 최종 로컬 검사 확정
+
+`pnpm check` 통과: Vitest81(11 files), 독립 core1, 데이터정책18, 비용감사15, strict/native 타입,
+lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export.
+`pnpm test:routing` 실제 Docker/운영 8개, 한국 공개 OSM 별도 5개, Chromium 전체 E2E10개,
+`pnpm pack:check` 실제 SDK tarball5개 모두 통과했다. skip/retry 통과 없음.
+날짜/검토기한 검증 보강 뒤 관련 Docker/운영 테스트와 lint를 재실행했다.
+정적 findings0·Web 외부 HTTP 시도0이며 패키지에 서비스/PBF/graph/비밀 설정이 없음을 확인했다.
+지역 한국 graph/원본은 ignored 상태로 보존하고 QA용 컨테이너/gateway는 종료한다.
+커밋 전 index 데이터·비용 감사와 diff를 확인한다. 원격 CI의 실제 결과는 해당 PR checks를 따른다.
+기존 high2, 현장/전국 품질·운영 부하·Native 기기·OS 전체 egress·이미지 CVE 검증은 잔여다.

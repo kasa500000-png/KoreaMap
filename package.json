@@ -46,7 +46,10 @@
     "test:geo": "pnpm build:sdk && node scripts/geo-local.mjs test",
     "search:service": "node --env-file-if-exists=artifacts/geo-dev/.env services/search/dist/cli.js",
     "search:migrate": "pnpm search:service migrate",
-    "search:serve": "pnpm search:service serve"
+    "search:serve": "pnpm search:service serve",
+    "routing:local": "node scripts/routing-local.mjs",
+    "routing:serve": "node services/routing/dist/cli.js",
+    "test:routing": "pnpm build:sdk && node scripts/routing-local.mjs test"
   },
   "devDependencies": {
     "typescript": "6.0.3",

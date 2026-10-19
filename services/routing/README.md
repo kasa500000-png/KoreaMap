@@ -1,9 +1,13 @@
 # routing service
 
-Private workspace boundary; not an npm SDK package or a running service.
-`src/index.ts` exports an explicit `not-implemented` descriptor only.
-No HTTP port, database, downloader, cloud resource or fallback is started.
-The SDK packages must never import this directory.
+Private operator service: pinned Valhalla Docker graph and loopback Node gateway,
+independent of search/PostGIS. Importing the SDK starts neither service.
 
-Implementation is deferred to the roadmap: geo-data pipelines M3/M6, search/routing engines M5.
-Operators will supply licensed input and their own infrastructure and pay its operating costs.
+See [routing guide](../../docs/routing.md) for OSM input rights, versioned regional
+builds, explicit configuration, startup, updates and rollback. The SDK packages
+must never import this directory. No engine URL, account, automatic download,
+straight-line route fallback, traffic or safety guarantee is supplied.
+
+`pnpm test:routing` builds an authored synthetic road PBF inside ignored artifacts,
+starts the real engine and checks three modes, waypoints, disconnected roads and
+the private gateway. Default `pnpm check` remains Docker/API-key independent.

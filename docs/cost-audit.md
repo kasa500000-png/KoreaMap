@@ -278,3 +278,18 @@ SDK core/data-adapters 실제 tarball SHA는 [검색 검증](research/search-val
 
 Expo의 추가 화면과 JS 모듈도 출처 검사에서 빠지지 않도록 기존 두 파일 한정을 전체 Expo JS/TS 소스로 확대했다.
 새 GPS 관련 소스16개와 기존 단순 Metro 설정1개를 개별 검토해 manifest에 기록했다. 검토되지 않은 중첩 화면을 거부하는 회귀 검사도 추가했다.
+
+## 선택형 자체 라우팅 추가 감사 — 2026-10-19
+
+- core/data-adapters는 주입된 transport만 호출하며 URL/키·환경변수 기본 탐색·엔진 설치 hook이 없다. 지도 초기화와 SDK 기본 check는 라우팅 서비스 없이 동작한다.
+- Valhalla 공식 base 이미지를 digest로 고정했다. scripted 이미지의 tile/timezone/default-speeds 다운로드는 사용하지 않는다. Docker image pull은 로컬 test/build의 명시적 실행에서만 발생하며 데이터 다운로드와 서버 운영은 운영자 책임이다.
+- 한국 공개 OSM PBF 289,590,631 bytes를 이번 QA에서 수동 다운로드해 로컬 graph를 빌드했다. SDK 설치/CI가 이를 받지 않으며 원본/graph/admin DB/.env는 ignored artifacts에만 있다. A/기한/권리 opt-in/해시/기준일을 확인한다.
+- build network none, 서빙 loopback 8002와 Node gateway 8093. 로컬 bridge는 egress 방화벽 보장이 아니다. 엔진 원격 tile·traffic·telemetry URL 없음, 요청/위치 로그 비활성. 검색/PostGIS 또는 제작자 계정에 연결하지 않는다.
+- gateway는 명시적 운영자 URL, HTTPS 또는 loopback HTTP, redirect 금지, 4KiB 입력/8MiB upstream, concurrency/deadline/cancel/Origin/Host 검사다. 공개 demo에 gateway나 공유 인증정보를 포함하지 않는다. Web /routing은 자체 고정 합성 경로만 표시한다.
+- Linux 표준 runner에 pnpm test:routing만 추가했다. 유료/larger runner·캐시·artifact 업로드·cron·배포 없음. 실제 계정 과금 설정을 코드만으로 보장하지 않는다.
+- 실제 Web E2E는 외부 HTTP 시도0을 확인했다. OS 전체 엔진 egress/Native 기기 실행은 별도이며 정적 감사로 대체하지 않는다. 최종 check/실제 npm tarball/index 결과는 진행 기록을 따른다.
+- npm audit는 기존 node-forge/braces high2로 종료1, 신규 외부 npm dependency 없음. 이미지 전체 SBOM/CVE 감사와 공개 운영 인프라 검증은 후속이다. 출시 차단 유지.
+
+최종 로컬 결과: `pnpm check`, `pnpm pack:check` SDK5개, `pnpm test:routing`8개, 한국 공개 OSM5개,
+Chromium E2E10개 통과. worktree/index/도달 가능한 history 및 실제 tarball 정적 findings0,
+Web 외부 HTTP 시도0. 이는 OS 전체 또는 원격 과금 계정의 안전성 증명은 아니다.
