@@ -65,3 +65,7 @@ tests/          단위 계약 · Web 화면/네트워크
 - [Zero Publisher Cost ADR](docs/decisions/009-zero-publisher-cost.md), [비용·보안 감사](docs/cost-audit.md), [프로젝트 정책](AGENTS.md)
 
 main 병합·운영 배포·공개 전환·npm 발행에는 각각 명시적 승인이 필요합니다. npm scope 소유권, Native 실제 빌드/화면 및 잔여 보안 감사가 완료되기 전 제품 발행을 진행하지 않습니다.
+
+## 데이터 공급원과 라이선스
+
+[공급원 조사](docs/data-sources.md), [데이터 라이선스](docs/data-licenses.md), [출처 표시](docs/attribution.md), [기계 판독 원장](data/sources.json)을 참고하세요. A 후보만 운영자 선택 후 수집 자격을 얻으며, B는 선택형 API, C/D는 제외합니다. 실제 외부 데이터는 Git/npm에 포함하지 않습니다. `pnpm check:data`, `pnpm test:data`, `pnpm pack:check`로 권리 메타데이터와 공개 산출물을 검사합니다.
