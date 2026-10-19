@@ -169,7 +169,7 @@
       "license": "MIT"
     },
     "packages/styles/src/index.ts": {
-      "sha256": "0e0ded2467986ea1b88856da5598842f2f7f8c10b75c174358869e43192dc787",
+      "sha256": "3c444535db086968d5f52546fe2a6d062343f9cdd02e90c32d844e3a59813e3b",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -194,7 +194,7 @@
       "license": "MIT"
     },
     "packages/web/src/index.ts": {
-      "sha256": "555c0e3d6b7bceda18556c181f06aa38fe0bbbfe13f40326d4029e7ca24f34b3",
+      "sha256": "2ef74d649aa197883640f1403b19737ea787db39770d7bf3eedf7a9451c65b3f",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -209,7 +209,7 @@
       "license": "MIT"
     },
     "packages/web/src/state.ts": {
-      "sha256": "02593d11f507237a0645912d9373dd8df7adc238b15429b16f2f871837340d68",
+      "sha256": "9065b157ceb1028fe25d3c9bf49559857c7b9fbd89292776f800e6fd14154509",
       "origin": "project-authored",
       "license": "MIT"
     },

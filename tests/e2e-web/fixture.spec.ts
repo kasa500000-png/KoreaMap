@@ -120,6 +120,10 @@ test('real renderer: camera, 100/1000 markers, selection, resize, disposal and r
   await cdp.send('HeapProfiler.collectGarbage');
   const after = await cdp.send('Runtime.getHeapUsage');
   expect(after.usedSize - baseline.usedSize).toBeLessThan(8 * 1024 * 1024);
+  console.log(
+    'HEAP_SAMPLE',
+    JSON.stringify({ before: baseline.usedSize, after: after.usedSize, cycles: 5 }),
+  );
   await testInfo.attach('heap-sample', {
     body: JSON.stringify({ before: baseline.usedSize, after: after.usedSize, cycles: 5 }),
     contentType: 'application/json',

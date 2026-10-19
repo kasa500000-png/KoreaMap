@@ -2,6 +2,36 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import ts from 'typescript';
+// Inspect resolved options: a child config must not silently disable strict checks.
+for (const group of ['packages', 'examples', 'services']) {
+  for (const name of readdirSync(group)) {
+    const configPath = resolve(group, name, 'tsconfig.json');
+    if (!ts.sys.fileExists(configPath)) continue;
+    const config = ts.getParsedCommandLineOfConfigFile(
+      configPath,
+      {},
+      {
+        ...ts.sys,
+        onUnRecoverableConfigFileDiagnostic(diagnostic) {
+          throw new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
+        },
+      },
+    );
+    assert(config?.options.strict === true, `${configPath}: strict must remain enabled`);
+    for (const option of [
+      'noImplicitAny',
+      'strictNullChecks',
+      'strictFunctionTypes',
+      'strictBindCallApply',
+      'strictPropertyInitialization',
+      'noImplicitThis',
+      'alwaysStrict',
+      'useUnknownInCatchVariables',
+      'strictBuiltinIteratorReturn',
+    ])
+      assert(config.options[option] !== false, `${configPath}: ${option} must not override strict`);
+  }
+}
 const allowed = {
   core: [],
   styles: ['core'],

@@ -1,6 +1,6 @@
 # Zero Publisher Cost — 보안 및 비용 경로 감사
 
-현재 상태는 마지막 「모노레포 foundation 감사」를 따른다. 아래 1~8절은 SDK 구현 전 정책 단계의 증거와 출시 절차다. 현재 일부 코드/실행 증거가 추가됐지만 Native 실빌드와 보안 미해결 2건으로 제품 출시는 차단된다.
+현재 판정은 [전체 QA 보고서](qa-report.md)와 문서 마지막 감사 기록을 따른다. 아래 1~8절은 SDK 구현 전 정책 단계의 증거다. Android 개발 APK의 이전 실행 증거는 있으나 실제 기기/iOS 및 보안 high2 미해결로 공개 출시는 차단된다.
 
 감사일: 2026-10-19 (UTC). 대상 브랜치: `docs/zero-publisher-cost`. 기준 설계 커밋: `e832012f341c41f6670ba27c423195f97ad927d1`. 정책: [AGENTS.md](../AGENTS.md), 설계: [ADR-009](decisions/009-zero-publisher-cost.md), 책임 구분: [README](../README.md).
 
@@ -317,3 +317,14 @@ Web 외부 HTTP 시도0. 이는 OS 전체 또는 원격 과금 계정의 안전�
 새 두 앱의 Web 외부 HTTP 시도0, worktree/index/도달 가능한 history/tarball 정적 findings0.
 Android APK 빌드·설치 및 합성 앱 화면 실행은 성공했다. 초기 startup ANR가 있었으며 OS 전체 요청 검증은 미완료다.
 npm audit는 기존 high2/exit1이며 공개 출시 차단을 유지한다.
+
+
+## 전체 품질 감사 — 2026-10-19
+
+- 동일값 Web 카메라/마커 갱신을 줄이고 GeoJSON 공개 타입 누락을 고쳤다. 새로운 runtime endpoint/키/계정은 추가하지 않았다. @types/geojson은 기존 고정 버전을 web/styles의 명시적 타입 의존성으로 이동·추가한 것이며 core 의존성은 0이다.
+- 오프라인 검사가 12개 manifest/27개 workspace 연결을 확인하도록 보강했다. 별도 임시 소비 앱이 실제 SDK4개 tarball을 설치해 strict 타입·SSR import·브라우저 렌더/선택/종료와 외부 요청0을 확인한다. SDK5개 clean rebuild tarball 바이트 일치 및 크기를 측정한다.
+- 작업 트리/index/로컬 refs 이력/SDK tarball의 정적 발견0과 built app 후보 검토를 구분한다. 실제 Next/Expo 출력94파일에서는 URL120·credential 형식5개 후보가 발생했다. Next URL probe/RN TextInput 토큰은 upstream 소스와 대조했으며 Expo Go home 조건부 asset CDN도 기록했다. Native OS egress까지 통과로 표시하지 않는다.
+- 라이선스 metadata는 recursive 전체 설치 그래프645개 버전으로 확대했다. LGPL(libvips)·MPL(lightningcss)·CC-BY(caniuse-lite) 등의 별도 의무와 미실행 native/image SBOM 범위를 QA 보고서에 명시한다. SDK tarball은 제3자 데이터/폰트/SDK 외 서버를 포함하지 않는다.
+- Web15, 실제 PostGIS19, 실제 합성 Valhalla8, 단위100 및 출처19/비용16 회귀가 통과했다. 390/768/1440 Web와 독립 소비 앱 외부 HTTP 요청0. 모든 앱/운영자 설정에서 비용이 없음을 보증하지 않는다.
+- npm audit는 high2/exit1, 공식 수정 버전 없음으로 재확인했다. Web NodeNext 외부 선언, Android 물리 기기/iOS, 장시간 메모리/실데이터 부하/OS 네트워크는 미검증 또는 미해결이며 출시 차단을 유지한다.
+- 기존 표준 runner에서 license/offline/독립 tarball 소비 앱 검사만 추가했다. paid runner·remote cache·artifact 업로드·cron·배포·공유 계정·npm publish 없음.

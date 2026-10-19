@@ -46,9 +46,35 @@ export function createMapState(initial: Partial<MapSnapshot> = {}): MapState {
         listeners.delete(listener);
       };
     },
-    setCamera: (camera) => update({ camera: validateCamera(camera) }),
+    setCamera(camera) {
+      const next = validateCamera(camera),
+        prior = snapshot.camera;
+      if (
+        next.center[0] === prior.center[0] &&
+        next.center[1] === prior.center[1] &&
+        next.zoom === prior.zoom &&
+        next.bearing === prior.bearing &&
+        next.pitch === prior.pitch
+      )
+        return;
+      update({ camera: next });
+    },
     setMarkers(markers) {
       const next = validateMarkers(markers);
+      if (
+        next.length === snapshot.markers.length &&
+        next.every((m, i) => {
+          const prior = snapshot.markers[i]!;
+          return (
+            m.id === prior.id &&
+            m.label === prior.label &&
+            m.description === prior.description &&
+            m.coordinate[0] === prior.coordinate[0] &&
+            m.coordinate[1] === prior.coordinate[1]
+          );
+        })
+      )
+        return;
       update({
         markers: next,
         selectedId: next.some((m) => m.id === snapshot.selectedId) ? snapshot.selectedId : null,

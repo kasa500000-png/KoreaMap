@@ -138,3 +138,12 @@ SDK에는 bounds 유틸리티와 Web 출처 컨트롤 수정만 추가한다.
 합성 UX 검증이며 실데이터 길찾기·실GPS·전국 검색·iOS/물리 기기 또는 공개 출시 완료가 아니다.
 
 Web E2E12와 Linux/Windows/macOS CI가 통과했다. Android API35 개발 APK에서 두 지도·산책 저장/복원/재생·여행 날짜/연결선·테마 전환을 실제 확인했다. 초기 ANR/소프트웨어 실행 지연과 전체 모바일 QA·물리 기기/iOS 미검증은 후속 검증 기록에 유지한다.
+
+
+## 전체 품질 감사 및 개선
+
+`feat/quality-audit`의 [QA 보고서](qa-report.md)를 최신 품질 판정으로 사용한다.
+Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라인 링크/라이선스 검사를 수정했다.
+390/768/1440px Web 회귀, 실제 PostGIS/Valhalla, 독립 tarball 소비 앱 및 SDK 재현성 검증을 보강했다.
+통과한 개별 항목만 완료다. high2 공식 패치, Web NodeNext 외부 선언, Android 실기기/iOS,
+실제 provider 부하·장기 메모리/OS 네트워크 검증은 다음 작업이며 M4/M5/M6 전체 및 출시 완료로 처리하지 않는다.
