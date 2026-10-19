@@ -3,3 +3,4 @@ export * from './contracts.js';
 export * from './validation.js';
 export * from './operations.js';
 export * from './controller.js';
+export * from './places.js';

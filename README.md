@@ -75,3 +75,15 @@ Web 지도 API와 Next 클라이언트 사용법은 [Web SDK 가이드](packages
 Standard·Dark·Pastel·Outdoor의 [지도 디자인 시스템과 비교 화면](docs/design-system.md), [폰트·아이콘 라이선스 및 플랫폼 검증](docs/font-icon-licenses.md)을 제공합니다. `pnpm dev:web` 실행 후 `/themes/`에서 토큰 색상과 확대 레벨을 비교할 수 있습니다. 글꼴 파일과 실제 지도 데이터는 패키지에 포함하지 않습니다.
 
 공통 SDK API: [계약·사용 예제·Web/Native 기능 동등성](docs/public-api.md), [생성 API 참조](docs/api/core.md). Web `MapHandle.api`와 Native `MapView` ref가 같은 `MapController`를 사용합니다. `pnpm dev:web` 후 `/api/`에서 외부 키 없는 예제를 실행할 수 있습니다. Native 실기기 QA는 아직 미검증입니다.
+
+## 공공 POI 데이터 서비스
+
+선택형 PostGIS ETL과 공통 `getNearbyPlaces()` / `getPlacesInBounds()` /
+`getPlacesByCategory()`를 추가했다. [실행·설정 가이드](docs/public-data-etl.md)와
+[검증 결과](docs/research/poi-etl-validation.md)를 따른다. A 등급 중 지원 프로파일만
+운영자 opt-in으로 수집하며 기본값은 네트워크가 없는 자체 합성 샘플이다.
+원본 파일 접근 실패로 실제 공공데이터 적재는 미검증이다.
+
+SDK 소스·패키지 제공 비용과 데이터 다운로드·DB·타일·검색·라우팅 서버 운영 비용은
+별개다. 서비스 운영자는 자신의 DB/계정/트래픽 비용을 부담하며 SDK 사용자의 증가가
+제작자 소유 서비스 호출로 이어지는 기본 경로는 없다. Supabase는 선택 사항이다.

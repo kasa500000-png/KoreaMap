@@ -89,7 +89,7 @@
       "license": "MIT"
     },
     "packages/core/src/index.ts": {
-      "sha256": "742e68c6b1bec56b33a974eb59267d683ee05b2752f6c271f427791987cd990f",
+      "sha256": "19bd1ccef34275819e842e68616081804642dd0bad090014a85e485a2336dfa9",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -104,7 +104,7 @@
       "license": "MIT"
     },
     "packages/data-adapters/src/index.ts": {
-      "sha256": "22f2770eef155c576e84629564c283b7c14dc6996dabdcf33c87cc38bbdd28a5",
+      "sha256": "2441e25a2ea772d70afcda68e47618d58fcb928d57e661795531377e9c32d61d",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -179,7 +179,7 @@
       "license": "MIT"
     },
     "services/geo-data/src/index.ts": {
-      "sha256": "aa56dec4da280fe81e5bd5a9ded45ac4ec8d8b33d93ab4a436a5d95e39d6a49f",
+      "sha256": "8967c3ddaae75b18224421ae817859f6e3202d21fc3b566595c6b425fc730519",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -190,6 +190,51 @@
     },
     "services/search/src/index.ts": {
       "sha256": "5185094fca437afb5f549f00cdc8c967533458c7736528f0c859f2b403e6d2b2",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/places.ts": {
+      "sha256": "72518db2aff4d7671f0a574409275b4869b58bdab624fff4d9d8311aefd6c467",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/places.ts": {
+      "sha256": "023132bd85e37b0ba190de46064aab9f6a88a7e47029ca4458c7bf76c2a84484",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/cli.ts": {
+      "sha256": "4eaa209dfc8f343a510b8d175445f27b6fdb7cda05099a6ad4e57f80d7712feb",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/database.ts": {
+      "sha256": "bd69999dc518618ea88c46cfa3e0d366bf9ea31b0f1d49e0dc35984f716d7cca",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/etl.ts": {
+      "sha256": "a09d62a0b3c28d890bb85265626eb9f2cb056f5e9d9250cd9108c82a5614fad8",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/fixture.ts": {
+      "sha256": "acf8d9ab20b29ca112665ae9b366da51bad615b96e38aa26c53a81c368af94b3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/ingestion.ts": {
+      "sha256": "f2e1ee13424ac77f4ca20ffe3ad85e3bd07b6d8f2e5251f2342854f755fc9da6",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/repository.ts": {
+      "sha256": "3d38d77c335e9515432b81cad830b5d415780cb551aa120417e99e0478a63f21",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/server.ts": {
+      "sha256": "c88329d8f1ee8f8ae6e5c977a405023fa20ed2b06e5449129fbeaa321fed448a",
       "origin": "project-authored",
       "license": "MIT"
     }

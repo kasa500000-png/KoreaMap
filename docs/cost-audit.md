@@ -213,3 +213,18 @@ Web `/api/`는 직접 작성한 합성 데이터만 inline으로 사용한다. �
 기존 dependency high2, Android/iOS 실제 compile·런타임 네트워크/메모리/권한 QA가 남아 있어 제품 출시는 차단된다. 신규 registry advisory 조회는 이번 범위에서 실행하지 않았다. Native가 이미 포함하던 Style Spec 26.2.1(ISC)을 직접 의존성으로 고정했으며 엔진/전이 그래프 버전은 바뀌지 않았다. main 병합·운영 배포·공개 전환·npm 발행을 수행하지 않는다.
 
 최종 로컬 판정: check/5개 실제 tarball/최종 Playwright 6개 통과, static findings 0, 로컬 브라우저 외부 HTTP 시도 0. artifact SHA는 [Public API 검증](research/public-api-validation.md)에 기록했다. staged index는 커밋 직전 별도 검사한다. 비용 없는 모든 운영 환경이나 Native 런타임 검증 완료를 뜻하지 않는다.
+## 공공 POI ETL / 2026-10-19
+
+- 기본 SDK 설치/빌드/단위 테스트에 pg·DB·API 계정·다운로드 URL을 추가하지 않았다. pg 8.23.1과 csv-parse 7.0.3은 private `services/geo-data`에만 있다. 공통 core는 외부 의존성 0, data-adapters는 core만 의존한다.
+- `createFixturePlacesProvider()`는 명시적 자체 합성 데이터이고 remote provider는 운영자가 transport를 주입해야 한다. 사용자의 DB/HTTP/프록시/원천 파일 접근과 운영 비용은 사용자가 책임진다. 제작자 endpoint, secret, 결제 설정, 계정 fallback 없음.
+- 다운로드는 명시적 A 프로파일·opt-in·권리/기한/CRS·원본 해시 확인 후에만 실행하며 HTTPS 공식 호스트·30초·10MiB, 키/쿠키/redirect 차단을 적용한다. 원본 HTTP 본문은 디스크/DB에 저장하지 않고 허용 열만 적재한다. 수동 취득 원본/설정은 ignored data/raw에 둔다. 실원천 HTTP 503으로 실제 성공 수집은 미검증이다.
+- Docker는 개발자가 명시적으로 실행할 때만 시작한다. digest 고정 amd64 이미지, loopback DB/HTTP, 실행 시 무작위 암호, ignored 서버 전용 설정, session writer/reader 역할·RLS·파라미터 SQL 적용. 원격 DB는 명시적 사용자·암호와 인증서 검증 TLS를 요구한다. 서비스 URL은 공개 클라이언트 설정, DB 암호는 서버 secret으로 구분한다.
+- CLI/DB 로그는 source·SHA·건수·run ID·안전한 오류 코드만 출력한다. HTTP 응답/원본 행/연결 문자열/키는 로그에 넣지 않는다. 읽기 서버는 요청 크기·동시성·시간/SQL 제한과 no-store를 적용하며 공개 운영에는 별도 인증·인가 프록시가 필요하다.
+- 실제 Docker PostGIS 테스트 12개에서 SDK→loopback HTTP→사용자 테스트 DB 경로를 확인했다. fixture 단위 테스트는 fetch 차단, mock 다운로드는 공식 요청 성공과 구분한다. PROJ 네트워크는 비활성이다. 스캐너의 `PASS_STATIC_ONLY`는 모든 동적/OS 트래픽을 증명하지 않는다.
+- CI는 기존 무료 표준 Linux runner에 임시 DB 검사만 추가했다. 클라우드 DB/유료 runner/cache/artifact/배포·cron은 추가하지 않았다. 일반 `pnpm check`는 DB 없이 가능하다. Docker image/의존성 설치는 공개 레지스트리 접속이 필요하다.
+- `pnpm audit` 재조회: high 2(기존 node-forge GHSA-86w9-cpqp-85rv, braces GHSA-vfj7-8cjw-p6xm), moderate/critical 0. 성공으로 억제하지 않으며 출시 차단 상태를 유지한다. 이번 조회에 신규 pg/csv-parse 취약점은 보고되지 않았다. 컨테이너 OS CVE 전수 검사는 수행하지 않았다.
+- 원장 A6/B0/C8/D2와 Git/npm의 제3자 payload 금지를 유지한다. 자체 코드·fixture 출처 12개 파일을 개별 검토해 manifest hash를 갱신했다. CSV parser 공식 문서 호스트 허용은 docs에만 적용하며 runtime endpoint 허용으로 번지지 않는 회귀 검사도 추가했다.
+
+전체 check·실제 tarball·staged 최종 결과와 원격 CI 상태는 [진행 기록](progress.md) 및 PR을 따른다. Supabase 프로젝트 접근/생성/배포, main 병합, npm 발행은 수행하지 않았다.
+
+로컬 최종 `pack:check`에서 SDK 5개 실제 tarball의 출처/파일 allowlist/빌드 바이트 일치와 키·endpoint 검사가 통과했다(발행 아님). core SHA-256 `1dc1236adf46d061f126218f497297297e3b40af02901cac8efed7de686791ba`, data-adapters `a37409fadd336e3e9f76fff1fe61e43517d34692861ddf960d68c82ab2975fe2`. 기존 Web Playwright 6개도 외부 HTTP 차단 아래 통과했다. 실제 공공 원천 다운로드 성공/운영 계정 과금/Native 네트워크까지 검증했다는 뜻은 아니다.

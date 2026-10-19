@@ -143,3 +143,15 @@ Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 R
 - [Style Spec 26.2.1 metadata](https://registry.npmjs.org/@maplibre/maplibre-gl-style-spec/26.2.1): ISC 라이선스 및 버전 확인.
 
 Native 재현: 기존 개발 가이드에 따라 `pnpm --filter @korea-map-kit/example-expo android` 또는 macOS에서 `ios` 실행 후 ready, marker 선택, route, bounds, style 교체, 취소/종료, 회전·백그라운드 복귀를 확인한다. 실제 native toolchain/device와 glyph provider가 필요한 검증은 아직 완료되지 않았다.
+## 공공 POI 조회 확장
+
+`PublicPlace`는 기존 `Place`와 별개로 출처·라이선스·주소·카테고리·nullable 위치를 보존한다.
+`createPlacesClient()`의 nearby/bounds/category 조회와 `PlacesProvider`는 core의 순수 계약이며
+Web/React Native가 동일하게 사용한다. 기존 `PlaceRepository` 쓰기 인터페이스는 변경하지 않는다.
+PostGIS/HTTP/합성 어댑터와 사용 예제는 [공공데이터 가이드](public-data-etl.md)에 있다.
+
+| 기능 | Web | React Native | 실제 검증 |
+| --- | --- | --- | --- |
+| 3종 POI 조회 / 타입 / 기한·취소 | 공통 core | 공통 core | Node 단위·독립 core·실제 로컬 DB/HTTP 통과 |
+| 합성/운영자 transport Provider | 동일 구현 | 동일 구현 | 단위 및 로컬 HTTP 통합 |
+| 조회 결과 지도·카드 연결 | 위치 확인 후 변환 | 위치 확인 후 변환 | 이번 단계의 신규 UI/Native 실화면 미검증 |

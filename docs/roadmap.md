@@ -83,3 +83,11 @@ Web 로컬 합성 데이터와 설치된 Noto CJK를 검증한다. Native 라벨
 `feat/shared-public-api`에서 M4의 공통 `MapController`, 지리·스타일·GeoJSON·오류·취소·Provider 계약과 Web/Native bridge를 구현했다. [계약·기능 동등성](public-api.md), [생성 API 문서](api/core.md), [검증 기록](research/public-api-validation.md)을 따른다. 이전 Web API를 보존하고 Changesets minor로 신규 계약·오류 code 확장을 관리한다.
 
 Web은 실제 스타일 교체·overlay 유지까지 검증한다. Native 카메라/마커/도형/경로/ref는 구현했지만 실제 기기와 native renderer 수명 검증은 M4 잔여 작업이다. Native 외부 리소스 차단 interceptor, glyph 공급 설정과 디바이스 QA가 준비되기 전 외부 스타일은 명시적으로 미지원 처리한다. 검색/GPS/DB/실제 routing 엔진은 인터페이스 구현과 별개이며 M5/M6에서 선택적으로 연결한다.
+## 공공 POI ETL / M6 일부 구현
+
+`feat/public-poi-etl`에서 세 A CSV 프로파일의 명시적 다운로드/검증, PostGIS 좌표 변환·upsert·복구·로그,
+로컬 Docker, read-only 조회 서비스와 공통 세 POI API를 구현했다. [실행 가이드](public-data-etl.md),
+[검증 기록](research/poi-etl-validation.md)을 따른다. 실제 DB는 자체 합성 자료로 검증했다.
+공공 원문/파일은 HTTP 503으로 접근되지 않았으며 실제 적재·정확도는 미검증이다.
+도시공원·화장실 등 추가 승인, TourAPI 좌표/키, XLSX, Native 화면, 대량 갱신·운영 인증은 후속이다.
+M6 전체 완료 또는 전국 POI 서비스/공개 발행 준비 완료 판정은 아니다.

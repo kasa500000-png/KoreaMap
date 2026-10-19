@@ -37,6 +37,7 @@ OFFLINE_REFERENCE_URLS = {
     "scripts/audit-cost-security.py": {"https://registry.npmjs.org/"},
 }
 DOCUMENTATION_HOSTS = {
+    "csv.js.org",  # Reviewed parser documentation only; never a runtime provider.
     "raw.githubusercontent.com", "openfontlicense.org",  # Reviewed Noto/OFL documentation only.
     "github.com", "docs.github.com", "maplibre.org", "docs.expo.dev", "nextjs.org",
     "www.rfc-editor.org", "postgis.net", "docs.protomaps.com", "nominatim.org",
