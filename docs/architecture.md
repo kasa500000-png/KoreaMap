@@ -10,6 +10,34 @@ MapLibre GL JS(Web)와 MapLibre Native를 감싼 MapLibre React Native(Android/i
 
 MVP에 포함: 지도, 한국어 라벨, 카메라, 마커·GeoJSON·선/면, 피처 선택, 스타일 교체, 출처 표시, 사용자 소유 스타일/타일, 유료 키 없는 자체 호스팅, 검색/경로 인터페이스 및 명확히 표시된 fixture 예제. 실제 검색/경로 엔진, 공공데이터 대량 통합, 계정, Supabase, 오프라인 다운로드, 3D 지형, 실시간 교통, 내비게이션은 P1/P2다. **경로 선을 그리는 기능과 길찾기를 계산하는 서비스는 별개다.**
 
+## 1.1 Zero Publisher Cost와 Provider 설정 계약
+
+[ADR-009](decisions/009-zero-publisher-cost.md)와 [비용 감사](cost-audit.md)를 모든 패키지·데모·도구에 적용한다. SDK 설치/import/기본 테스트가 제작자의 API 키·DB·타일 서버·백엔드·유료 계정으로 요청하지 않게 설계한다. 무료 계정의 quota도 제작자 공유 자원이며 기본값으로 사용하지 않는다.
+
+지도 입력은 다음 중 하나를 명시적으로 선택한다. 아래는 구현 예정 계약이며 런타임 검증 완료를 의미하지 않는다.
+
+```ts
+type MapProviderConfig =
+  | { mode: 'local-fixture'; fixtureId: string }
+  | { mode: 'operator'; style: object | string; allowedOrigins: string[] };
+```
+
+`local-fixture`는 패키지/앱에 포함된 별도 허가 소형 데이터만 사용하며 서버에서 다운로드해 채우지 않는다. Web 테스트는 loopback fixture 서버, 앱은 bundle asset을 사용한다. fixtureId는 승인된 registry에 있는 ID만 허용한다. `operator`는 이용자가 관리하는 style/TileJSON/tiles/glyph/sprite URL과 허용 origin을 지정한다. 빈 설정에 자동 fixture 모드를 적용하지 않고 `INVALID_ARGUMENT`의 `CONFIG_REQUIRED` 세부 원인으로 반환한다. renderer 생성 전에 검사해 MapLibre RN 기본 demo style로의 접속도 막는다. 검색·경로·공공데이터 provider 미설정은 해당 기능만 비활성/명시적 실패이며 지도 설정이 있으면 지도는 유지한다.
+
+공공데이터 provider도 URL/데이터셋 ID/인증 필요 여부/비용 고지/허가 metadata를 운영자가 설정한다. 배치 명령은 명시적 input/config 없이는 다운로드나 클라우드 작업을 시작하지 않는다. key가 필요한 수집은 운영자 서버에서 수행한다. SDK가 제작자 환경변수·계정 profile·demo token을 탐색하지 않는다.
+
+endpoint 소유자와 비용 책임은 provider 문서와 설정 화면에 표시한다. style의 source/TileJSON, glyph/fonts, sprite/icons/images, terrain 및 redirect 이후 목적지도 설정된 허용 범위에 포함해야 한다. 상대 경로는 지정 asset base로 해석한다. 문자열 검사만으로 동적 요청을 통제했다고 간주하지 않으며 Web worker·Native transport에서 실제 목적지를 검증한다. 허용 외 URL/redirect는 요청 전에 거부하는 경로를 검증하고, 플랫폼에서 통제가 안 되면 해당 source 기능을 비활성화한다.
+
+Secret은 운영자 서버에만 둔다. browser/native 환경변수, `NEXT_PUBLIC_*`, `EXPO_PUBLIC_*`, config plugin 출력·native resource·소스맵·bundle은 공개 정보다. client-safe identifier도 비용·quota를 사용할 수 있어 제작자의 값을 번들하지 않는다. 사용자 endpoint/키를 로그·telemetry·오류 리포트·설정 예시에 기록하지 않는다. Git에는 개인 서버 주소나 결제 account/project ID를 넣지 않고 placeholder 또는 값 없는 template만 둔다.
+
+기본 예제/공개 데모는 same-origin 소형 fixture로 구성한다. 검색·경로는 표시된 로컬 fixture만 제공하며 외부 provider 전환은 운영자가 자기 환경에 설치한 뒤 설정한다. 공개 데모에 공유 API 키·범용 proxy·token 발급 서버·사용자 입력에 따른 원격 질의·실시간 전국 갱신을 두지 않는다. CSP 및 서비스 구성으로 외부 connect를 기본 차단하고 fonts/workers/icons도 로컬로 제공한다. 정적 호스팅 역시 비용이 있을 수 있어 무료 한도와 유료 전환 차단을 확인한 배치만 별도 승인 후 허용한다. 한도 초과 시 유료 fallback 대신 중지한다.
+
+기본 build/test는 로컬 장비와 합성/허가 fixture로 실행한다. 공개 registry의 의존성 다운로드와 지도 서비스 API 호출을 구분하되 install/prepare hooks 및 전이 의존의 telemetry·다운로드도 검사한다. EAS/유료 원격 빌드·DB·제작자 remote cache는 필수가 아니다. 실제 대형 OSM 배치/검색 품질 테스트는 운영자 opt-in 작업이며 기본 unit/E2E에 넣지 않는다.
+
+Actions는 무료 조건을 충족하는 공개 저장소 표준 runner를 기본으로 한다. larger/GPU/custom image·유료 self-hosted 인프라·스토리지 초과·paid cache·deploy는 별도 승인 없이 켜지 않는다. 최초 CI는 가벼운 검사, 최소 권한, timeout·concurrency 취소 정책으로 시작한다. artifact/cache는 무료 한도·retention을 확인한 뒤 도입하며 한도를 늘리는 계정 설정을 자동 변경하지 않는다. 이번 단계에는 workflow를 추가하지 않는다.
+
+배포 gate는 Git/실제 npm tarball/Web bundle/모바일 앱의 비밀정보·endpoint 정적 검사와 **설치·import·실행·테스트의 실제 네트워크 목적지/요청 수 검사**다. `docs/cost-audit.md`에 커밋/artifact hash, 조건, 요청 소유자·비용, 차단 결과와 미검증을 기록한다. SDK 없는 상태의 정적 통과는 제품 Zero Publisher Cost 런타임 합격이 아니다. 구체적인 검사 순서는 해당 감사 문서를 따른다.
+
 ## 2. 구성과 의존 방향
 
 ```mermaid

@@ -1,6 +1,6 @@
 # 설계 일관성 검증
 
-날짜: 2026-10-19. 대상: [아키텍처](../architecture.md), [요구사항](../requirements.md), [로드맵](../roadmap.md), ADR 8개, [조사 기록](technical-review.md). 상태: 문서 자동 검사 및 수동 일관성 리뷰 통과. 제품 동작은 미검증.
+날짜: 2026-10-19. 최초 대상: [아키텍처](../architecture.md), [요구사항](../requirements.md), [로드맵](../roadmap.md), ADR 8개, [조사 기록](technical-review.md). 상태: 문서 자동 검사 및 수동 일관성 리뷰 통과. 제품 동작은 미검증. Zero Publisher Cost 추가 검증은 마지막 절을 따른다.
 
 ## 재현 명령
 
@@ -39,3 +39,17 @@
 - 공개 upstream Web UX: 마커 popup·drag·wheel/Fly 화면 반응 관찰 완료. 정확 카메라 좌표와 상세 타일 완전성은 미검증. [관찰 로그](ux-observations.json).
 - SDK 단위/통합/E2E, Next.js 빌드, Expo native 빌드, Android/iOS 실화면, 실제 한국 타일·PostGIS·검색·경로 엔진, 성능·비용·의존성 보안 audit: 미실행·미검증.
 - 이유: 이번 범위는 설계이며 제품 코드/서비스를 설치하지 않았다. REA/Ghidra/ADB 사용과 앱 역분석도 수행하지 않았다.
+
+## Zero Publisher Cost 후속 검증
+
+기준일: 2026-10-19. [ADR-009](../decisions/009-zero-publisher-cost.md), [비용 감사](../cost-audit.md), [README](../../README.md)를 추가했다. 최초 검증 기록을 보존하고 현재 검사 범위를 아래와 같이 확장한다.
+
+- 자동 추적성: 기존 R01~R24와 Z01~Z12 총 36개 요구사항, ADR 9개, 요구사항의 단계/P0~P2 배치와 양방향 참조를 검사한다.
+- 무설정 지도: renderer 생성 전 `INVALID_ARGUMENT` / `CONFIG_REQUIRED`로 실패하도록 설계했다. SDK 내부 기본 style 또는 제작자 계정 연결은 금지한다.
+- 외부 서비스: 타일·검색·경로·공공데이터 provider를 운영자가 명시적으로 설정한다. 로컬 fixture도 명시적 모드이며 공용 무료 서비스 자동 fallback을 두지 않는다.
+- 자산/설치: style의 하위 tile/glyph/sprite 요청, worker/Native, redirect, transitive install hook, remote cache까지 감사 범위에 포함했다.
+- 배포/비용: README의 운영자 책임, 공개 환경변수 노출, 무료 표준 Actions runner 조건, 제품 배포 전 실제 네트워크 증거 요구를 정책/설계/로드맵에 일치시켰다.
+- 자동 보안/비용 감사: 작업 트리·index·로컬 refs 이력의 정적 검사 통과, 11개 회귀 테스트 통과. 테스트 tarball은 합성 자료이며 실제 제품 tarball 검증을 대신하지 않는다.
+- 미검증: SDK 설치/실행 요청, Web·Android·iOS 화면/네트워크, 원격 계정 결제 설정. 제품 구현 없이 이 조건을 통과 처리하지 않는다.
+
+명령과 탐지 범위/한계는 [비용 감사](../cost-audit.md)에 기록했다. 모든 최종 변경에 문서 검사·감사·회귀 테스트·staged diff 검사를 재적용한 후 커밋한다.
