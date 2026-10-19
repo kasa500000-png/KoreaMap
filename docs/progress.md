@@ -397,3 +397,18 @@
 - [PR #4](https://github.com/kasa500000-png/KoreaMap/pull/4)를 연결된 GitHub 커넥터로 생성했다. `ac2d4d209f848c70ab9b49afe05f431623d50ad6`의 [CI 실행](https://github.com/kasa500000-png/KoreaMap/actions/runs/39207562003)은 Linux·Windows·macOS 모두 success다. 각 OS의 check/staged/pack과 Linux E2E가 통과했다.
 - 추가 수동 검토에서 CSV 외 XML/RDF/줄 단위 JSON 등의 형식과 임의 경로의 JSON도 명시적으로 거부하도록 보강했다. 알려진 설정/조사 JSON 경로만 허용하며 그 안의 중첩 GeoJSON도 거부한다. 음성 회귀 사례를 확장한 뒤 `pnpm check`, 실제 tarball 검사, staged 검사를 통과했다.
 - 보강 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: reject unreviewed structured data payloads$'`. 최종 커밋의 원격 결과는 PR checks와 사용자 보고를 따른다. Native 및 외부 데이터 QA 미검증 범위는 동일하다.
+
+## Web 지도 SDK — 2026-10-19
+
+1. **구현 기능:** MapLibre 초기화/종료, 상태 분리, 카메라/줌/이동/회전, 배치 마커와 선택·장소 카드, GeoJSON Point/Line/Polygon·경로 표시, 사용자 레이어, 이벤트, 자동 크기 조정, 로딩/오류/Abort 처리, 키보드 선택과 출처. 명시적 운영자 style/허용 origin/비용동의 및 Next 클라이언트 dynamic import.
+2. **파일:** packages/core/src/index.ts, packages/web/src/{index,state,provider,geojson}.ts, packages/web/README.md, examples/web/app/{map-client,map-demo,page}.tsx와 style.css, tests/unit/web.test.ts, tests/e2e-web/fixture.spec.ts, data/publication.json, .changeset/web-map-sdk.md, README와 roadmap/progress/cost-audit/Web 검증 문서.
+3. **테스트:** Vitest 18, 타입/ESLint, Next production build 및 Chromium E2E 4개 통과. 100/1,000 실제 렌더링 마커, 포인터/모바일 터치, 선택, resize, 5회 재생성, 오류/복구 및 origin 차단 검사. 전체 검사·tarball·staged 최종 결과는 아래 확정 기록에 추가한다.
+4. **실화면:** desktop 및 390×844 mobile Chromium screenshot 직접 확인. 합성 지도와 한글 UI·경로·장소 카드·MIT 출처 정상. 실기기 및 Safari/Firefox 미검증.
+5. **라이선스/보안:** 자체 작성 데이터만 MIT, 실제 외부 데이터 없음. 외부 endpoint 기본값/제작자 credential 없음. 운영자 config는 공개정보이며 secret 저장소가 아니다. 기존 dependency high2 출시 차단 유지.
+6. **남은 작업:** 상위 MapLibre global dispatcher worker 1개 유지(완전 종료 미충족). 지도별 리스너/observer/DOM 해제 및 worker 비증가·제한된 heap 회귀 통과. Native API 동등성, 실제 타일/glyph/검색·경로 계산, 장시간/GPU/실기기 QA 미완료.
+7. **Git:** `feat/web-map-sdk`, base `feat/data-source-policy` (`001252c6f4fea50fea7dfbc3feafb035676a18fd`). 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: implement MapLibre web map SDK$'`. 연결된 GitHub 커넥터로 draft PR 생성 예정. main 병합·운영 배포·npm 발행 없음.
+8. **다음 단계:** 독립 Native adapter/실제 타일 파이프라인 및 Web 호환성 검증 진행 가능. 제품 전체 완료/출시 판정은 불가. 자세한 제한은 [Web SDK 검증](research/web-sdk-validation.md) 참조.
+
+### 최종 로컬 검사 확정
+
+`pnpm check`·`pnpm pack:check` 통과, 최종 Next 배포물 Playwright 4개 통과(0 skipped/flaky). SDK 상태/오류 단위 테스트를 포함한 Vitest 18개, 데이터 정책 16개, 비용 감사 11개 통과. 다섯 재생성 전후 GC heap 증가 +206,008 bytes; 공유 worker 1개 유지와 SDK 리스너/observer 해제 확인. artifact SHA와 범위는 Web 검증 문서에 기록했다. staged 검사를 통과한 뒤 커밋하며 원격 3 OS CI는 PR에서 확인한다.

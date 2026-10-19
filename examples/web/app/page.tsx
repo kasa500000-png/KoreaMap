@@ -1,4 +1,4 @@
-import { MapDemo } from './map-demo';
+import { MapClient } from './map-client';
 export default function Page() {
-  return <MapDemo />;
+  return <MapClient />;
 }

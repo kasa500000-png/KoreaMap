@@ -23,23 +23,28 @@
       "origin": "project-authored",
       "license": "MIT"
     },
+    "examples/web/app/map-client.tsx": {
+      "sha256": "f918a207165042bd8c14e9b9defe97da459df227856f868b7019d20a6b8eaac1",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
     "examples/web/app/map-demo.tsx": {
-      "sha256": "bf3a037c046ee2e904a25d47332181a10fdcea4fae2c30f56ef12f4d3508b75e",
+      "sha256": "ab9b1a221ffbf2db454f8fad6ba0b48f260659257d8bc145ed8b886b2cbb0973",
       "origin": "project-authored",
       "license": "MIT"
     },
     "examples/web/app/page.tsx": {
-      "sha256": "531d74877e0f60490e3392db3e13fb084f6f164fb980ea69906e8ad81ed50718",
+      "sha256": "7198fb6df69c7f0cb0a708ce8b61d3b5fccd30da15c54047cf5c5c7a773e6623",
       "origin": "project-authored",
       "license": "MIT"
     },
     "examples/web/app/style.css": {
-      "sha256": "321f046639a845cd75b31eb43441d9782fc7508627bfa3044daa386f2024e4c6",
+      "sha256": "7e8032e613fccffdad3577883db2c2a3ebb94075cb860ec37a09196ae5d27ffc",
       "origin": "project-authored",
       "license": "MIT"
     },
     "packages/core/src/index.ts": {
-      "sha256": "a1e73e419ff6db5a76033e118343f970a542c9c25ed82ca2a5668c8e551a7f7c",
+      "sha256": "ff52de39db44f2cc663c4aab870aa793ad853e504f52f2d2781339c68b3a265a",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -58,8 +63,23 @@
       "origin": "project-authored",
       "license": "MIT"
     },
+    "packages/web/src/geojson.ts": {
+      "sha256": "b4881ccf6094646c7ff66f9bae4995c397a1ff41893b6a4bd839a882a451eed7",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
     "packages/web/src/index.ts": {
-      "sha256": "6fb264888e84d14d023dc6b56eacd012e841d263e57a37b912981f3639d07066",
+      "sha256": "f7ef953138fdd801fb2b14784bbdaa605c4ce90f7a643059ca8e6baa83445b43",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/provider.ts": {
+      "sha256": "98752af1e4ee957d111fa6f0ea7c05975c47d2e9c4befb353aa28824a1e4d826",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/state.ts": {
+      "sha256": "cde6a166e52d7cecc15c3d04ec6a693950773b2694acd01fc51f07e97a65e41a",
       "origin": "project-authored",
       "license": "MIT"
     },

@@ -176,3 +176,16 @@ pnpm audit --json
 산출물 SHA-256과 검증 범위는 [데이터 검증 기록](research/data-validation.md)에 있다. 정책 검사 통과는 제작자 계정의 실제 청구 설정이나 법적 권리 판단의 정확성을 자동 보증하지 않는다.
 
 - 원격 추가 증거: `ac2d4d2`의 [3 OS CI](https://github.com/kasa500000-png/KoreaMap/actions/runs/39207562003) 모두 통과. XML/RDF/줄 단위 JSON 및 검토되지 않은 경로의 JSON 차단을 보강했으며 새로운 네트워크 기능은 없다. 후속 커밋은 같은 PR의 CI로 확인한다.
+
+## 11. Web SDK — 2026-10-19
+
+- 기본 fixture에는 외부 style/tile/sprite/glyph/font/API endpoint가 없다. 데모는 자체 합성 GeoJSON과 로컬 worker를 사용한다. 100/1,000 마커·경로 표시는 네트워크 서비스 호출이 아니다.
+- 선택형 `operator` 설정은 style URL, 정확한 허용 origin, 출처, 비용 책임 동의를 모두 요구한다. HTTPS 또는 HTTP loopback만 허용하며 URL 내 username/password는 거부한다. 제작자 계정·환경변수 탐색·무료 공용 fallback은 없다. 운영자 요청 비용은 해당 운영자 책임이다.
+- `transformRequest`로 허용되지 않은 리소스 origin을 거부한다. 테스트에서 같은 origin의 운영자 스타일 성공 및 다른 origin의 GeoJSON 차단을 확인했다. HTTP redirect와 사용자 custom layer JavaScript는 이 검사만으로 격리되지 않으므로 신뢰할 수 있는 스타일/redirect와 CSP·서비스 quota가 필요하다. allowlist를 청구 한도나 비밀키 보호 장치로 표시하지 않는다.
+- 공개 클라이언트 값은 비밀이 아니다. 팝업은 textContent만 사용하고 직접 제공하는 출처는 escape한다. 운영자 스타일 내부의 외부 링크/출처 역시 운영자가 검토해야 한다. SDK 오류 이벤트는 원본 URL/credential을 전달하지 않는다.
+- Playwright의 실제 fixture 탐색·선택·반복 종료 및 운영자 origin 차단 시나리오에서 외부 HTTP 시도 0건을 검사한다. 모바일 Chromium은 터치 에뮬레이션이며 실제 Safari/Android 환경의 네트워크 감사는 아니다.
+- dependency/lockfile·CI 인프라 변경 없음. 기존 high2는 미해결 출시 차단으로 유지한다. 이번 작업은 advisory 재조회를 대신하지 않는다. 실제 공개/발행 전 감사를 다시 수행한다.
+- 작업 트리/index 및 다섯 실제 npm tarball의 provenance·비밀값·endpoint 검사를 수행한다. 자체 작성 runtime 파일만 수동 검토 후 publication manifest를 갱신한다. 제3자 지도 payload는 추가하지 않았다.
+- MapLibre 전역 dispatcher의 공유 worker 1개 유지가 관측된다. 지도 종료 후 새로운 요청은 발생하지 않으며, SDK가 다른 지도 인스턴스에 영향을 줄 수 있는 강제 종료를 수행하지 않는다. 반복 mount 시 worker 증가 여부와 제한된 heap regression을 검사한다.
+
+상세 실행 결과 및 제한은 [Web SDK 검증 기록](research/web-sdk-validation.md)에 기록한다.
