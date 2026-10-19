@@ -104,7 +104,7 @@
       "license": "MIT"
     },
     "packages/core/src/index.ts": {
-      "sha256": "1eb83e6b4b96e1a78a23a1989edbb00fa0a3ef46f16e0e56bb90ad3dd037a806",
+      "sha256": "fd473c8bbeea5902fd5dfcf4a2563362238e168ba8820ed2764d6f3ae3500339",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -129,7 +129,7 @@
       "license": "MIT"
     },
     "packages/data-adapters/src/index.ts": {
-      "sha256": "aa9e38a02cf5856da029b145442f5045f8bf95b7077b48a4875eec292a95d9f4",
+      "sha256": "efa7effa7992c642b10afbf5204a3cfbde17e8328bbbd80c31c430a5bc89adef",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -254,7 +254,7 @@
       "license": "MIT"
     },
     "services/routing/src/index.ts": {
-      "sha256": "2694342cef42578fc49dc35827a0beccd4370f7b9c42d245d127e2a2d96dd3f5",
+      "sha256": "35ce8fcc6884f2b3c798a31f4bc20e0c2e603bd483301fbcf70010a3a27b4be8",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -340,6 +340,41 @@
     },
     "examples/expo/metro.config.cjs": {
       "sha256": "1b801de05c908cc3d91b95d8e4f271e0bcb43c63cf40339f9813f3fbf73cc72c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/routing.ts": {
+      "sha256": "fb5c4357414cf094cc94531ae3ced0f127f0c87da680d5545f9d067925607273",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/routing.ts": {
+      "sha256": "9304bb72cae2b2bbea81841de259c452afe9fce44c39516d4ad66c3933f15697",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/routing/src/server.ts": {
+      "sha256": "f99bfc7325b1253494c0ebbc74bd2587fb69c40ab949b367a8cd7fb5d357181a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/routing/src/cli.ts": {
+      "sha256": "7e8b4c0f4c5ce6b84f78a79427d34361ed9502b6022b32ea78d469b29cd4a46e",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/routing/page.tsx": {
+      "sha256": "45bec1116b645710ce232110214180f6b06a09317215f9f8e5837ef57ec22ae9",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/routing/routing-client.tsx": {
+      "sha256": "e558a60da51249b99191ec0aae85b04d5193606ca0a09544500852dd3da50aba",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/routing/routing-demo.tsx": {
+      "sha256": "92b10f947f06c37ebfd28da830b1107a179d3478d889f1072a68e2f04ea80639",
       "origin": "project-authored",
       "license": "MIT"
     }

@@ -35,7 +35,7 @@ Playwright 브라우저는 `pnpm exec playwright install chromium`으로 준비�
 ```text
 packages/       core · web · native · styles · data-adapters (SDK)
 examples/       web (Next.js) · expo (비공개 소비 앱)
-services/       geo-data · search · routing (비공개 서비스 경계, 엔진 미구현)
+services/       geo-data · search · routing (private 운영자 서비스, SDK와 별도 실행)
 docs/           설계 · 요구사항 · 로드맵 · 진행 · 감사
 scripts/        Windows/macOS/Linux 공통 Node/Python 개발 명령
 tests/          단위 계약 · Web 화면/네트워크
@@ -95,3 +95,12 @@ API 키가 없으며 실제 DB·검색 서비스 운영 비용은 해당 운영�
 [GPS·이동 경로 가이드](docs/gps-tracks.md): Web `/gps/`와 Expo **GPS 경로 예제**에서 동의 후 위치 조회·기록,
 GeoJSON/GPX 교환과 리플레이를 제공한다. 기본 외부 전송·장기 저장은 없다. 전경 수집만 지원하며
 Android/iOS 실제 기기·백그라운드 검증은 미완료다. 장기 저장/서버 운영 비용과 정책은 소비 앱 책임이다.
+
+## 선택형 자체 길찾기
+
+[라우팅 가이드](docs/routing.md): Valhalla 3.9.1 기반 walking/cycling/driving, 경유지·거리·예상 시간·GeoJSON,
+취소·오류·출처 검증을 제공한다. 검색/PostGIS와 독립인 Docker 서비스는 운영자가 명시적으로 실행한다.
+`pnpm test:routing`은 실제 엔진과 자체 합성 도로망을 사용하며, `/routing/` 웹 데모는 외부 요청 없이 고정 합성 경로를 표시한다.
+공급자 미설정·연결 불가에서도 지도는 동작하고 직선 fallback은 없다. 실시간 교통·보행 안전은 보장하지 않는다.
+SDK 코드는 무료이며 OSM 다운로드·graph 갱신·라우팅 서버의 CPU/RAM/저장·전송 비용은 해당 운영자가 부담한다.
+OSM/파생 graph는 ODbL이고 Git/npm에 포함하지 않는다. [실제 한국 데이터/합성 검증 기록](docs/research/routing-validation.md).

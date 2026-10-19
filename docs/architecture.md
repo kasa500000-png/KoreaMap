@@ -76,7 +76,7 @@ KoreaMap/
   services/
     geo-data/                # private 상태 경계; 배치 엔진은 M3/M6
     search/                  # private 상태 경계; 검색 엔진은 M5
-    routing/                 # private 상태 경계; 경로 엔진은 M5
+    routing/                 # private 선택형 Valhalla gateway; 검색/DB와 독립
   tests/unit/
   tests/e2e-web/
   scripts/
@@ -211,8 +211,8 @@ PMTiles 직접형은 Range GET의 `206`, 올바른 `Content-Range`/`Content-Leng
 | Nominatim | OSM 명칭/주소 검색·역지오코딩 | P1 첫 자체 호스팅 reference adapter; 한국 주소 품질 별도 측정, 자동완성 capability false |
 | Photon | 다국어·오타·자동완성, OpenSearch 기반 | P1 실사용 수요 및 한국어 검색 품질 확보 후; JVM/인덱스 운영 추가 |
 | Pelias | 여러 출처를 함께 넣는 검색 파이프라인 | P2; importers/검색 저장소 등 여러 서비스 유지비가 큼 |
-| OSRM | 사전 처리 road graph의 경로 질의 | P1 첫 routing reference adapter; driving 1개 profile부터 |
-| Valhalla | 다양한 이동 모드·비용 모델 | P2 walking/cycling 수요가 있을 때 검토 |
+| OSRM | 사전 처리 road graph의 경로 질의 | 대안으로 보류; 모드별 그래프 운영 부담 |
+| Valhalla | 다양한 이동 모드·비용 모델 | 사용자 요청 3모드에 따라 P1 채택: 3.9.1, 선택형 자체 Docker/주입 어댑터. [운영/검증](routing.md) |
 | GraphHopper | Java 엔진·custom model | 대안; OSS 엔진과 유료 hosted API의 기능/조건을 분리 |
 
 provider의 서버 URL, timeout, 제한된 credentials 전달 방식을 소비자가 지정한다. 서비스 timeout 기본값은 검색 5초/경로 10초로 제안하며 호출자가 조정 가능하다. 검색은 composition 종료 후 NFC 정규화, 300ms debounce, 이전 요청 취소 및 응답 requestId 대조를 앱 레이어에서 적용한다. 자동완성은 해당 capability와 운영 정책이 허용할 때만 활성화한다. 공용 Nominatim을 SDK 자동완성/기본 검색 서비스로 연결하지 않는다.

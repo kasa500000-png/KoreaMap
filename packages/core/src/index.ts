@@ -9,3 +9,4 @@ export * from './location.js';
 export * from './tracks.js';
 export * from './track-formats.js';
 export * from './replay.js';
+export * from './routing.js';

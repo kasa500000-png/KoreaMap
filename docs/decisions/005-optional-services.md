@@ -1,10 +1,12 @@
 # ADR-005 — 검색·경로·저장 서비스 주입
 
-날짜: 2026-10-19. 상태: 설계 채택, 구현 검증 전. [전체 아키텍처](../architecture.md)
+날짜: 2026-10-19. 상태: 설계 채택, 검색/라우팅 선택형 구현 추가. [전체 아키텍처](../architecture.md)
 
 ## 결정
 
-core는 SearchProvider/RoutingProvider 계약만 제공하고 MVP는 합성 fixture와 미설정 상태를 검증한다. P1 reference는 자체 Nominatim(검색/역지오코딩), 자체 OSRM(driving) 각 하나다. Supabase는 P1 저장 어댑터이며 auth/DB가 core에 들어오지 않는다. Photon/Pelias 및 추가 모드는 별도 품질·비용 판단 후다.
+core는 플랫폼 독립 SearchProvider/RoutingProvider 계약과 검증을 제공하고 MVP는 합성 fixture와 미설정 상태를 검증한다. 추가 요청에 따라 P1 검색은 자체 PostGIS POI, 라우팅은 Valhalla 3.9.1을 선택했다. 하나의 도로 그래프에서 auto/pedestrian/bicycle 비용 모델을 제공하므로 OSRM 모드별 전처리보다 현재 세 모드 운영에 적합하다. Nominatim/Photon/Pelias는 별도 지오코딩 품질·비용 판단 후다. 선택 저장소의 auth/DB는 core에 들어오지 않는다.
+
+Valhalla 기본 Docker 이미지 digest를 고정하며 scripted 이미지의 원격 다운로드 기본값을 채택하지 않는다. OSM 공개 PBF는 A 원장/해시/기준일/ODbL opt-in 뒤 운영자 로컬 저장소에서 빌드한다. 검색 DB 없이 실행하며 공급자 없는 지도도 정상 동작한다. 최대 10개 경유점, 50m 기본 스냅, 타임아웃, 명시 오류, 거리 m/시간 s/GeoJSON을 검증한다. 직선 fallback·실시간 교통·보행 안전 보장은 없다. [상세 결정·운영 제약](../routing.md).
 
 ## 이유와 대안
 

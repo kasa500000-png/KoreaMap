@@ -107,3 +107,13 @@ M6 전체 완료 또는 전국 POI 서비스/공개 발행 준비 완료 판정�
 [가이드](gps-tracks.md), [검증/기기 절차](research/gps-validation.md)를 따른다.
 Android 기기/ADB/SDK 부재로 실센서와 OS background 검증은 미완료이며 M4 전체 완료로 처리하지 않는다.
 background 지속 수집은 별도 설계/기기 QA 후 결정한다. 장기 저장·암호화·동기화·삭제 정책은 소비 앱에 둔다.
+
+## 선택형 자체 라우팅 — P1 확장
+
+`feat/self-hosted-routing`에서 Valhalla 3.9.1 단일 graph의 walking/cycling/driving과
+주입형 Provider, 스냅/거리 제한·오류/취소, 지역별 전체 rebuild·검증 후 선택·롤백, 독립 loopback gateway를 추가했다.
+기본 지도와 SDK 빌드는 라우팅 서비스 없이 유지한다. 한국 공개 PBF와 자체 합성 graph를 각각 검증한다.
+[가이드](routing.md), [결과](research/routing-validation.md).
+
+전국 통행 품질·안전·부하/SLA·경계 clipping/변경분 갱신·실시간 교통·내비게이션·Native 기기 화면은 미완료다.
+이번 구현으로 M5 전체 또는 공개 제품 출시 완료를 표시하지 않는다.
