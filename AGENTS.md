@@ -4,7 +4,8 @@
 
 ## 프로젝트
 
-- Git 저장소명: `Koreamap`
+- Git 저장소명: `KoreaMap` (최초 요청 표기: `Koreamap`)
+- GitHub 원격: <https://github.com/kasa500000-png/KoreaMap>
 - 프로젝트명: Korea Map Kit (가칭)
 - 목표: 한국에 특화된 무료 오픈소스 지도 SDK 개발
 - SDK 코드의 최종 라이선스 목표: MIT
