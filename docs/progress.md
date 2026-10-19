@@ -427,3 +427,18 @@
 ### 최종 로컬 검사 확정
 
 `pnpm check`(Vitest 31·데이터 정책 17·비용 감사 12), `pnpm pack:check`(5개 tarball), 최종 Next 배포물 Playwright 5개가 통과했다. Noto KR face 1의 11,190 코드포인트와 Chromium font 선택/실제 한글 raster·4종 화면·override 픽셀·출처 표시를 확인했다. 외부 HTTP 시도 0. staged 검사를 통과한 뒤 커밋하며 원격 결과는 해당 PR checks를 따른다. Android/iOS 렌더링 미검증과 high2 출시 차단은 유지한다.
+
+## Web·React Native 공통 Public API — 2026-10-19
+
+1. **구현:** 필수 공통 타입/GeoJSON 부분집합, 9개 주요 API와 setCamera/removeGeoJSON/onEvent/destroy, 여섯 Provider 인터페이스, 순수 검증·bounds/route 변환, portable 취소/기한/error 모델. Web handle.api와 Native ref/Source/Layer 연결, 생성 API 문서·타입 예제·동등성 표·Changeset.
+2. **파일:** packages/core/src의 base/contracts/validation/operations/controller/index, packages/web의 public-api/index/state/geojson, packages/native의 controller/index, data-adapters 검색 취소 처리, Web /api·Expo 예제, tests/types·unit·core-independent·e2e, API 문서 generator·경계 검사·task/manifest·publication·README·설계/진행/비용 문서.
+3. **테스트:** Vitest 41, core 독립 Node 1, 타입 검사와 Next production build, Expo Android/iOS JS export, Playwright 6개 통과. 최종 check/pack/staged 확정은 아래 기록. 발견한 초기 ready 시점의 origin 차단 회귀를 수정하고 전체 브라우저 검사를 다시 통과했다.
+4. **실화면:** Web 공통 API Dark 지도·도형·경로·선택 팝업·한글 UI·출처 캡처 직접 확인. 2회 스타일 교체 후 표시 유지, 종료 canvas/popup 제거 검증. Android/iOS는 mock bridge와 JS export만 수행해 실화면 **미검증**이다.
+5. **라이선스/보안:** 기존 라이선스 경계 유지, 자체 코드/합성 예제 MIT. 새 외부 데이터/폰트·엔드포인트·키 없음. core UI/백엔드 의존성 없음. 비용 gate 유지, Native 외부 스타일 실패. 기존 high2 미해결(새 advisory 조회 미실행).
+6. **남은 작업:** Native 기기 build/렌더링·접근성/제스처/lifecycle, resource interceptor·glyph 공급, 실제 Provider 구현, Safari/Firefox 및 장시간/GPU 검증. 기존 MapLibre singleton worker 1개 유지 제한. API 계약 구현을 서비스/전체 MVP 출시 완료로 판정하지 않는다.
+7. **Git:** `feat/shared-public-api`, base `feat/map-design-system` (`f112fb0330e8de88e85bc75591d6cf4f7c3ee509`). 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: implement shared public map API$'`. 검사 후 commit/push 및 연결된 GitHub 커넥터로 draft PR을 생성한다. main 병합·운영 배포·npm 발행 없음.
+8. **다음 단계:** 공통 계약을 이용한 선택형 provider 구현과 Native 기기 QA 진행 가능. 외부 Native 스타일 지원 및 제품 출시 완료 판정은 위 차단 항목 해결 후 가능하다. [검증 기록](research/public-api-validation.md) 참조.
+
+### 최종 로컬 검사 확정
+
+`pnpm check`(Vitest 41·core 독립 Node 1·데이터 정책 17·비용 검사 12), `pnpm pack:check`(5 SDK tarball), 최종 Next 배포물 Playwright 6개가 통과했다. 타입 음성 사례, API 선언 문서 일치, core 외부 의존성/DOM 금지, 실제 Web 스타일 교체·카메라·overlay·선택·취소·종료·출처를 검증했다. 외부 HTTP 시도 0. staged 검사를 통과한 뒤 커밋하며 원격 결과는 PR checks를 따른다. Native 실기기/실빌드 및 기존 high2 출시 차단을 유지한다.

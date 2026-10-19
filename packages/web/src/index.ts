@@ -1,11 +1,15 @@
 import {
   KitError,
+  normalizeVisibleBounds,
+  type MapController,
+  type MapStyle,
+  type OperationContext,
   type CameraState,
   type LngLat,
   type MapMarker,
   type MapFeatureCollection,
 } from '@korea-map-kit/core';
-import { createFixtureStyle } from '@korea-map-kit/styles';
+import { createFixtureStyle, parseCustomStyle } from '@korea-map-kit/styles';
 import type {
   Map as LibreMap,
   Popup as LibrePopup,
@@ -43,6 +47,7 @@ export interface CreateMapOptions {
   images?: readonly { id: string; image: { width: number; height: number; data: Uint8Array } }[];
 }
 export interface MapHandle {
+  readonly api: MapController;
   readonly state: MapState;
   readonly ready: Promise<void>;
   on<K extends keyof MapEvents>(event: K, callback: (value: MapEvents[K]) => void): () => void;
@@ -71,6 +76,7 @@ export interface MapHandle {
   };
   destroy(): void;
 }
+import { createWebController } from './public-api.js';
 let activeWorker = '';
 const markerSource = 'kmk-markers';
 const markerLayer = 'kmk-marker-points';
@@ -123,6 +129,21 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     transformRequest: (url) => ({ url: resourceUrl(config, url, origin) }),
   });
   activeWorker = options.workerUrl;
+  const shared: { api?: MapController } = {};
+  let pendingStyle: { resolve(): void; reject(error: Error): void; off(): void } | undefined;
+  const apiAttribution = document.createElement('div');
+  apiAttribution.className = 'kmk-api-attribution';
+  Object.assign(apiAttribution.style, {
+    position: 'absolute',
+    bottom: '28px',
+    right: '0',
+    background: '#ffffff',
+    color: '#111111',
+    zIndex: '2',
+    fontSize: '12px',
+    padding: '2px 5px',
+  });
+  options.container.append(apiAttribution);
   let status: MapStatus = 'loading';
   let disposed = false;
   let syncingCamera = false;
@@ -266,6 +287,12 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     closePopup();
     selector.removeEventListener('change', select);
     selector.remove();
+    apiAttribution.remove();
+    if (pendingStyle) {
+      pendingStyle.off();
+      pendingStyle.reject(new KitError('ABORTED', 'STYLE_ABORTED'));
+      pendingStyle = undefined;
+    }
     selector.replaceChildren();
     for (const off of listeners.splice(0)) off();
     try {
@@ -284,6 +311,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
       ),
     );
     emit('status', status);
+    shared.api?.destroy();
     callbacks.clear();
   }
   function fail() {
@@ -311,7 +339,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
       fail();
     }
   });
-  listen('load', () => {
+  function loadedStyle() {
     if (!engine || disposed) return;
     try {
       const style = engine.getStyle();
@@ -348,9 +376,20 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
       for (const [id, data] of overlays) renderOverlay(id, data);
       emit('status', status);
       resolveReady();
+      if (pendingStyle) {
+        pendingStyle.off();
+        pendingStyle.resolve();
+        pendingStyle = undefined;
+      }
     } catch {
       fail();
     }
+  }
+  listen('style.load', () => {
+    if (pendingStyle) loadedStyle();
+  });
+  listen('load', () => {
+    if (status === 'loading' && !pendingStyle) loadedStyle();
   });
   listen('error', () => {
     if (status === 'loading') fail();
@@ -416,7 +455,33 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     if (!/^[a-zA-Z0-9_-]{1,64}$/.test(id))
       throw new KitError('INVALID_ARGUMENT', 'INVALID_LAYER_ID');
   }
+  function replaceStyle(style: MapStyle, context: OperationContext): Promise<void> {
+    const map = requireMap();
+    if (pendingStyle) throw new KitError('UNAVAILABLE', 'STYLE_CHANGE_IN_PROGRESS');
+    const document = parseCustomStyle(style.document);
+    if (
+      Object.keys(document.sources).some((id) => id.startsWith('kmk-')) ||
+      document.layers.some((layer) => layer.id.startsWith('kmk-'))
+    )
+      throw new KitError('INVALID_ARGUMENT', 'RESERVED_LAYER_ID');
+    return new Promise<void>((resolve, reject) => {
+      pendingStyle = { resolve, reject, off: context.signal.subscribe(() => cleanup('destroyed')) };
+      status = 'loading';
+      closePopup();
+      customLayers.clear();
+      apiAttribution.textContent = style.attribution;
+      emit('status', status);
+      try {
+        map.setStyle(document, { diff: false });
+      } catch {
+        fail();
+      }
+    });
+  }
   const handle: MapHandle = {
+    get api() {
+      return shared.api!;
+    },
     state,
     ready,
     on: (event, callback) => {
@@ -490,12 +555,16 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     addImage(id, image) {
       const map = requireMap();
       if (status !== 'ready') throw new KitError('UNAVAILABLE', 'MAP_NOT_READY');
-      map.addImage(id, validateImage(id, image));
+      const copy = validateImage(id, image);
+      map.addImage(id, copy);
+      images.push({ id, image: copy });
     },
     removeImage(id) {
       const map = requireMap();
       if (!map.hasImage(id)) throw new KitError('INVALID_ARGUMENT', 'IMAGE_NOT_FOUND');
       map.removeImage(id);
+      const index = images.findIndex((entry) => entry.id === id);
+      if (index >= 0) images.splice(index, 1);
     },
     resize() {
       requireMap().resize();
@@ -527,6 +596,30 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
       cleanup('destroyed');
     },
   };
+  shared.api = createWebController(
+    handle,
+    replaceStyle,
+    () => {
+      if (status !== 'ready') throw new KitError('UNAVAILABLE', 'MAP_NOT_READY');
+      const bounds = requireMap().getBounds();
+      return normalizeVisibleBounds(
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth(),
+      );
+    },
+    (bounds, padding) => {
+      const east = bounds.west > bounds.east ? bounds.east + 360 : bounds.east;
+      requireMap().fitBounds(
+        [
+          [bounds.west, bounds.south],
+          [east, bounds.north],
+        ],
+        { padding, duration: 0, bearing: 0, pitch: 0 },
+      );
+    },
+  );
   return handle;
 }
 class MapCallbacks {

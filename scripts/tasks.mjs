@@ -46,6 +46,8 @@ else if (task === 'check') {
     'format:check',
     'typecheck',
     'test',
+    'test:core',
+    'check:api-docs',
     'build',
     'check:docs',
     'audit:cost',

@@ -277,3 +277,7 @@ CI는 lint/types/build/contract, 패키지 exports, `npm pack --dry-run`, 소비
 - 한글 glyph 크기·폰트 라이선스: 필요한 문자 범위와 fallback을 검증하되 음절 누락을 성능 최적화로 정당화하지 않는다.
 - 신규 schema/과도한 배치 시간: 지역 bbox와 레이어 범위를 축소해 검증; 기존 global schema를 채택할 경우 해당 스타일/데이터 고지를 포함하는 새 ADR 필요.
 - 서버 운영 부담: 검색/경로/PostGIS를 개별 배치하고 사용하지 않는 서비스는 설치·기동하지 않는다. 초기 Kubernetes·multi-region·상시 전국 graph rebuild는 제외한다.
+
+## 공통 Public API 구현 연결
+
+[Public API](public-api.md)와 [생성 선언 문서](api/core.md)가 0.x 구현 계약이다. core의 `MapController` → `MapPort` 경계를 두고 Web의 `MapHandle.api`, React Native의 `MapView` ref를 연결했다. 공유 데이터·검증·취소/기한 처리는 ES2022-only core에 있고, 타이머/엔진 수명·화면·resource policy는 어댑터에 있다. `SearchProvider` 등 여섯 provider 인터페이스는 opt-in 계약이며 기본 서비스가 아니다. Native는 리소스 origin gate 완성 전 외부 스타일을 거부한다. 설계상 목표와 플랫폼별 실제 검증 범위는 기능 동등성 표를 따른다.

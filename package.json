@@ -33,7 +33,10 @@
     "check:data": "node scripts/python.mjs scripts/check-data.py",
     "test:data": "node scripts/python.mjs scripts/test-data-policy.py",
     "docs:data": "node scripts/python.mjs scripts/render-data-docs.py",
-    "check:data-docs": "node scripts/python.mjs scripts/render-data-docs.py --check"
+    "check:data-docs": "node scripts/python.mjs scripts/render-data-docs.py --check",
+    "test:core": "pnpm exec tsc -b packages/core && node --test tests/core-independent.test.mjs",
+    "docs:api": "pnpm exec tsc -b packages/core && node scripts/render-api-docs.mjs",
+    "check:api-docs": "node scripts/render-api-docs.mjs --check"
   },
   "devDependencies": {
     "typescript": "6.0.3",

@@ -1,5 +1,6 @@
 import {
-  assertMercatorCoordinate,
+  validateCamera,
+  validateMarkers,
   KitError,
   type CameraState,
   type MapMarker,
@@ -16,47 +17,6 @@ export interface MapState {
   setCamera(camera: CameraState): void;
   setMarkers(markers: readonly MapMarker[]): void;
   selectMarker(id: string | null): void;
-}
-export function validateCamera(camera: CameraState): CameraState {
-  assertMercatorCoordinate(camera.center);
-  for (const [value, min, max] of [
-    [camera.zoom, 0, 22],
-    [camera.bearing, -360, 360],
-    [camera.pitch, 0, 60],
-  ] as const) {
-    if (!Number.isFinite(value) || value < min || value > max)
-      throw new KitError('INVALID_ARGUMENT', 'INVALID_CAMERA');
-  }
-  return Object.freeze({
-    ...camera,
-    center: Object.freeze([...camera.center] as [number, number]),
-  });
-}
-export function validateMarkers(markers: readonly MapMarker[]): readonly MapMarker[] {
-  if (!Array.isArray(markers) || markers.length > 10000)
-    throw new KitError('INVALID_ARGUMENT', 'MARKER_LIMIT');
-  const ids = new Set<string>();
-  return Object.freeze(
-    markers.map((marker) => {
-      assertMercatorCoordinate(marker.coordinate);
-      if (
-        typeof marker.id !== 'string' ||
-        !marker.id ||
-        ids.has(marker.id) ||
-        typeof marker.label !== 'string' ||
-        !marker.label ||
-        marker.label.length > 500 ||
-        (marker.description !== undefined &&
-          (typeof marker.description !== 'string' || marker.description.length > 5000))
-      )
-        throw new KitError('INVALID_ARGUMENT', 'INVALID_MARKER');
-      ids.add(marker.id);
-      return Object.freeze({
-        ...marker,
-        coordinate: Object.freeze([...marker.coordinate] as [number, number]),
-      });
-    }),
-  );
 }
 /** No DOM, renderer or network. A state instance can outlive a map mount. */
 export function createMapState(initial: Partial<MapSnapshot> = {}): MapState {
@@ -103,3 +63,5 @@ export function createMapState(initial: Partial<MapSnapshot> = {}): MapState {
   if (initial.selectedId != null) state.selectMarker(initial.selectedId);
   return state;
 }
+
+export { validateCamera, validateMarkers } from '@korea-map-kit/core';

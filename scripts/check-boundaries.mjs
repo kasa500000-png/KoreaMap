@@ -46,11 +46,13 @@ for (const [name, edges] of Object.entries(allowed)) {
       const spec =
         ts.isImportDeclaration(node) || ts.isExportDeclaration(node)
           ? node.moduleSpecifier
-          : ts.isCallExpression(node) &&
-              (node.expression.kind === ts.SyntaxKind.ImportKeyword ||
-                node.expression.getText(source) === 'require')
-            ? node.arguments[0]
-            : undefined;
+          : ts.isImportTypeNode(node) && ts.isLiteralTypeNode(node.argument)
+            ? node.argument.literal
+            : ts.isCallExpression(node) &&
+                (node.expression.kind === ts.SyntaxKind.ImportKeyword ||
+                  node.expression.getText(source) === 'require')
+              ? node.arguments[0]
+              : undefined;
       if (spec && ts.isStringLiteral(spec)) {
         const value = spec.text;
         assert(

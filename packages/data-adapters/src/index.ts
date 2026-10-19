@@ -4,7 +4,15 @@ import { KitError, type SearchProvider } from '@korea-map-kit/core';
 export function createFixtureSearchProvider(): SearchProvider {
   return {
     capabilities: { autocomplete: false, reverse: false },
-    async search(query) {
+    async search(query, options) {
+      if (options?.signal?.aborted) throw new KitError('ABORTED', 'OPERATION_ABORTED');
+      if (
+        options?.timeoutMs !== undefined &&
+        (!Number.isFinite(options.timeoutMs) ||
+          options.timeoutMs < 1 ||
+          options.timeoutMs > 2147483647)
+      )
+        throw new KitError('INVALID_ARGUMENT', 'INVALID_TIMEOUT');
       if (
         typeof query.text !== 'string' ||
         !Number.isInteger(query.limit) ||

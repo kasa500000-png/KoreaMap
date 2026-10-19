@@ -6,3 +6,5 @@ SDK code and the synthetic fixture are MIT. Third-party code/data keep their own
 No publisher key, backend, or default remote endpoint is included.
 Build from the repository root with `pnpm build:sdk`. Only `dist` and this README are packed.
 Operator HTTP providers and full platform parity remain later milestones.
+
+React 19 `MapView` accepts `ref: Ref<MapController>` and `onEvent`. Wait for the `ready` event, then call the same async methods as Web's `handle.api`. Shared marker/GeoJSON/route rendering and camera refs are implemented; mock bridge tests and Expo JS export are not device rendering QA. External-resource and symbol styles fail with `UNSUPPORTED` until native request-origin enforcement is implemented. See [contracts, examples and parity](../../docs/public-api.md).
