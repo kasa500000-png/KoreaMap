@@ -189,3 +189,15 @@ pnpm audit --json
 - MapLibre 전역 dispatcher의 공유 worker 1개 유지가 관측된다. 지도 종료 후 새로운 요청은 발생하지 않으며, SDK가 다른 지도 인스턴스에 영향을 줄 수 있는 강제 종료를 수행하지 않는다. 반복 mount 시 worker 증가 여부와 제한된 heap regression을 검사한다.
 
 상세 실행 결과 및 제한은 [Web SDK 검증 기록](research/web-sdk-validation.md)에 기록한다.
+
+## 12. 독립 지도 디자인 시스템 — 2026-10-19
+
+- 테마 토큰·GeoJSON fixture·POI RGBA는 자체 작성 코드다. 스타일 생성/이름 fallback/폰트 cmap 검사 함수는 네트워크 요청을 하지 않는다. 폰트 파일·glyph PBF·sprite를 Git/npm에 추가하지 않았다.
+- Web `inline` config도 attribution, 허용 origin, 비용 동의를 요구한다. 비교 예제의 허용 origin은 빈 목록이다. 설치된 Noto CJK를 사용하며 glyph/sprite/font-face URL 또는 제작자 endpoint를 넣지 않는다. 사용자 glyph URL은 명시적인 운영자 설정이며 Native local 생략은 거부한다.
+- 브라우저 E2E에서 4종 실제 렌더링, 한글 폰트 선택/픽셀, zoom 규칙, 사용자 수역색 및 출처 표시를 검사하며 외부 HTTP 시도 0을 확인한다. 외부 glyph 운영자의 과금·redirect·quota와 실제 Native 트래픽은 검증하지 않았다.
+- 코드 런타임의 새 기본 다운로드/telemetry/install hook은 없다. lockfile 변경은 examples/web→styles의 내부 workspace 연결뿐이다. Linux 무료 표준 CI runner의 Noto OS 패키지 설치는 QA 준비 동작이며 SDK 설치 경로가 아니다. 배포판 제공 폰트 SHA를 실행 로그에 출력하고 고정된 로컬 QA SHA도 문서에 기록한다.
+- 사용자가 요청한 자체 테마 screenshot 네 경로만 PNG 구조·크기·CRC·해시·출처 검사로 허용한다. 임의 PNG/font/raw 데이터는 계속 차단한다. npm tarball에는 screenshot도 포함하지 않는다. 픽셀에 담긴 권리를 자동 검사만으로 증명하지 않으며 네 장을 직접 열어 검토한다.
+- 새로운 외부 dependency 버전은 없고 기존 high2 취약점은 미해결 출시 차단으로 유지한다. 이번 작업에서 advisory 재조회나 실제 폰트/glyph 서버 배포를 수행하지 않았다.
+- main 병합·공개 전환·배포·npm 발행 및 유료 Actions 기능 변경은 없다. 로컬/원격 최종 결과는 [디자인 검증](research/design-system-validation.md)과 PR checks에 기록한다.
+
+- 디자인 단계 최종 로컬 검사: `pnpm check`, 5개 tarball 및 최종 Web E2E 5개 통과. Noto/OFL 공식 문서 호스트 두 개를 문서 참조용으로 검토했으며 runtime URL 허용으로 확대되지 않음을 새 회귀 검사로 확인했다(비용 회귀 총 12개).

@@ -15,7 +15,8 @@
     "maplibre-gl": "6.14.0",
     "@korea-map-kit/core": "workspace:*",
     "@korea-map-kit/web": "workspace:*",
-    "@korea-map-kit/data-adapters": "workspace:*"
+    "@korea-map-kit/data-adapters": "workspace:*",
+    "@korea-map-kit/styles": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "19.3.0",

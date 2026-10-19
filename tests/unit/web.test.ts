@@ -127,3 +127,26 @@ it('validates GeoJSON and clones caller data; rejects open rings and unsupported
     } as never),
   ).toThrow('INVALID_GEOJSON');
 });
+it('accepts explicitly attributed inline styles and rejects all unlisted resource origins', () => {
+  const config = validateWebConfig(
+    {
+      mode: 'inline',
+      style: { version: 8, sources: {}, layers: [{ id: 'background', type: 'background' }] },
+      allowedOrigins: [],
+      attribution: 'Authored style',
+      costAcknowledged: true,
+    },
+    'http://localhost',
+  );
+  expect(config.mode).toBe('inline');
+  if (config.mode !== 'inline') throw new Error('inline config expected');
+  expect(() =>
+    resourceUrl(config, 'https://tiles.example.invalid/tile.pbf', 'http://localhost'),
+  ).toThrow('RESOURCE_ORIGIN_BLOCKED');
+  expect(() => validateWebConfig({ ...config, attribution: '' }, 'http://localhost')).toThrow(
+    'PROVIDER_CONFIG_REQUIRED',
+  );
+  expect(() =>
+    validateWebConfig({ ...config, style: { version: 0 } } as never, 'http://localhost'),
+  ).toThrow('INVALID_STYLE_SPEC');
+});

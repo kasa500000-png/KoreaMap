@@ -103,3 +103,9 @@
 - 현재 제3자 지도 데이터·사진·폰트 payload는 A도 Git/npm에 포함하지 않는다. 운영자 데이터 저장소와 SDK를 분리한다. 합성 fixture의 출처를 실제 공공데이터로 표시하지 않는다.
 - `pnpm check:data`, `pnpm test:data`, `pnpm check:data-docs`를 통과해야 한다. runtime source 수정은 `data/publication.json`의 출처·해시 검토를 함께 갱신한다. 해시 일괄 재생성으로 권리 검토를 대신하지 않는다.
 - 공개 전 실제 npm tarball을 `pnpm pack:check`로 검사하고, 커밋 전 `pnpm check:data --staged`로 index를 검사한다. 자동 검사가 법적 권리와 모든 위장 데이터를 증명하지 못한다는 한계를 보고한다.
+
+## 지도 디자인 QA 산출물
+
+- 사용자가 요청한 자체 합성 4종 테마 스크린샷은 `docs/screenshots/themes/{standard,dark,pastel,outdoor}.png` 네 경로에 한해 허용한다. `data/publication.json`의 `screenshots` 출처·SHA-256과 실제 PNG 구조를 검증한다. 다른 이미지·폰트·지도 payload 허용으로 확대하지 않는다.
+- 스크린샷은 실제 렌더러 캡처 후 직접 확인하고 해시를 갱신한다. 폰트 파일·glyph PBF는 여전히 Git/npm에 포함하지 않으며 로컬 QA 파일의 라이선스와 해시를 문서에 기록한다.
+- Web 로컬 폰트 결과를 Android/iOS 결과로 대신하지 않는다. Native glyph 공급원 누락은 실패시키고, 실기기/시뮬레이터 없이 해당 렌더링을 통과로 표시하지 않는다.

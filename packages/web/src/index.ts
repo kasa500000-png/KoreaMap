@@ -40,6 +40,7 @@ export interface CreateMapOptions {
   state?: MapState;
   signal?: AbortSignal;
   loadTimeoutMs?: number;
+  images?: readonly { id: string; image: { width: number; height: number; data: Uint8Array } }[];
 }
 export interface MapHandle {
   readonly state: MapState;
@@ -56,7 +57,12 @@ export interface MapHandle {
   setRoute(id: string, coordinates: readonly LngLat[]): void;
   addLayer(layer: LayerSpecification | CustomLayerInterface, beforeId?: string): void;
   removeLayer(id: string): void;
+  addImage(id: string, image: { width: number; height: number; data: Uint8Array }): void;
+  removeImage(id: string): void;
   resize(): void;
+  getRenderedFeatures(
+    layerIds: readonly string[],
+  ): readonly { layerId: string; properties: Record<string, unknown> }[];
   diagnostics(): {
     status: MapStatus;
     listeners: number;
@@ -81,6 +87,12 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     throw new KitError('INVALID_ARGUMENT', 'INVALID_TIMEOUT');
   const signal = options.signal;
   if (signal?.aborted) throw new KitError('ABORTED', 'MAP_ABORTED');
+  const images = (options.images ?? []).map(({ id, image }) => ({
+    id,
+    image: validateImage(id, image),
+  }));
+  if (new Set(images.map((entry) => entry.id)).size !== images.length)
+    throw new KitError('INVALID_ARGUMENT', 'DUPLICATE_IMAGE');
   const { Map, Popup, NavigationControl, setWorkerUrl } = await import('maplibre-gl');
   if (signal?.aborted) throw new KitError('ABORTED', 'MAP_ABORTED');
   if (activeWorker && activeWorker !== options.workerUrl)
@@ -90,7 +102,12 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
   const camera = state.getSnapshot().camera;
   let engine: LibreMap | undefined = new Map({
     container: options.container,
-    style: config.mode === 'local-fixture' ? createFixtureStyle(config) : config.styleUrl,
+    style:
+      config.mode === 'local-fixture'
+        ? createFixtureStyle(config)
+        : config.mode === 'inline'
+          ? config.style
+          : config.styleUrl,
     center: [...camera.center],
     zoom: camera.zoom,
     bearing: camera.bearing,
@@ -99,7 +116,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     maxZoom: 22,
     attributionControl: {
       compact: false,
-      ...(config.mode === 'operator'
+      ...(config.mode !== 'local-fixture'
         ? { customAttribution: escapeAttribution(config.attribution) }
         : {}),
     },
@@ -257,6 +274,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     } finally {
       engine = undefined;
     }
+    images.length = 0;
     overlays.clear();
     customLayers.clear();
     rejectReady(
@@ -281,11 +299,18 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
   }
   selector.addEventListener('change', select);
   signal?.addEventListener('abort', abort, { once: true });
-  function listen(event: 'load' | 'error' | 'move' | 'idle', callback: () => void) {
+  function listen(event: 'load' | 'style.load' | 'error' | 'move' | 'idle', callback: () => void) {
     const map = requireMap();
     map.on(event, callback);
     listeners.push(() => map.off(event, callback));
   }
+  listen('style.load', () => {
+    try {
+      for (const { id, image } of images) requireMap().addImage(id, image);
+    } catch {
+      fail();
+    }
+  });
   listen('load', () => {
     if (!engine || disposed) return;
     try {
@@ -462,8 +487,26 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
       map.removeLayer(id);
       customLayers.delete(id);
     },
+    addImage(id, image) {
+      const map = requireMap();
+      if (status !== 'ready') throw new KitError('UNAVAILABLE', 'MAP_NOT_READY');
+      map.addImage(id, validateImage(id, image));
+    },
+    removeImage(id) {
+      const map = requireMap();
+      if (!map.hasImage(id)) throw new KitError('INVALID_ARGUMENT', 'IMAGE_NOT_FOUND');
+      map.removeImage(id);
+    },
     resize() {
       requireMap().resize();
+    },
+    getRenderedFeatures(layerIds) {
+      const map = requireMap();
+      if (status !== 'ready') return [];
+      return map.queryRenderedFeatures({ layers: [...layerIds] }).map((feature) => ({
+        layerId: feature.layer.id,
+        properties: structuredClone(feature.properties),
+      }));
     },
     diagnostics() {
       return {
@@ -509,4 +552,22 @@ class MapCallbacks {
     for (const set of this.callbacks.values()) set.clear();
     this.callbacks.clear();
   }
+}
+
+function validateImage(id: string, image: { width: number; height: number; data: Uint8Array }) {
+  if (
+    !/^[a-zA-Z0-9_-]{1,64}$/.test(id) ||
+    id.startsWith('kmk-') ||
+    !image ||
+    !Number.isInteger(image.width) ||
+    !Number.isInteger(image.height) ||
+    image.width < 1 ||
+    image.height < 1 ||
+    image.width > 512 ||
+    image.height > 512 ||
+    !(image.data instanceof Uint8Array) ||
+    image.data.length !== image.width * image.height * 4
+  )
+    throw new KitError('INVALID_ARGUMENT', 'INVALID_IMAGE');
+  return { width: image.width, height: image.height, data: new Uint8Array(image.data) };
 }

@@ -257,6 +257,9 @@ importers:
       '@korea-map-kit/data-adapters':
         specifier: workspace:*
         version: link:../../packages/data-adapters
+      '@korea-map-kit/styles':
+        specifier: workspace:*
+        version: link:../../packages/styles
       '@korea-map-kit/web':
         specifier: workspace:*
         version: link:../../packages/web

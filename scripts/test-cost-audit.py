@@ -120,6 +120,15 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit("--artifact", str(artifact))
         self.assertIn("UNSAFE_ARCHIVE_MEMBER", rules)
 
+    def test_font_license_documentation_does_not_allow_runtime_endpoints(self):
+        url = 'https' + '://' + 'openfontlicense.org/ofl-faq/'
+        self.write('docs/font-license.md', url + '\n')
+        process, _, rules = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        self.write('packages/styles/src/unreviewed.ts', 'const url = "' + url + '";\n')
+        _, _, rules = self.run_audit()
+        self.assertIn('EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW', rules)
+
     def test_billing_settings_require_review(self):
         self.write("eas.json", "{}\n")
         _, _, rules = self.run_audit()

@@ -71,3 +71,9 @@ M3는 OSM 공개 추출본으로 시작하고, M6는 개별 공공데이터 필�
 `feat/web-map-sdk`에서 M2의 Web 지도 생명주기, 공통 카메라/마커 상태, GeoJSON/경로 표시, 사용자 레이어, 이벤트·접근성 및 운영자 스타일 URL 설정을 구현했다. [Web API 가이드](../packages/web/README.md)와 [검증 기록](research/web-sdk-validation.md)을 따른다. Next 클라이언트 동적 import와 합성 데모를 제공한다.
 
 Chromium 100/1,000 마커, 모바일 터치 에뮬레이션, 반복 종료와 오류 복구를 검사한다. MapLibre 6.14.0 전역 dispatcher worker 1개 유지, Safari/Firefox/실기기 및 Native 동등 API 검증은 남아 있다. 실제 타일·한글 glyph·온라인 검색/경로 계산·실행 중 style 교체는 이번 범위가 아니다. M2/MVP 전체 완료나 출시 승인을 의미하지 않는다.
+
+## 독립 지도 디자인 시스템
+
+`feat/map-design-system`에서 Standard/Dark/Pastel/Outdoor 토큰·스타일 생성기, 한국어 fallback, 원본 POI 기호, cmap/글리프 coverage 도구와 `/themes/` 비교 예제를 추가했다. M2의 스타일 커스터마이징과 M3의 스키마/폰트 준비 작업이다. [비교 문서](design-system.md), [폰트 정책](font-icon-licenses.md), [검증 기록](research/design-system-validation.md)을 따른다.
+
+Web 로컬 합성 데이터와 설치된 Noto CJK를 검증한다. Native 라벨은 명시적 glyph URL을 요구하며 Android/iOS 실화면은 미검증이다. 실제 vector tile 스키마 변환·글리프 pack 생성/배포·복잡한 도심/색각 QA와 전체 플랫폼 동등성은 후속이며 M2/M3/MVP 전체 완료 판정이 아니다.

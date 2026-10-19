@@ -116,6 +116,7 @@ export function MapDemo() {
       <header>
         <p className="eyebrow">KOREA MAP KIT</p>
         <h1>내 환경에서 시작하는 지도</h1>
+        <a href="/themes/">4종 지도 테마 비교 →</a>
         <p>직접 만든 합성 지형·장소·경로입니다. 실제 한국 지도나 길찾기 결과가 아닙니다.</p>
       </header>
       <section className="workspace">

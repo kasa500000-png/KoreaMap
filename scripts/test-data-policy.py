@@ -157,4 +157,21 @@ class DataPolicyTest(unittest.TestCase):
                      [('../escape',b'x',tarfile.REGTYPE)], []):
             with self.assertRaises(ValueError): check_tarball(archive(rows), expected, 'core')
 
+class ScreenshotPolicyTests(unittest.TestCase):
+    def test_exact_reviewed_paths_and_digest(self):
+        import struct, zlib
+        def chunk(kind,payload):
+            return struct.pack('>I',len(payload))+kind+payload+struct.pack('>I',zlib.crc32(kind+payload)&0xffffffff)
+        png=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',1,1,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(b'\0\xff\xff\xff'))+chunk(b'IEND',b'')
+        path='docs/screenshots/themes/standard.png'
+        inv={'schemaVersion':1,'reviewedAt':'2026-10-19','thirdPartyPayloads':[],'runtimeSources':{},'screenshots':{path:{'sha256':hashlib.sha256(png).hexdigest(),'origin':'project-authored','license':'MIT'}}}
+        check_file(path,png);check_inventory({path:png},inv)
+        with self.assertRaises(ValueError):check_file('docs/screenshots/themes/extra.png',png)
+        with self.assertRaises(ValueError):check_file(path,png+b'payload')
+        with self.assertRaises(ValueError):check_file(path,b'not a PNG')
+        changed=copy.deepcopy(inv);changed['screenshots'][path]['sha256']='0'*64
+        with self.assertRaises(ValueError):check_inventory({path:png},changed)
+        with self.assertRaises(ValueError):check_inventory({path:png},dict(inv,screenshots={}))
+        with self.assertRaises(ValueError):check_inventory({},inv)
+
 if __name__ == '__main__': unittest.main()
