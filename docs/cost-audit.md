@@ -252,3 +252,29 @@ Web `/api/`는 직접 작성한 합성 데이터만 inline으로 사용한다. �
 SDK core/data-adapters 실제 tarball SHA는 [검색 검증](research/search-validation.md)에 기록했다.
 로컬 CLI 가이드를 실행해 pnpm 내장 search 충돌을 제거했고, DB migration·서버 조회·정상 종료까지 확인했다.
 공식 문서와 의존성 registry/Docker 다운로드는 SDK 런타임 provider 요청과 구분한다.
+
+## GPS·이동 경로 / 2026-10-19
+
+- SDK는 사용자 동의 false로 생성되며 current/watch의 명시적 호출에서만 위치를 수집한다.
+  core에 브라우저/Native/저장소/네트워크 의존성을 추가하지 않았다. 외부 업로드·telemetry·위치 로그 없음.
+- Web Geolocation/Expo foreground adapter는 위치 갱신을 앱 메모리로만 전달한다. pause/삭제/철회/비활성/종료에서 구독을 해제한다.
+  늦은 구독 생성은 즉시 정리하며 지도 작업/파일 읽기에도 취소를 적용한다. 공개 Web 데모의 기본은 수동 모의 GPS다.
+- 위치 수집과 장기 보관 정책은 분리했다. 내보낸 파일은 위치·시각을 포함한다는 안내 후 사용자 클릭으로만 생성한다.
+  recorder.clear와 예제 삭제는 앱이 소유한 메모리/지도/textarea 참조만 제거하며 이미 다운로드/복사한 외부 파일은 별도 삭제 대상이다.
+- GeoJSON/GPX parser는 크기/점/깊이 상한과 좌표/시각 검증을 적용한다. DTD·외부 entity·XML schema 요청 없음.
+  GPX namespace 한 문자열은 정확한 소스/산출물 경로의 상수 선언에서만 정적 예외로 검토했다.
+  같은 URL의 fetch 표현/다른 경로는 계속 차단하는 회귀 검사를 추가했다. 일반 endpoint 허용이 아니다.
+- expo-location58.0.17(MIT)은 Expo 예제에만 exact 추가했고 SDK는 모듈 주입형이다. 설치된 Expo58 권장 버전과 공식 registry/소스를 확인했다.
+  background 권한·서비스·TaskManager를 추가하지 않았다. config introspect에 전경 Android/iOS 권한만 있는지 확인했다.
+  SDK5개 tarball에는 Expo 모듈/기기 기록/파일을 넣지 않는다.
+- 새 단위17개 fetch 차단, Chromium GPS2개 local-only route 검사에서 외부 HTTP 요청 시도0을 확인했다.
+  플랫폼 위치 결정 자체의 OS 네트워크·Native 진단 로그는 실제 기기가 없어 미검증이다. 기기 전체 무통신을 주장하지 않는다.
+- CI는 기존 무료 표준 runner만 사용한다. 유료 기기 farm/클라우드 GPS/새 artifact·cache·cron/배포 설정 없음.
+- pnpm audit 재조회: 기존 high2(node-forge GHSA-86w9-cpqp-85rv, braces GHSA-vfj7-8cjw-p6xm), moderate/critical0.
+  실패 상태를 통과로 바꾸지 않으며 제품 출시 차단은 유지한다. 새 expo-location 항목의 advisory는 이번 응답에 없었다.
+
+최종 check/pack/staged·전체 브라우저 검사 결과는 [진행 기록](progress.md), [GPS 검증](research/gps-validation.md)을 따른다.
+실제 위치/원본 파일은 Git/npm/공개 screenshot/CI 로그에 포함하지 않는다. 모든 경로 테스트/capture는 자체 합성 자료다.
+
+Expo의 추가 화면과 JS 모듈도 출처 검사에서 빠지지 않도록 기존 두 파일 한정을 전체 Expo JS/TS 소스로 확대했다.
+새 GPS 관련 소스16개와 기존 단순 Metro 설정1개를 개별 검토해 manifest에 기록했다. 검토되지 않은 중첩 화면을 거부하는 회귀 검사도 추가했다.

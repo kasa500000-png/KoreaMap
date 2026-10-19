@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import { useRef, useState } from 'react';
 import { normalizeError, type MapController } from '@korea-map-kit/core';
+import { GpsDemo } from './gps-demo';
 import { MapView } from '@korea-map-kit/native';
 
 const config = { mode: 'local-fixture', fixtureId: 'synthetic-v1' } as const;
-export default function App() {
+function ApiDemo() {
   const map = useRef<MapController>(null);
   const initialized = useRef(false);
   const [status, setStatus] = useState('지도 준비 중');
@@ -60,3 +61,13 @@ const styles = StyleSheet.create({
   title: { fontSize: 26, fontWeight: '700', paddingHorizontal: 20, color: '#18362b' },
   caption: { padding: 20, color: '#527a67' },
 });
+
+export default function App() {
+  const [gps, setGps] = useState(false);
+  return (
+    <View style={{ flex: 1, paddingTop: 36 }}>
+      <Button title={gps ? '지도 API 예제' : 'GPS 경로 예제'} onPress={() => setGps(!gps)} />
+      {gps ? <GpsDemo /> : <ApiDemo />}
+    </View>
+  );
+}

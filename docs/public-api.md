@@ -170,3 +170,16 @@ PostGIS/HTTP/합성 어댑터와 사용 예제는 [공공데이터 가이드](pu
 | 검색 UI·IME·키보드/출처 | Next `/search/` 예제 | 소비 앱 구현 필요 |
 | 역지오코딩 | 가까운 POI 주소만 구현 | 동일 계약, 기기 미검증 |
 | 전국 도로명주소 geocoder | 운영자 별도 구현 필요 | 운영자 별도 구현 필요 |
+
+## GPS와 기록 API 동등성
+
+기존 LocationProvider를 보존하고 LocationStreamProvider/LocationClient, Track/TrackRecorder,
+GeoJSON/GPX codec과 TrackReplay를 추가했다. [GPS 가이드](gps-tracks.md) 참조.
+
+| 기능 | Web | React Native |
+| --- | --- | --- |
+| 동의·현재 위치·구독·권한 거절 | 실제 Chromium API + 합성 위치 검증 | 주입형 Expo 구현·타입/모의 bridge 검사, 기기 미검증 |
+| 경로 필터·거리/활성 시간·구간·파일·리플레이 | 공통 순수 코어 검증 | 동일 코어, 실기기 UI 미검증 |
+| 저장/불러오기 | 명시적 파일 다운로드/선택/문자열 | 문자열 복사·붙여넣기 예제; 파일 선택/보관은 앱 책임 |
+| 비활성화 중단 | visibility 이벤트 모의 검사 | AppState 모의 검사; OS background 미검증 |
+| 지속 background 수집 | 미지원 | 미지원·권한/서비스 기본 비활성 |

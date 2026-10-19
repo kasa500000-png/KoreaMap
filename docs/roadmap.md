@@ -99,3 +99,11 @@ M6 전체 완료 또는 전국 POI 서비스/공개 발행 준비 완료 판정�
 [검색 가이드](search.md), [검증 기록](research/search-validation.md)을 따른다.
 현재 M5의 첫 검색 엔진은 이미 운영하는 PostGIS POI다. Nominatim 설치를 선행 요구하지 않는다.
 전국 주소 지오코더·길찾기 엔진·실제 전국 데이터 품질/규모 성능·Native UI/기기 QA는 후속이며 M5 전체 완료가 아니다.
+
+## 공통 GPS·경로 기록
+
+`feat/gps-tracks`에서 동의 기반 foreground LocationClient·Web/주입형 Expo 어댑터,
+순수 경로 기록/필터·거리/활성 시간·GeoJSON/GPX·다중 표시·리플레이와 두 플랫폼 예제를 구현한다.
+[가이드](gps-tracks.md), [검증/기기 절차](research/gps-validation.md)를 따른다.
+Android 기기/ADB/SDK 부재로 실센서와 OS background 검증은 미완료이며 M4 전체 완료로 처리하지 않는다.
+background 지속 수집은 별도 설계/기기 QA 후 결정한다. 장기 저장·암호화·동기화·삭제 정책은 소비 앱에 둔다.

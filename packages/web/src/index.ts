@@ -664,3 +664,5 @@ function validateImage(id: string, image: { width: number; height: number; data:
     throw new KitError('INVALID_ARGUMENT', 'INVALID_IMAGE');
   return { width: image.width, height: image.height, data: new Uint8Array(image.data) };
 }
+
+export { createBrowserLocationClient } from './location.js';

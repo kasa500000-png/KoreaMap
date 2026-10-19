@@ -87,6 +87,16 @@ test('core runs in an isolated directory without node_modules, MapLibre or brows
       nextOffset: null,
     });
     assert.equal(core.normalizeSearchText('서 울'), '서울');
+    const recorder = core.createTrackRecorder('isolated', {
+      monotonicMs: () => 0,
+      epochMs: () => 0,
+    });
+    recorder.start();
+    recorder.ingest({ coordinate: [127, 37.5], timestampMs: 0, accuracyMeters: 5 });
+    const saved = recorder.stop().track;
+    assert.deepEqual(core.importTracksGeoJSON(core.exportTracksGeoJSON([saved])), [saved]);
+    assert.equal(core.importTracksGPX(core.exportTracksGPX([saved]))[0].segments.length, 1);
+    assert.equal(core.replayFrameAt(saved, 0).finished, true);
   } finally {
     globalThis.fetch = previousFetch;
     rmSync(dir, { recursive: true, force: true });

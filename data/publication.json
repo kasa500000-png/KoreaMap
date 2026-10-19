@@ -4,7 +4,7 @@
   "thirdPartyPayloads": [],
   "runtimeSources": {
     "examples/expo/App.tsx": {
-      "sha256": "c8b17b4a2e112651acb1c2e137f97c4e2372eec26f2aa59299d34196a019c456",
+      "sha256": "8f395cfaba5cae8924b436b8c44f37ff9c5ddb6140d83f4ee5b125aed4374e12",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -104,7 +104,7 @@
       "license": "MIT"
     },
     "packages/core/src/index.ts": {
-      "sha256": "b7fc8fddc02f20e46c797cfb7b6abb01af4441f4b58fb81f5c2e3e2d2309c612",
+      "sha256": "1eb83e6b4b96e1a78a23a1989edbb00fa0a3ef46f16e0e56bb90ad3dd037a806",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -129,7 +129,7 @@
       "license": "MIT"
     },
     "packages/data-adapters/src/index.ts": {
-      "sha256": "5173fb65aacf57215c02b2925c56521f4d1c616def1c376affe62f83b2fc53e4",
+      "sha256": "aa9e38a02cf5856da029b145442f5045f8bf95b7077b48a4875eec292a95d9f4",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -149,7 +149,7 @@
       "license": "MIT"
     },
     "packages/native/src/index.tsx": {
-      "sha256": "f773ad3352af672c7cf28d6dfd3ee91d0929d38f5b158baa878208529abc1f33",
+      "sha256": "c09470910160dd186bf27bd86f6fe15717f9e8d092939d96b815f441682c601f",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -194,7 +194,7 @@
       "license": "MIT"
     },
     "packages/web/src/index.ts": {
-      "sha256": "0038667a604f9301b66bef8fe9b8337a82b8d5e415c93afa2ef37b2cbf8cbcdc",
+      "sha256": "2e2196ee754a9aa682511a31e2146d27a8143a585d781bbc360c163f42ee0604",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -280,6 +280,66 @@
     },
     "services/search/src/server.ts": {
       "sha256": "1950c42e2fbe10c820a6cfc618c10930ea91378450d836a82e235adc33cb6fdd",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/location.ts": {
+      "sha256": "f1417f0c704493a0f9281d6e82a21bc97749522465b1249960a64506db540aec",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/tracks.ts": {
+      "sha256": "3a92df04c12388f9cff2370fe5e77358944bbf6a56d0aeb414957ce5d576c55c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/track-formats.ts": {
+      "sha256": "dc4afefee9dc67a0eb63dd0f48287337b5fa13939871b355ba5d17a262bca868",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/replay.ts": {
+      "sha256": "14b9b8912ed659bd4889eaaa79f92a548249c54971a4bc08d64496f9dc3bf1a3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/location.ts": {
+      "sha256": "1895069db16f74e9e0c9682f31a557f9d711f798426cf716ee0a1c5e20f55c1f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/native/src/location.ts": {
+      "sha256": "5dd5166854ba092af3dc9e919b0f8cf7116e8e3a9fca66a3416d4f1099ac5494",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/location.ts": {
+      "sha256": "d0fbcc8fa699b9e33d89140f7c509f310ae8da3223e0d4d5abeac27e03f21b36",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/gps/page.tsx": {
+      "sha256": "37b514272f70fbe4d8d34be35f19e833135566dbeb04d8416c6652698713239b",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/gps/gps-client.tsx": {
+      "sha256": "22d7b4e37cf79dd0fb2823369d96d1359663b7618917095d103f1f20acf8f27f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/gps/gps-demo.tsx": {
+      "sha256": "b774e6b2c3d7dda3d084feb55144b34c63f68630546792631df0e2c991e3ea3d",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/expo/gps-demo.tsx": {
+      "sha256": "6846a0e75814a1800ddc97bcc45e669a90d1b77cf1657b7ff3c4eff98e4871f5",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/expo/metro.config.cjs": {
+      "sha256": "1b801de05c908cc3d91b95d8e4f271e0bcb43c63cf40339f9813f3fbf73cc72c",
       "origin": "project-authored",
       "license": "MIT"
     }

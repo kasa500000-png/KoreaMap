@@ -91,3 +91,7 @@ SDK 소스·패키지 제공 비용과 데이터 다운로드·DB·타일·검�
 한국 장소명·POI 주소 검색은 [검색 가이드](docs/search.md)를 따른다. `services/search`의 선택형 자체
 PostGIS/pg_trgm 서비스와 `/search/` 합성 Web 데모를 제공한다. SDK 검색에는 제작자 endpoint나
 API 키가 없으며 실제 DB·검색 서비스 운영 비용은 해당 운영자에게 있다. 전국 도로명주소 변환은 별도 Provider다.
+
+[GPS·이동 경로 가이드](docs/gps-tracks.md): Web `/gps/`와 Expo **GPS 경로 예제**에서 동의 후 위치 조회·기록,
+GeoJSON/GPX 교환과 리플레이를 제공한다. 기본 외부 전송·장기 저장은 없다. 전경 수집만 지원하며
+Android/iOS 실제 기기·백그라운드 검증은 미완료다. 장기 저장/서버 운영 비용과 정책은 소비 앱 책임이다.

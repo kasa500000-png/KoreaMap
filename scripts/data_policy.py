@@ -136,7 +136,7 @@ def runtime_source(path):
     parts = PurePosixPath(path).parts
     return ((len(parts) >= 4 and parts[0] in {'packages', 'services'} and parts[2] == 'src')
             or path.startswith('examples/web/app/')
-            or path in {'examples/expo/App.tsx', 'examples/expo/index.js'})
+            or (path.startswith('examples/expo/') and PurePosixPath(path).suffix in {'.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'}))
 
 
 def validate_screenshot(data):

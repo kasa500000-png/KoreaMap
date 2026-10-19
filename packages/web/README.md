@@ -43,3 +43,8 @@ From the repository root: `pnpm check`, `pnpm pack:check`, `pnpm test:web`. Brow
 Design-system styles can be passed using `config: { mode: 'inline', style, allowedOrigins: [], attribution, costAcknowledged: true }`. Inline JSON is validated and copied before renderer construction; every required resource origin must be explicitly listed. Empty origins allow local GeoJSON and installed fonts without HTTP resources. `images: [{id, image: {width, height, data: Uint8Array}}]` registers caller-authored RGBA images on style load. IDs must be unique and dimensions at most 512×512. After ready, use `addImage`/`removeImage` with your own layer lifecycle. `getRenderedFeatures(layerIds)` returns detached layer/property records for querying rendered content. No raw engine is exposed. The `/themes/` example uses this API with all four themes and always-visible attribution.
 
 The shared async API is available as `handle.api` after `await handle.ready`. It adds `setCenter`, `setZoom`, `fitBounds`, `setStyle`, marker upsert/removal, GeoJSON, routes and visible bounds. See [Public API and parity](../../docs/public-api.md) and the `/api/` demo. Existing synchronous methods remain available. Style replacement preserves common overlays/markers and registered images; legacy custom layers must be included in the replacement style. Cancelling a pending style load disposes the map.
+
+`createBrowserLocationClient()` provides consent-gated foreground GPS with current-position and
+watch APIs. It never prompts on import/construction; call `setConsent(true)` only after the user
+agrees. Visibility loss stops collection without automatic resume. Use core track/GPX/GeoJSON/replay
+functions and the repository's `docs/gps-tracks.md`. No persistence or remote upload is included.
