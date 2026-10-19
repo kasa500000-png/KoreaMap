@@ -534,3 +534,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **남은 작업:** 실제 ARM64 Android 및 iOS 빌드/기기·한글 glyph·PMTiles/XYZ·네트워크 capture·장시간 heap/GPU·제스처/회전/복귀/권한 QA. 개발 APK는 x86_64 전용이며 물리 기기 설치 패키지가 아니다. 배경 지속 GPS·자동 native redirect 제어·파일 PMTiles는 미지원이다.
 7. **Git:** `feat/native-sdk`, 커밋 식별: `git log -1 --format=%H feat/native-sdk`. `feat/self-hosted-routing` 위에 Draft PR을 구성한다. main 병합·운영 배포·npm 발행은 수행하지 않는다.
 8. **다음 단계:** 코드 리뷰 및 기기 QA 준비는 가능하다. M4 전체/실화면 합격/공개 출시 완료로 처리하지 않는다.
+
+## 두 예제 앱 — 2026-10-19
+
+1. **구현:** Web/Expo의 몽실 산책 지도(모의 현재 위치·실시간 기록·시작/정지/재개/종료·저장·시설·Pastel/Outdoor·재생)와 차곡 여행 지도(검색·저장·날짜별 핀/방문 순서 연결선·카드·카메라·Standard)를 추가했다. 같은 private session과 core MapController를 사용한다. core bounds 유틸리티, Web 출처 컨트롤 겹침, 모바일 버튼 CSS·replay 정리를 수정했다.
+2. **파일:** `examples/scenarios`, `examples/web/app/{scenarios,walk,trip}`, `examples/expo/scenario-screen.tsx`와 앱 진입점/의존성/lockfile, `packages/core/src/coordinate-bounds.ts`, Web renderer, 단위/E2E·출처 정책 검사, Changeset/publication 원장, API·README·roadmap·cost·설치/검증 문서를 변경했다. [사용 가이드](example-apps.md).
+3. **테스트:** `pnpm check` 통과(Vitest99/13파일, 독립 core1, 데이터19, 비용 회귀16, 타입/lint/format/문서/Next build/Expo JS export). `pnpm pack:check` SDK5개, 실제 Chromium 전체 E2E12개 통과. Android x86_64 Development Build 성공(3m32s) 및 APK 설치 Success. npm audit high2 실패는 기존 출시 차단으로 유지한다.
+4. **실화면 QA:** Web 산책/여행 기능·모바일390×844·4회 전환·저장/reload·재생·카드/출처를 실행하고 수정 후 캡처를 직접 확인했다. 준비 시간915~1158ms, 외부 HTTP0. Android는 OS 부팅·APK 설치 후 System UI 및 앱 startup ANR로 두 앱 화면 미검증이다. 실제 Android 기기와 iOS/Xcode 부재로 해당 QA도 미검증이다. [상세 결과](research/example-apps-validation.md).
+5. **라이선스·보안:** 자체 코드·가상 자료 MIT. AsyncStorage2.2.0은 예제 전용 MIT 의존성이다. 실제 개인 위치·제3자 지도/font payload·비공개 앱 코드·제작자 키/URL 없음. 가짜 GPS만 사용하고 방문 연결선을 도로 경로로 표시하지 않는다. APK/로그/캡처는 ignored artifacts에만 보존한다. 기존 node-forge/braces high2와 Native 전체 egress 감사는 잔여다.
+6. **남은 작업:** Android 가속 환경/실기기에서 두 앱 UI·저장·터치/스크롤·회전/복귀·성능 확인, iOS 빌드/실행, 장시간 heap/GPU·배터리·Native 네트워크 검사. 실제 위치와 전국 검색/도로 길찾기는 이 합성 예제의 검증 범위가 아니다. 모바일 QA 완료로 처리하지 않는다.
+7. **Git:** `feat/scenario-apps`, base `feat/native-sdk`의 `502d165030ac657a9648829372dce9a247140921`. 커밋 식별: `git log -1 --format='%H %s' --grep='^feat: add shared walking and itinerary example apps$'`. 검사 후 commit/push 및 연결 GitHub 커넥터로 Draft PR 생성. main 병합·배포·npm 발행은 하지 않는다.
+8. **다음 단계:** 코드 리뷰와 가속 Android/iOS 기기 QA로 진행 가능하다. 두 플랫폼 전체 검증 완료 또는 공개 출시 판정은 불가하다.

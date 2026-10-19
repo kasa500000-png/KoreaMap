@@ -1,0 +1,14 @@
+{
+  "name": "@korea-map-kit/example-scenarios",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@korea-map-kit/core": "workspace:*",
+    "@korea-map-kit/styles": "workspace:*"
+  }
+}

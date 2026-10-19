@@ -16,7 +16,8 @@
     "@korea-map-kit/core": "workspace:*",
     "@korea-map-kit/web": "workspace:*",
     "@korea-map-kit/data-adapters": "workspace:*",
-    "@korea-map-kit/styles": "workspace:*"
+    "@korea-map-kit/styles": "workspace:*",
+    "@korea-map-kit/example-scenarios": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "19.3.0",

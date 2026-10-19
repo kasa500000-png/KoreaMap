@@ -4,7 +4,7 @@
   "thirdPartyPayloads": [],
   "runtimeSources": {
     "examples/expo/App.tsx": {
-      "sha256": "b29366d0aca315a15b9c643f6e57e7bcced0cf0eded9d1ec5fd801636a07fe37",
+      "sha256": "293ef852a693df30f77818c7ea37dc48fb9f6309f38777dfd4ed7373bd3477c2",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -49,7 +49,7 @@
       "license": "MIT"
     },
     "examples/web/app/page.tsx": {
-      "sha256": "7198fb6df69c7f0cb0a708ce8b61d3b5fccd30da15c54047cf5c5c7a773e6623",
+      "sha256": "65db7c87085974eecc66e5fb25989f96427ed802113f00718ef86e44c8b33518",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -104,7 +104,7 @@
       "license": "MIT"
     },
     "packages/core/src/index.ts": {
-      "sha256": "fd473c8bbeea5902fd5dfcf4a2563362238e168ba8820ed2764d6f3ae3500339",
+      "sha256": "71650217e966504e5459580b4b674624e0d8897edf89a829013e87772ab6c0b3",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -194,7 +194,7 @@
       "license": "MIT"
     },
     "packages/web/src/index.ts": {
-      "sha256": "2e2196ee754a9aa682511a31e2146d27a8143a585d781bbc360c163f42ee0604",
+      "sha256": "555c0e3d6b7bceda18556c181f06aa38fe0bbbfe13f40326d4029e7ca24f34b3",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -380,6 +380,46 @@
     },
     "packages/native/src/resources.ts": {
       "sha256": "8f6429f3cdb2f42ff631f5ec0636e7f3f08fdbfaf17aadd07b6c9c7c8b5beef2",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/expo/scenario-screen.tsx": {
+      "sha256": "f7f6baae71a2adb4c8d8293cc0e170980a56bf7556613dfa4ff100dfaf874363",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/scenarios/src/index.ts": {
+      "sha256": "82b5917ce867f7e58e8abb951f106dd513510bcdccc8948c3e29144b69ceb401",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/scenarios/scenario-app.tsx": {
+      "sha256": "f96a3b6f315fb2e802869c21739bbde8b3b72ca029b268c55cf1930103561d3b",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/scenarios/scenario-client.tsx": {
+      "sha256": "b978cd3d656128565fe0a09fbb31b830a7baf274a78894252987ec8b8293245f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/scenarios/scenarios.css": {
+      "sha256": "cc75cba469bc954d9d0f5aaa39d16952995f3d1389f225951065db8d714b6203",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/trip/page.tsx": {
+      "sha256": "4c478b721399a8768871dd3cd08266b9532fc5a33dfa3110db22a6a757691fdb",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/walk/page.tsx": {
+      "sha256": "47f55c2c8e5c819cd4f282a28226132c1addc6ce3c2d44ecc9847dded75f8634",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/coordinate-bounds.ts": {
+      "sha256": "53fb6880cebd2d536ed32411c39a26b9a6acb5f8b680a9b36b723d668d6c3b0b",
       "origin": "project-authored",
       "license": "MIT"
     }

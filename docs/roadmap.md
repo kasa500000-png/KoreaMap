@@ -128,3 +128,11 @@ Expo Development Build 설정과 엔진 버전을 고정한다. [설치 가이�
 PMTiles RN 런타임, 한글 glyph, 물리 기기·iOS·장시간 메모리/OS lifecycle QA는 검증 결과에 따라
 별도로 판정한다. 단위 검사·JS export·prebuild를 Native 렌더링 성공으로 취급하지 않는다.
 전체 플랫폼 M4 또는 공개 출시 완료를 선언하지 않는다.
+
+## 두 소비 앱으로 SDK 통합 검증
+
+`feat/scenario-apps`에서 Web/Expo 산책 지도와 여행 일정 지도를 추가한다.
+공통 MapController를 사용하는 private 예제 세션에 가짜 검색·기록·일정·저장 정책을 두며
+SDK에는 bounds 유틸리티와 Web 출처 컨트롤 수정만 추가한다.
+[가이드](example-apps.md), [검증 기록](research/example-apps-validation.md).
+합성 UX 검증이며 실데이터 길찾기·실GPS·전국 검색·iOS/물리 기기 또는 공개 출시 완료가 아니다.

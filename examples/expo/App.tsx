@@ -8,6 +8,7 @@ import {
   type ThemeName,
 } from '@korea-map-kit/styles';
 import { GpsDemo } from './gps-demo';
+import { ScenarioScreen } from './scenario-screen';
 import { MapView } from '@korea-map-kit/native';
 
 function themeStyle(theme: ThemeName) {
@@ -180,11 +181,22 @@ const styles = StyleSheet.create({
   caption: { padding: 12, color: '#345342' },
 });
 export default function App() {
-  const [gps, setGps] = useState(false);
+  const [screen, setScreen] = useState<'api' | 'gps' | 'walk' | 'trip'>('walk');
   return (
     <View style={{ flex: 1, paddingTop: 48, paddingBottom: 28 }}>
-      <Button title={gps ? '지도 API 예제' : 'GPS 경로 예제'} onPress={() => setGps(!gps)} />
-      {gps ? <GpsDemo /> : <ApiDemo />}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <Button title="산책 앱" onPress={() => setScreen('walk')} />
+        <Button title="여행 앱" onPress={() => setScreen('trip')} />
+        <Button title="SDK API" onPress={() => setScreen('api')} />
+        <Button title="GPS 도구" onPress={() => setScreen('gps')} />
+      </View>
+      {screen === 'walk' || screen === 'trip' ? (
+        <ScenarioScreen key={screen} kind={screen} />
+      ) : screen === 'gps' ? (
+        <GpsDemo />
+      ) : (
+        <ApiDemo />
+      )}
     </View>
   );
 }

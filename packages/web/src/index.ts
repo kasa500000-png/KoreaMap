@@ -99,7 +99,8 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
   }));
   if (new Set(images.map((entry) => entry.id)).size !== images.length)
     throw new KitError('INVALID_ARGUMENT', 'DUPLICATE_IMAGE');
-  const { Map, Popup, NavigationControl, setWorkerUrl } = await import('maplibre-gl');
+  const { Map, Popup, NavigationControl, AttributionControl, setWorkerUrl } =
+    await import('maplibre-gl');
   if (signal?.aborted) throw new KitError('ABORTED', 'MAP_ABORTED');
   if (activeWorker && activeWorker !== options.workerUrl)
     throw new KitError('INVALID_ARGUMENT', 'WORKER_CONFLICT');
@@ -120,30 +121,19 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     pitch: camera.pitch,
     maxPitch: 60,
     maxZoom: 22,
-    attributionControl: {
-      compact: false,
-      ...(config.mode !== 'local-fixture'
-        ? { customAttribution: escapeAttribution(config.attribution) }
-        : {}),
-    },
+    attributionControl: false,
     transformRequest: (url) => ({ url: resourceUrl(config, url, origin) }),
   });
   activeWorker = options.workerUrl;
   const shared: { api?: MapController } = {};
   let pendingStyle: { resolve(): void; reject(error: Error): void; off(): void } | undefined;
-  const apiAttribution = document.createElement('div');
-  apiAttribution.className = 'kmk-api-attribution';
-  Object.assign(apiAttribution.style, {
-    position: 'absolute',
-    bottom: '28px',
-    right: '0',
-    background: '#ffffff',
-    color: '#111111',
-    zIndex: '2',
-    fontSize: '12px',
-    padding: '2px 5px',
+  let attributionControl = new AttributionControl({
+    compact: false,
+    ...(config.mode !== 'local-fixture'
+      ? { customAttribution: escapeAttribution(config.attribution) }
+      : {}),
   });
-  options.container.append(apiAttribution);
+  engine.addControl(attributionControl, 'bottom-right');
   let status: MapStatus = 'loading';
   let disposed = false;
   let syncingCamera = false;
@@ -287,7 +277,6 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     closePopup();
     selector.removeEventListener('change', select);
     selector.remove();
-    apiAttribution.remove();
     if (pendingStyle) {
       pendingStyle.off();
       pendingStyle.reject(new KitError('ABORTED', 'STYLE_ABORTED'));
@@ -469,7 +458,12 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
       status = 'loading';
       closePopup();
       customLayers.clear();
-      apiAttribution.textContent = style.attribution;
+      map.removeControl(attributionControl);
+      attributionControl = new AttributionControl({
+        compact: false,
+        customAttribution: escapeAttribution(style.attribution),
+      });
+      map.addControl(attributionControl, 'bottom-right');
       emit('status', status);
       try {
         map.setStyle(document, { diff: false });

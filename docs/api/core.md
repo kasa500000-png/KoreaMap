@@ -454,6 +454,16 @@ export interface TileProvider {
 export declare function createMapController(port: MapPort, scheduler: Scheduler): MapController;
 ```
 
+## boundsFromCoordinates
+
+```ts
+/** Smallest longitude arc containing all points; west > east crosses the date line.
+ * Empty input fails. A single point returns a degenerate bounds (use setCenter/setZoom if desired).
+ * Does not mutate input. O(n log n), at most 10,000 points.
+ */
+export declare function boundsFromCoordinates(points: readonly Coordinate[]): MapBounds;
+```
+
 ## LocationObserver
 
 ```ts
