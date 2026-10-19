@@ -43,6 +43,14 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(report["status"], "PASS_STATIC_ONLY")
         self.assertFalse(report["runtime_verified"])
 
+    def test_android_sdk_docs_are_not_a_runtime_provider(self):
+        self.write("docs/native.md", "https://" + "developer.android.com/studio\n")
+        process, _, _ = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        self.write("src/provider.ts", 'const url = "https://' + 'developer.android.com/studio";\n')
+        _, _, rules = self.run_audit()
+        self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+
     def test_synthetic_token_is_detected_without_printing_value(self):
         sentinel = "gh" + "p_" + "a" * 36
         self.write("src/config.ts", 'export const value = "' + sentinel + '";\n')

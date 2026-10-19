@@ -84,7 +84,7 @@ if (browserAbort.signal.aborted) request.cancel();
 | PlaceRepository | get/put/remove. get의 미존재 값은 null; 인가·영속성은 구현 책임 |
 | TileProvider | id/attribution/costResponsibility='operator', getStyle(options). SDK가 자동 조회·선택하지 않음 |
 
-어댑터 인스턴스는 사용자가 생성·주입한다. core는 fetch, Supabase, DB schema, 특정 HTTP transport, 계정 정보를 갖지 않는다. TileProvider 반환값을 setStyle에 넘겨도 처음 mount 때 지정한 Web allowedOrigins는 확대되지 않는다. 외부 리소스 사용에는 운영자 URL·허용 origin·비용 동의를 포함한 기존 WebMapConfig가 필요하다. Native는 origin별 요청 차단을 아직 구현하지 않아 외부 source/glyph/sprite 및 symbol 스타일을 `UNSUPPORTED`로 거부한다. 라이브 검색·지오코딩·경로·GPS·DB 구현을 이번 계약 추가만으로 완료했다고 보지 않는다.
+어댑터 인스턴스는 사용자가 생성·주입한다. core는 fetch, Supabase, DB schema, 특정 HTTP transport, 계정 정보를 갖지 않는다. TileProvider 반환값을 setStyle에 넘겨도 처음 mount 때 지정한 Web allowedOrigins는 확대되지 않는다. 외부 리소스 사용에는 운영자 URL·허용 origin·비용 동의를 포함한 기존 WebMapConfig가 필요하다. Native는 명시적 operator config의 직접 XYZ/glyph/sprite를 입력 검사 후 허용한다. remote style/TileJSON 탐색은 거부하며 native HTTP redirect 차단은 보장하지 않는다. [설치·정책](native-sdk.md)을 따른다. 라이브 검색·지오코딩·경로·GPS·DB 구현을 이번 계약 추가만으로 완료했다고 보지 않는다.
 
 ## SDK 사용
 
@@ -114,7 +114,7 @@ Native는 `const map = useRef<MapController>(null)`과 `<MapView ref={map} confi
 
 ## Web·Android·iOS 기능 동등성
 
-Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 RN wrapper를 사용하며 양쪽 JS export 및 타입 검사와 mock bridge 테스트만 수행했다.
+Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 RN wrapper를 사용한다. 양쪽 JS export·타입·mock bridge 검사와 Android x86_64 Development Build 컴파일을 통과했으며 실화면/iOS 빌드는 미검증이다. [최신 Native 검증](research/native-sdk-validation.md)을 따른다.
 
 | 기능 | Web | Android | iOS |
 | --- | --- | --- | --- |
@@ -122,10 +122,10 @@ Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 R
 | setCenter/setZoom/setCamera/fitBounds | 실제 Chromium 검증 | bridge 구현·mock 검증; 기기 미검증 | bridge 구현·mock 검증; 기기 미검증 |
 | add/removeMarker, GeoJSON, showRoute | 실제 렌더링 검증 | 선언형 Source/Layer 구현; 기기 미검증 | 선언형 Source/Layer 구현; 기기 미검증 |
 | getVisibleBounds/날짜변경선 | 렌더러 경계 + 순수 함수/브리지 테스트 | bridge 구현·mock 검증 | bridge 구현·mock 검증 |
-| setStyle 및 overlay 유지 | 실제 반복 교체 검증 | 로컬 도형 스타일만 구현; 렌더링 미검증 | 로컬 도형 스타일만 구현; 렌더링 미검증 |
-| 외부 tiles/glyph/sprite | 초기 허용 origin 정책 아래 사용 가능 | 미지원, 명시적 거부 | 미지원, 명시적 거부 |
+| setStyle 및 overlay 유지 | 실제 반복 교체 검증 | 4종 테마·운영자 스타일 구현; 렌더링 미검증 | 4종 테마·운영자 스타일 구현; 렌더링 미검증 |
+| 외부 tiles/glyph/sprite | 초기 허용 origin 정책 아래 사용 가능 | 명시적 운영자 설정·입력 검사; 기기 미검증 | 명시적 운영자 설정·입력 검사; 기기 미검증 |
 | MapEvent | 실제 카메라·선택·종료 연결 | event props 연결, 화면 미검증 | event props 연결, 화면 미검증 |
-| 선택 UI/접근성 | 키보드 selector/팝업 검증 | 터치 선택·Text 표시 구현; 접근성 QA 미검증 | 터치 선택·Text 표시 구현; 접근성 QA 미검증 |
+| 선택 UI/접근성 | 키보드 selector/팝업 검증 | 터치·장소 버튼·닫기 카드 구현; 접근성 QA 미검증 | 터치·장소 버튼·닫기 카드 구현; 접근성 QA 미검증 |
 | 취소/timeout/종료 | core 단위 + 실제 pre-cancel/종료 | core·mock bridge 통과, 기기 lifecycle 미검증 | core·mock bridge 통과, 기기 lifecycle 미검증 |
 | 검색/라우팅/GPS/POI | 선택형 PostGIS/Valhalla·foreground GPS 및 Web 검증. 별도 가이드 참조 | 같은 Provider·foreground Expo 어댑터. 실제 기기 통합 미검증 | 같은 Provider·foreground Expo 어댑터. 실제 기기 통합 미검증 |
 
@@ -133,7 +133,7 @@ Native의 '구현'은 실제 화면 합격이 아니다. Android/iOS는 동일 R
 
 공통 계약은 `@korea-map-kit/core`가 소유하며 다섯 SDK 패키지는 기존 Changesets fixed group을 유지한다. 현재 0.1.0 manifest는 아직 발행하지 않았고 이번 Changeset은 minor다. 기존 메서드/이름을 제거하지 않았지만 KitErrorCode union 확장은 exhaustive switch 사용자의 소스 수정이 필요할 수 있어 0.x minor 릴리스 노트에 명시한다. 안정 1.x 이후 호환성을 깨는 의미·형태·반환값 변경은 major, 호환 API 추가는 minor, 버그 수정은 patch로 관리한다. 0.x에서도 파괴적 변경은 최소 minor와 마이그레이션 설명을 요구한다. 자동 publish는 없다.
 
-엔진 버전과 전이 의존성 그래프 변경은 없다. Native는 RN 11.5.0이 이미 정확히 사용하는 Style Spec 26.2.1을 직접 의존성으로 명시해 해당 스키마로 JSON을 검증한다(ISC). Web/styles는 26.4.4를 유지한다. Native TypeScript는 상위 패키지의 extensionless 타입 참조를 올바르게 해석하도록 ESNext/Bundler를 사용하며, `check:native-types`가 component/ref/method의 any 유입을 차단한다. GL JS 6.14.0, RN 11.5.0, 두 Style Spec, TypeScript 6.0.3의 설치 선언과 아래 공식 문서를 2026-10-19에 대조했다. 공식 페이지가 미래 버전으로 바뀔 수 있으므로 lockfile/타입 검사 결과를 함께 본다.
+공통 API 단계에서 엔진 버전과 전이 의존성 그래프는 변경하지 않았다. 이후 Native SDK 단계는 예제에 expo-dev-client를 추가했다. Native는 RN 11.5.0이 이미 정확히 사용하는 Style Spec 26.2.1을 직접 의존성으로 명시해 해당 스키마로 JSON을 검증한다(ISC). Web/styles는 26.4.4를 유지한다. Native TypeScript는 상위 패키지의 extensionless 타입 참조를 올바르게 해석하도록 ESNext/Bundler를 사용하며, `check:native-types`가 component/ref/method의 any 유입을 차단한다. GL JS 6.14.0, RN 11.5.0, 두 Style Spec, TypeScript 6.0.3의 설치 선언과 아래 공식 문서를 2026-10-19에 대조했다. 공식 페이지가 미래 버전으로 바뀔 수 있으므로 lockfile/타입 검사 결과를 함께 본다.
 
 - [MapLibre GL JS Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/): setStyle, fitBounds, getBounds.
 - [MapLibre React Native Camera](https://maplibre.org/maplibre-react-native/docs/components/camera): setStop, bounds 순서, duration.

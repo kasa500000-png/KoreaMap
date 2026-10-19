@@ -1,16 +1,48 @@
 # @korea-map-kit/native
 
-Korea Map Kit foundation package. Unpublished; this is not the complete MVP.
+React Native MapLibre SDK using the same `MapController` as Web. Unpublished; native device
+certification is incomplete. SDK code and original synthetic fixtures are MIT.
 
-SDK code and the synthetic fixture are MIT. Third-party code/data keep their own licenses.
-No publisher key, backend, or default remote endpoint is included.
-Build from the repository root with `pnpm build:sdk`. Only `dist` and this README are packed.
-Operator HTTP providers and full platform parity remain later milestones.
+Requires React 19.3.0, React Native 0.88.0 (New Architecture), MapLibre React Native 11.5.0.
+For Expo, use SDK 58.0.14, the MapLibre config plugin and a **Development Build**, never Expo Go.
+Build this workspace with `pnpm build:sdk` before using `examples/expo`.
 
-React 19 `MapView` accepts `ref: Ref<MapController>` and `onEvent`. Wait for the `ready` event, then call the same async methods as Web's `handle.api`. Shared marker/GeoJSON/route rendering and camera refs are implemented; mock bridge tests and Expo JS export are not device rendering QA. External-resource and symbol styles fail with `UNSUPPORTED` until native request-origin enforcement is implemented. See [contracts, examples and parity](../../docs/public-api.md).
+```tsx
+const map = useRef<MapController>(null);
+<MapView
+  ref={map}
+  config={{ mode: 'local-fixture', fixtureId: 'synthetic-v1' }}
+  onEvent={(event) => {
+    if (event.type === 'ready') void map.current?.setZoom(14);
+  }}
+/>;
+```
 
-`createExpoLocationClient(expoLocation, AppState, scheduler)` adapts an operator-injected Expo
-Location module. Consent starts false. Only foreground permissions/watches are used; background
-AppState stops collection and returning never restarts it automatically. Expo Location is not an
-SDK dependency. The example pins the version recommended by its installed Expo SDK.
-See `docs/gps-tracks.md`; Android/iOS device and OS background behavior remain unverified.
+Give the parent a height or flex layout. Coordinates are `[longitude, latitude]`.
+Use `setCenter`, `setZoom`, `setCamera`, `fitBounds`, `setStyle`, `addMarker`, `removeMarker`,
+`addGeoJSON`, `removeGeoJSON`, `showRoute`, `getVisibleBounds`, `onEvent`, `destroy` after ready.
+Handle rejected promises. Markers have accessible selection buttons and a dismissible place card.
+Point/Line/Polygon overlays and routes survive style changes. Layers belong in inline style JSON.
+`gesturesEnabled={false}` hands scroll gestures to the parent; coordinate its ScrollView setting.
+Unmount/destroy releases the session and native view. Remount after fatal errors.
+
+Four themes come from `@korea-map-kit/styles`. Korean map labels require an operator glyph
+endpoint and font stack. Default fixtures use no fonts/tiles/network; RN Text labels are not map
+glyph validation. Attribution stays outside the themed map and the engine control stays enabled.
+
+`config={{ mode: 'operator', style, resources: { allowedOrigins: [...] } }}` opts into explicit
+HTTPS/loopback HTTP XYZ, glyph and sprite URLs. Remote styles/TileJSON/remote GeoJSON and URL
+credentials/query parameters are rejected. Configuration is mount-scoped; `setStyle` cannot
+expand allowed origins. This is input validation, **not a native redirect firewall**. Operators
+must serve direct responses and own service costs. No publisher backend, API key or implicit
+provider exists. `createNativeVectorSource` selects HTTP by default. PMTiles requires both
+`transport: 'experimental-pmtiles'` and `resources.experimentalPMTiles: true`; OS/RN runtime
+compatibility remains unverified. Retry with explicit HTTP tiles and a remounted map on failure.
+
+`createExpoLocationClient(expoLocation, AppState, scheduler)` uses injected Expo Location;
+it is not a required SDK dependency. Consent and foreground permission are required. Background
+stops collection; returning does not automatically restart it. No default transmission/storage.
+
+Full setup, source schema, Korean glyphs, PMTiles fallback and validation limitations:
+[Native guide](https://github.com/kasa500000-png/KoreaMap/blob/feat/native-sdk/docs/native-sdk.md).
+Third-party fonts/data keep their own licenses and are not included in this package.

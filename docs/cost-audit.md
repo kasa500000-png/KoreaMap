@@ -293,3 +293,13 @@ Expo의 추가 화면과 JS 모듈도 출처 검사에서 빠지지 않도록 �
 최종 로컬 결과: `pnpm check`, `pnpm pack:check` SDK5개, `pnpm test:routing`8개, 한국 공개 OSM5개,
 Chromium E2E10개 통과. worktree/index/도달 가능한 history 및 실제 tarball 정적 findings0,
 Web 외부 HTTP 시도0. 이는 OS 전체 또는 원격 과금 계정의 안전성 증명은 아니다.
+
+## Native SDK 확장 감사 — 2026-10-19
+
+- 기본 합성 지도와 4종 도형 테마는 타일/glyph/sprite/검색/라우팅 endpoint가 없다. 운영자 설정은 mount 시 명시적으로 받으며 SDK가 환경변수나 제작자 계정을 자동 탐색하지 않는다.
+- 직접 XYZ/glyph/sprite origin 입력 검사를 추가했다. remote style/TileJSON/GeoJSON 자동 탐색, URL credentials/query/fragment, 비-loopback 평문 HTTP는 거부한다. Native redirect 차단은 구현하지 않았으며 운영자 서버는 직접 응답해야 한다. OS 전체 요청 감사는 별도 출시 조건이다.
+- PMTiles는 두 가지 명시적 실험 설정이 필요하다. HTTP가 기본이며 사용자가 제공한 XYZ로만 전환한다. RN/Android/iOS 실제 PMTiles 검증은 문서상의 엔진 지원과 구분한다.
+- expo-dev-client 58.0.14만 새 외부 직접 의존성으로 추가했다. Expo 공식 버전 범위와 대조했다. 로컬 launcher/Metro를 사용하고 OTA/EAS/계정·비공개 API 키는 설정하지 않는다. 개발 launcher의 모든 OS 네트워크 요청까지 정적 검사로 보장하지 않는다.
+- 로컬 SDK/Gradle/에뮬레이터 다운로드는 개발 검증용이며 SDK 설치 hook이 아니다. 인증/결제 계정 없이 수행한다. APK/생성 프로젝트·SDK·타일·glyph·폰트·실화면은 Git/npm에 포함하지 않는다.
+- npm audit high 2(node-forge, braces) 유지, exit 1. 취약점 해결 및 native runtime 네트워크/메모리/실기기/iOS QA 전 공개 출시 차단 유지.
+- 최종 worktree/index/history/tarball 결과와 실제 빌드 상태는 [Native 검증 기록](research/native-sdk-validation.md), [진행 기록](progress.md)에 구분해 기록한다.

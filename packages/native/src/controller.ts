@@ -11,6 +11,7 @@ import {
   type MapStyle,
   type Scheduler,
 } from '@korea-map-kit/core';
+import { validateNativeResources, type NativeResourcePolicy } from './resources.js';
 import { validateStyleMin, type StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
 
 /** Minimal native bridge, checked against installed MapLibre CameraRef/MapRef by MapView. */
@@ -30,27 +31,23 @@ export interface NativeBridge {
   getBounds(): Promise<[number, number, number, number]>;
 }
 export interface NativeSnapshot {
+  readonly revision: number;
   readonly style: StyleSpecification;
   readonly attribution: string;
   readonly markers: readonly MapMarker[];
   readonly overlays: ReadonlyMap<string, MapFeatureCollection>;
   readonly destroyed: boolean;
 }
-/** Until a native resource interceptor is implemented, external resources fail closed. */
-export function validateNativeStyle(input: MapStyle): StyleSpecification {
+/** Inline style plus explicit operator resources; no implicit TileJSON or provider discovery. */
+export function validateNativeStyle(
+  input: MapStyle,
+  policy?: NativeResourcePolicy,
+): StyleSpecification {
   const envelope = defineMapStyle(input.document, input.attribution);
   const style = envelope.document as unknown as StyleSpecification;
   if (validateStyleMin(style).length)
     throw new KitError('INVALID_ARGUMENT', 'INVALID_NATIVE_STYLE');
-  if (
-    style.glyphs ||
-    style.sprite ||
-    Object.values(style.sources).some(
-      (source) => source.type !== 'geojson' || !source.data || typeof source.data !== 'object',
-    ) ||
-    style.layers.some((layer) => layer.type === 'symbol')
-  )
-    throw new KitError('UNSUPPORTED', 'NATIVE_OFFLINE_GEOMETRY_STYLE_REQUIRED');
+  validateNativeResources(style, policy);
   if (
     Object.keys(style.sources).some((id) => id.startsWith('kmk-')) ||
     style.layers.some((layer) => layer.id.startsWith('kmk-'))
@@ -64,9 +61,14 @@ export function createNativeMapSession(
   bridge: NativeBridge,
   scheduler: Scheduler,
   changed: (snapshot: NativeSnapshot) => void,
+  resourcePolicy?: NativeResourcePolicy,
 ) {
+  const policy = resourcePolicy
+    ? { ...resourcePolicy, allowedOrigins: [...resourcePolicy.allowedOrigins] }
+    : undefined;
   let snapshot: NativeSnapshot = {
-    style: validateNativeStyle(initial),
+    revision: 0,
+    style: validateNativeStyle(initial, policy),
     attribution: initial.attribution,
     markers: [],
     overlays: new Map(),
@@ -76,7 +78,13 @@ export function createNativeMapSession(
   let pending: { resolve(): void; reject(error: Error): void; off(): void } | undefined;
   const listeners = new Set<(event: MapEvent) => void>();
   function emit(event: MapEvent) {
-    for (const listener of listeners) listener(event);
+    for (const listener of [...listeners]) {
+      try {
+        listener(event);
+      } catch {
+        /* Consumer callbacks cannot prevent native cleanup. */
+      }
+    }
   }
   function update(patch: Partial<NativeSnapshot>) {
     snapshot = { ...snapshot, ...patch };
@@ -112,11 +120,15 @@ export function createNativeMapSession(
             });
           }
           case 'style': {
-            const style = validateNativeStyle(command.style);
+            const style = validateNativeStyle(command.style, policy);
             ready = false;
             return new Promise<void>((resolve, reject) => {
               pending = { resolve, reject, off: context.signal.subscribe(() => api.destroy()) };
-              update({ style, attribution: command.style.attribution });
+              update({
+                style,
+                attribution: command.style.attribution,
+                revision: snapshot.revision + 1,
+              });
             });
           }
           case 'marker':
@@ -173,8 +185,8 @@ export function createNativeMapSession(
   return {
     api,
     getSnapshot: () => snapshot,
-    loaded() {
-      if (snapshot.destroyed) return;
+    loaded(revision = snapshot.revision) {
+      if (snapshot.destroyed || revision !== snapshot.revision || ready) return;
       ready = true;
       if (pending) {
         pending.off();
@@ -183,7 +195,8 @@ export function createNativeMapSession(
       }
       emit({ type: 'ready' });
     },
-    failed() {
+    failed(revision = snapshot.revision) {
+      if (snapshot.destroyed || revision !== snapshot.revision) return;
       emit({ type: 'error', error: new KitError('UNAVAILABLE', 'MAP_LOAD_FAILED'), fatal: true });
       api.destroy();
     },

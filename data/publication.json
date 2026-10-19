@@ -4,7 +4,7 @@
   "thirdPartyPayloads": [],
   "runtimeSources": {
     "examples/expo/App.tsx": {
-      "sha256": "8f395cfaba5cae8924b436b8c44f37ff9c5ddb6140d83f4ee5b125aed4374e12",
+      "sha256": "b29366d0aca315a15b9c643f6e57e7bcced0cf0eded9d1ec5fd801636a07fe37",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -144,12 +144,12 @@
       "license": "MIT"
     },
     "packages/native/src/controller.ts": {
-      "sha256": "bd67c911d27865db414b0f02a0003fa22ef8cede440631fc1c3ca7a06da4f7c8",
+      "sha256": "40c35edd7a22cc06dc75e6860eee3e2aa2db42c81b315d8cfa4e8eb7289ec02b",
       "origin": "project-authored",
       "license": "MIT"
     },
     "packages/native/src/index.tsx": {
-      "sha256": "c09470910160dd186bf27bd86f6fe15717f9e8d092939d96b815f441682c601f",
+      "sha256": "abe825758295784867a9928f3109492e74e2038a11fdc9a56886d98f40f40a4c",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -375,6 +375,11 @@
     },
     "examples/web/app/routing/routing-demo.tsx": {
       "sha256": "92b10f947f06c37ebfd28da830b1107a179d3478d889f1072a68e2f04ea80639",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/native/src/resources.ts": {
+      "sha256": "8f6429f3cdb2f42ff631f5ec0636e7f3f08fdbfaf17aadd07b6c9c7c8b5beef2",
       "origin": "project-authored",
       "license": "MIT"
     }
