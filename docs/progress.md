@@ -326,3 +326,10 @@
 ### 8. 다음 단계 진행 가능 여부
 
 - M1 남은 Native 호환성/실화면과 M2 SDK 계약 구현을 계속 진행할 수 있다. 모노레포 기능 검증 통과이며 M1/MVP 전체 완료 또는 보안/출시 합격이 아니다.
+
+### CI 최초 실행과 수정
+
+- [최초 CI 실행](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205075633): Windows 전체 통과. Linux/macOS는 build·unit·문서·감사까지 통과했으나 마지막 Changesets에서 로컬 main ref가 없어 실패했다.
+- changeset:status에 `--since=origin/main`을 명시해 detached checkout에서도 비교할 수 있게 수정했다. 로컬 main이 없는 임시 clone의 detached HEAD에서 실제 재현 검사 통과. 수정 커밋 식별: `git log -1 --format='%H %s' --grep='^fix: resolve Changesets base in detached CI checkouts$'`. 원격 재실행 결과는 PR #3 checks와 사용자 보고로 확인한다.
+- 실제 core tarball을 새 임시 소비 프로젝트에 `npm install --offline --ignore-scripts --no-audit --no-fund`로 설치하고 Node에서 import·좌표 검사·CONFIG_REQUIRED 실패를 확인했다.
+- GitHub Actions 권한 설정 조회는 연동 API 권한 부족 HTTP403이었다. 실제 workflow 실행 조회는 가능하며 과금/권한 설정을 변경하지 않았다.

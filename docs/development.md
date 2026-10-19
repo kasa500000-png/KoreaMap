@@ -47,4 +47,4 @@ Expo Go는 지원하지 않는다. MapLibre config plugin이 app.json에 들어 
 
 무료 표준 `ubuntu-24.04`, `windows-2025`, `macos-15` runner에서 동일 `pnpm check`와 tarball 감사를 실행한다. Linux만 Chromium E2E를 추가한다. actions는 공식 tag의 commit SHA에 고정하고 setup-node의 암묵적 package-manager cache를 끈다. contents read, credential 비보존, 20분 timeout, 중복 실행 취소를 적용했다. schedule/cache/upload-artifact/deploy/publish 작업은 없다. hosted runner OS 이미지는 관리형이므로 image digest 고정을 보장하지 않는다. 실제 ImageVersion과 결과는 각 실행 로그가 근거다.
 
-SDK 5개는 0.1.0에서 시작하는 Changesets fixed group이다. `pnpm changeset:status`는 계획만 검사한다. 예제/서비스/root는 private이며 자동 version/publish는 없다. npm namespace는 실제 발행 승인 전 소유권 확인이 필요하다. `dist`의 JS/d.ts/MIT 고지와 README만 pack하고 소스맵·tsbuildinfo·앱·서비스·환경값은 제외한다.
+SDK 5개는 0.1.0에서 시작하는 Changesets fixed group이다. `pnpm changeset:status`는 `--since=origin/main`으로 계획만 검사한다. PR detached checkout에도 존재하는 remote-tracking ref를 사용하며 새 clone에서는 origin/main을 fetch해야 한다. 예제/서비스/root는 private이며 자동 version/publish는 없다. npm namespace는 실제 발행 승인 전 소유권 확인이 필요하다. `dist`의 JS/d.ts/MIT 고지와 README만 pack하고 소스맵·tsbuildinfo·앱·서비스·환경값은 제외한다.

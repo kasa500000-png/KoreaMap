@@ -28,7 +28,7 @@
     "test:audit": "node scripts/python.mjs scripts/test-cost-audit.py",
     "pack:check": "node scripts/pack-check.mjs",
     "changeset": "changeset",
-    "changeset:status": "changeset status",
+    "changeset:status": "changeset status --since=origin/main",
     "offline:check": "node scripts/offline-install-check.mjs"
   },
   "devDependencies": {

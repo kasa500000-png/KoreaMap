@@ -30,3 +30,9 @@ Web screenshot SHA256: `28e31f40b9a679bccbe488746e5431148ffcba1c28fdeacd736bf44e
 최종 pnpm check를 `strace -f -e trace=network,execve`로 관측했다. 외부 TCP connect 0, 인터넷 목적지 UDP connect 1, AF_NETLINK 이외 sendto/sendmsg/sendmmsg 0이었다. 유일한 UDP connect는 Expo의 lan-network가 로컬 출발 주소를 고르기 위해 공개 resolver 주소에 연결 정보를 설정한 뒤 즉시 socket을 닫는 코드다. DNS 질의 payload 전송은 관측되지 않았다. SDK provider/제작자 서비스 접속은 아니다. 네트워크 probe까지 0건이라고 주장하지 않는다. 전체 wire packet capture 또는 Native OS 계측은 별도 미검증이다.
 
 초기 Next 자동 upgrade 조회는 공식 agentUpgrade false로 제거했으며 수동 pnpm audit는 그대로 실행해 high2를 보고한다. 오프라인 새 설치는 connect 0건이었다. 초기 온라인 설치는 전체 syscall trace가 없으므로 같은 증거로 대체하지 않는다.
+
+## 원격 CI 후속
+
+[최초 실행](https://github.com/kasa500000-png/KoreaMap/actions/runs/39205075633)의 Windows는 통과했고 Linux/macOS는 기능 검사 후 Changesets의 로컬 main 참조 부재로 실패했다. status 비교를 origin/main으로 바꾸고 로컬 main이 없는 detached clone에서 재검증했다. PR #3의 후속 checks를 최종 실행 결과로 사용한다.
+
+별도 소비 검증: 실제 core tarball을 새 임시 프로젝트에 offline/ignore-scripts로 설치하고 Node ESM import·좌표 검증·설정 누락 오류를 확인했다. SDK tarball 발행은 수행하지 않았다.
