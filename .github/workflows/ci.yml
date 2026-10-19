@@ -35,9 +35,11 @@ jobs:
       - run: pnpm check
       - run: pnpm check:data --staged
       - run: pnpm pack:check
+      - run: pnpm offline:check
       - run: pnpm exec playwright install --with-deps chromium
       - run: sudo apt-get install --no-install-recommends --yes fonts-noto-cjk
       - run: node scripts/check-font.mjs --font /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc --face 1
+      - run: pnpm verify:packages
       - run: pnpm test:web
       - run: pnpm test:geo
       - run: pnpm test:routing

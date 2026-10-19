@@ -150,3 +150,26 @@ it('accepts explicitly attributed inline styles and rejects all unlisted resourc
     validateWebConfig({ ...config, style: { version: 0 } } as never, 'http://localhost'),
   ).toThrow('INVALID_STYLE_SPEC');
 });
+it('does not notify or replace snapshots for equal camera/1000-marker values, but preserves meaningful edits', () => {
+  const markers = Array.from({ length: 1000 }, (_, i) => ({
+    id: `p${i}`,
+    label: `P${i}`,
+    coordinate: [127, 37] as const,
+  }));
+  const state = createMapState({ markers });
+  const before = state.getSnapshot();
+  let notifications = 0;
+  state.subscribe(() => notifications++);
+  for (let i = 0; i < 10; i++) {
+    state.setCamera({ ...before.camera, center: [...before.camera.center] });
+    state.setMarkers(markers.map((m) => ({ ...m, coordinate: [...m.coordinate] })));
+  }
+  expect(notifications).toBe(0);
+  expect(state.getSnapshot()).toBe(before);
+  state.setMarkers(markers.map((m, i) => (i === 0 ? { ...m, description: 'updated' } : m)));
+  expect(notifications).toBe(1);
+  state.setCamera({ ...before.camera, zoom: before.camera.zoom + 1 });
+  expect(notifications).toBe(2);
+  expect(() => state.setMarkers([...markers, markers[0]!])).toThrow('INVALID_MARKER');
+  expect(notifications).toBe(2);
+});

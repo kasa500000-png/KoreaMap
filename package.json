@@ -49,7 +49,10 @@
     "search:serve": "pnpm search:service serve",
     "routing:local": "node scripts/routing-local.mjs",
     "routing:serve": "node services/routing/dist/cli.js",
-    "test:routing": "pnpm build:sdk && node scripts/routing-local.mjs test"
+    "test:routing": "pnpm build:sdk && node scripts/routing-local.mjs test",
+    "check:licenses": "node scripts/check-licenses.mjs",
+    "audit:dependencies": "pnpm audit --audit-level=high",
+    "verify:packages": "node scripts/verify-packages.mjs"
   },
   "devDependencies": {
     "typescript": "6.0.3",

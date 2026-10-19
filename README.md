@@ -30,6 +30,16 @@ pnpm dev:web
 
 Playwright 브라우저는 `pnpm exec playwright install chromium`으로 준비합니다. OS별 전제조건, native 로컬 빌드, worker, 서비스 범위는 [개발 가이드](docs/development.md)를 따릅니다. **Expo JS export는 APK/IPA 빌드나 Android/iOS 실화면 QA가 아닙니다.** 의존성 보안 미해결 사항은 [비용·보안 감사](docs/cost-audit.md)에 기록하며 제품 출시는 차단합니다.
 
+## 품질 감사
+
+[전체 QA 보고서](docs/qa-report.md)에 수정 사항, 실제 테스트, 성능·패키지 크기와 미검증 항목을 기록합니다.
+`pnpm check:licenses`는 전체 워크스페이스의 라이선스 metadata 정책을 검사하고,
+`pnpm pack:check` 뒤 `pnpm verify:packages`는 SDK 재빌드 바이트 일치와 독립 Web 소비 앱을 확인합니다.
+소비 앱의 최초 lock 해석은 공개 npm registry metadata를 준비하며, 이어지는 설치는 frozen/offline으로 검증합니다.
+`pnpm audit:dependencies`는 현재 upstream high 취약점 2건으로 실패하며 공개 출시는 차단됩니다.
+Web 소비 앱은 TypeScript strict + `moduleResolution: Bundler`를 사용합니다.
+MapLibre 하위 선언의 NodeNext 호환 문제와 Android 실기기/iOS 검증은 미완료입니다.
+
 ## 모노레포
 
 ```text

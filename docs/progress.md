@@ -547,3 +547,24 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 8. **다음 단계:** 코드 리뷰와 가속 Android/iOS 기기 QA로 진행 가능하다. 전체 모바일 QA 완료 또는 공개 출시 판정은 불가하다.
 
 구현 커밋 `30792ba4ee1a311b498c84efd4f790890e6a7ecb`의 [원격 CI](https://github.com/kasa500000-png/KoreaMap/actions/runs/39251573849)는 Linux·Windows·macOS 모두 success다. [Draft PR #13](https://github.com/kasa500000-png/KoreaMap/pull/13)을 연결 GitHub 커넥터로 생성했다. 후속 Android 실화면 결과는 문서 커밋으로 보완한다.
+
+
+## 전체 품질 감사 및 개선 — 2026-10-19
+
+1. **구현:** Web 동일 카메라/1,000개 마커 setter의 불필요한 알림·엔진 갱신 제거, GeoJSON ambient 공개 타입 누락 수정, strict 상속 검사, 전체 workspace 라이선스·offline 연결·독립 tarball 소비 앱/재현성 검사, 3폭 QA/성능 회귀를 보강했다.
+2. **파일:** web state/index·styles index/manifest·lockfile·출처 SHA3개, 단위/Web QA, check-boundaries/offline/check-licenses/verify-packages/tasks·CI·root package, Changeset, README/qa-report/progress/roadmap/cost-audit.
+3. **테스트:** 로컬 check(Vitest100/13 files, core1, data19, cost16, strict/lint/build), 실제 PostGIS19·Valhalla8, Web15, SDK tarball5·독립 Web 소비 앱·offline12 manifests/27 links 통과. npm audit **high2/exit1**, Web NodeNext 선언 probe **TS2834/exit2**는 별도 실패로 유지한다. 최종 검사 결과는 QA 보고서와 해당 commit의 CI를 따른다.
+4. **실화면:** Chromium390/768/1440 실제 캡처 확인, 마커100/1000·이동/줌·테마/한글·경로·503 복구·정리·예제 화면 전환 통과. Android adb 연결 목록 없음, iOS/Xcode 없음으로 이번 실기기 QA **미검증**. 이전 에뮬레이터 실행을 재사용해 완료 표시하지 않는다.
+5. **라이선스/보안:** 자체 코드/fixture MIT, 전체 설치645버전 license metadata 통과 및 LGPL/MPL 등 별도 의무 기록. 비밀/데이터 정책과 SDK tarball 통과, built app URL/credential 형식 후보125개 수동 분류. Web 외부 요청0. 공식 패치 미배포 high2로 출시 차단 유지.
+6. **잔여:** 물리 Android/iOS·Native glyph/PMTiles/권한/메모리·OS egress, 장시간/실제 타일·전국 데이터 부하, Web NodeNext, native/image SBOM, OS 간 및 앱 binary 바이트 재현은 미완료다. [전체 QA 보고서](qa-report.md)의 심각도별 표를 따른다.
+7. **Git:** `feat/quality-audit`, base `feat/scenario-apps` (`0d3a8d20bf490b841ca86e9e7854275862977edf`). 구현 커밋 조회: `git log -1 --format='%H %s' --grep='^fix: strengthen SDK quality gates and isolated consumer types$'`. 기능 회귀 통과 후 commit/push 및 연결 GitHub 커넥터 Draft PR. main 병합/운영 배포/npm 발행 없음.
+8. **다음 단계:** P1 의존성 수정 버전 확인과 실제 기기 QA 진행 가능. 전체 품질 감사·모바일 QA·공개 제품 출시 완료 판정은 불가하다.
+
+
+### CI 환경 차이 회귀 수정
+
+구현 커밋 `200a11fcd7c8029ad47b905a2a9278207e2ab1e5`를 연결 GitHub 커넥터의 [Draft PR #14](https://github.com/kasa500000-png/KoreaMap/pull/14)로 제출했다.
+첫 원격 Windows/macOS는 통과, Linux의 독립 소비 앱은 package store와 registry metadata 캐시의 차이로 실패했다.
+소비 앱 lock을 빈 metadata 캐시에서 공개 registry로 명시적으로 준비한 뒤 frozen/offline 설치하도록 고쳤다.
+기존 검토 그래프 밖의 제3자 버전은 거부한다. 로컬 재검증 뒤 후속 커밋하며 최신 원격 checks로 판정한다.
+이 변경은 검사 준비 절차이며 SDK runtime/타입/타일 endpoint는 변경하지 않는다.

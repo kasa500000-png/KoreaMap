@@ -39,6 +39,7 @@ else if (task === 'build') build();
 else if (task === 'check') {
   for (const step of [
     'check:boundaries',
+    'check:licenses',
     'check:data',
     'test:data',
     'check:data-docs',

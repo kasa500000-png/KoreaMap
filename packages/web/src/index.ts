@@ -1,3 +1,5 @@
+// Upstream MapLibre declarations use the ambient GeoJSON namespace. Preserve it in published types.
+/// <reference types="geojson" preserve="true" />
 import {
   KitError,
   normalizeVisibleBounds,
