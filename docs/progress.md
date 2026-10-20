@@ -667,3 +667,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 공식 수정 버전·지원 그래프, 전체 소비 선언 수락과 원격 새 CI의 실제 결과가 남는다. 배포 대상은 사용자 선택 확인 중이며 아직 외부 배포를 실행하지 않았다.
 7. **Git:** `fix/stage-01-security-review`, 기준 `259d75e116a2de456f546c736014d50197774a4d`. 단계 commit은 `git log -1 --format='%H %s' --grep='^ci: isolate consumer declaration gates$'`로 식별한다. 실제 PR/merge SHA는 원격 반영 후 보고한다.
 8. **다음:** CI 격리 개선을 검증해 preview 소스로 반영하고 독립 타입/QA/데이터 단계를 계속한다. 취약점 해소·보안 수락 자체는 BLOCKED다.
+
+## 우선순위 10단계 — 02 Native 공개 GeoJSON 타입 — 2026-10-21 KST
+
+1. **구현:** Native가 공개 선언에서 사용하는 GeoJSON namespace 참조와 설치 타입 의존성 누락을 수정했다. 실제 tarball의 Bundler/NodeNext SDK 선언을 각각 strict·skipLibCheck:false로 검사한다. 전체 RN 앱 선언은 별도 실패 게이트를 유지한다. [검증 근거](research/stage-02-public-types.md)를 따른다.
+2. **파일:** Native index의 보존 참조·Native manifest/lock importer 역할 이동·독립 verifier/회귀8개·patch Changeset·개별 sourceSHA1개·문서/비용 기록. 공식 TypeScript/React Native 문서 host2개는 docs-only로 검토했고 executable URL 차단 회귀를 추가했다.
+3. **검사:** 격리 tarball install·SDK Bundler/NodeNext 전체 선언2개·앱 strict·plugin·Android/iOS JS export PASS, 전체RN TS2411/TS2344/TS2416으로 PARTIAL_PASS/exit1. 최초 pack의 미검토 docs URL/sourceSHA 실패는 루트 개별 검토 후 `pack:check`5개 PASS로 재검사했다. 미추적 신규 Changeset을 index에 추가한 뒤 전체 `pnpm check`도 PASS(Vitest181·Native policy8·release14)다. 최초 실패는 보존한다.
+4. **실화면:** 타입/주석 변경으로 runtime 실행문은 불변, 이번 단계 UI QA는 미실행이다. JS export를 기기 성공으로 표시하지 않는다.
+5. **라이선스/보안:** 자체 MIT 2줄 참조, 기존 정확한 @types/geojson7946.0.16을 dev에서 dependencies로 옮겼고 새 버전/외부 그래프/endpoint/원본 payload를 추가하지 않았다. Native sourceSHA는 개별 diff 검토 후 갱신했다. 공식 docs 허용은 runtime 요청 허용이 아니다.
+6. **차단:** Web TS2834·전체 RN 선언3건·보안 high2는 그대로 실패한다. 지원 공개 SDK 부분 개선과 전체 앱/릴리스 수락을 구분한다.
+7. **Git:** 01단계 [PR18](https://github.com/kasa500000-png/KoreaMap/pull/18), commit4914fbc681fca9fd0cec3b24574b735d836494e7/merge9db22c21f68509aaa1e242bd78e969805121559e. 02통합 브랜치 `fix/stage-02-public-types`, commit조회 `git log -1 --format='%H %s' --grep='^fix: preserve native public GeoJSON declarations$'`.
+8. **다음:** 선언 누락 수정은 검증 후 preview 통합 가능하며 브라우저·성능·Android 독립 빌드 단계를 계속한다. 전체 타입/보안·기기 수락 및 실제 외부 배포 완료가 아니다.

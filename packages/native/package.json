@@ -29,14 +29,14 @@
   "dependencies": {
     "korea-map-core": "workspace:*",
     "korea-map-styles": "workspace:*",
-    "@maplibre/maplibre-gl-style-spec": "26.2.1"
+    "@maplibre/maplibre-gl-style-spec": "26.2.1",
+    "@types/geojson": "7946.0.16"
   },
   "devDependencies": {
     "react": "19.3.0",
     "react-native": "0.88.0",
     "@maplibre/maplibre-react-native": "11.5.0",
-    "@types/react": "19.3.0",
-    "@types/geojson": "7946.0.16"
+    "@types/react": "19.3.0"
   },
   "peerDependencies": {
     "react": "19.3.0",

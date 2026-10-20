@@ -32,9 +32,34 @@ export function assertConsumerDeclarations(summary) {
   assertDeclarationProbe(summary, 'Native dependency declarations');
 }
 
+/** Exercise the SDK boundary without loading React Native application ambient declarations. */
+export function createNativePublicTypeConfig(mode) {
+  assert(['Bundler', 'NodeNext'].includes(mode), 'Unsupported public SDK resolution mode');
+  return {
+    compilerOptions: {
+      strict: true,
+      skipLibCheck: false,
+      module: mode === 'NodeNext' ? 'NodeNext' : 'ESNext',
+      moduleResolution: mode,
+      target: 'ES2022',
+      jsx: 'react-jsx',
+      types: ['react'],
+      lib: ['ES2022'],
+      noEmit: true,
+    },
+    files: ['public-sdk.tsx'],
+  };
+}
+
+export function assertPublicSdkDeclarations(checks) {
+  for (const key of ['publicSdkBundlerDeclarations', 'publicSdkNodeNextDeclarations'])
+    assertDeclarationProbe(checks?.[key], `Native ${key}`);
+}
+
 export function assertConsumerManifest(manifest, tarballs) {
   assert.equal(manifest.private, true, 'Consumer must never be publishable');
   assert.equal(manifest.main, 'index.js');
+  assert.equal(manifest.type, 'module', 'NodeNext must exercise an ESM consumer');
   for (const [name, version] of Object.entries(pinnedPeers))
     assert.equal(manifest.dependencies[name], version, `Unreviewed peer version: ${name}`);
   for (const name of sdkNames) {
@@ -59,6 +84,18 @@ export function assertInstalledSdk(manifest, packageRoot, consumerRoot) {
   assert(!existsSync(resolve(installed, 'src')), 'SDK source must not be installed');
   assert(existsSync(resolve(installed, 'dist/index.js')), 'Published JavaScript missing');
   assert(existsSync(resolve(installed, 'dist/index.d.ts')), 'Public declarations missing');
+  if (manifest.name === 'korea-map-native') {
+    assert.equal(
+      manifest.dependencies?.['@types/geojson'],
+      '7946.0.16',
+      'Native must ship its reviewed GeoJSON type dependency',
+    );
+    assert.match(
+      readFileSync(resolve(installed, 'dist/index.d.ts'), 'utf8'),
+      /^\/\/\/ <reference types="geojson" preserve="true" \/>/m,
+      'Native public declarations must preserve their GeoJSON reference',
+    );
+  }
   for (const value of Object.values(manifest.dependencies ?? {}))
     assert(!/^(workspace:|link:|file:)/.test(value), 'Packed manifest retained a local dependency');
 }
@@ -178,10 +215,10 @@ function runVerification() {
       name: 'isolated-korea-map-native-consumer',
       private: true,
       version: '0.0.0',
+      type: 'module',
       main: 'index.js',
       dependencies: { ...tarballs, ...pinnedPeers },
       devDependencies: {
-        '@types/geojson': '7946.0.16',
         '@types/react': '19.3.0',
         typescript: '6.0.3',
       },
@@ -315,6 +352,48 @@ export default function App() {
     const tsc = require.resolve('typescript/bin/tsc');
     execute(process.execPath, [tsc, '-p', 'tsconfig.json'], directory);
     report.checks.publicTypesStrictWithSkipLibCheck = 'PASS';
+    // No react-native import, DOM lib or consumer-supplied GeoJSON ambient reference.
+    // Public SDK declarations must bring their own transitive type requirements.
+    writeFileSync(
+      resolve(directory, 'public-sdk.tsx'),
+      `import { useRef } from 'react';
+import { defineMapStyle, type Coordinate, type MapController, type MapInteractionController } from 'korea-map-core';
+import { MapView, type MapViewProps, type NativeMapConfig, type NativeMarkerClustering } from 'korea-map-native';
+import { createThemeStyle, designAttribution } from 'korea-map-styles';
+const center: Coordinate = [126.978, 37.5665];
+const style = defineMapStyle(createThemeStyle({ theme: 'standard', target: 'native', data: { mode: 'fixture' }, typography: { mode: 'none' } }), designAttribution);
+const config: NativeMapConfig = { mode: 'operator', style, resources: { allowedOrigins: [] } };
+const clustering: NativeMarkerClustering = { radius: 48, maxZoom: 13 };
+const props: MapViewProps = { config, markerClustering: clustering, onInteractionsReady(controller) { const typed: MapInteractionController | null = controller; void typed; } };
+type IsAny<T> = 0 extends (1 & T) ? true : false;
+const componentIsTyped: IsAny<typeof MapView> = false;
+const propsAreTyped: IsAny<Parameters<typeof MapView>[0]> = false;
+void center; void componentIsTyped; void propsAreTyped;
+// @ts-expect-error Coordinates remain length-two tuples through the installed public API.
+const invalidCenter: Coordinate = [127]; void invalidCenter;
+// @ts-expect-error The public component does not accept arbitrary clustering radius strings.
+const invalidProps: MapViewProps = { config, markerClustering: { radius: 'wide' } }; void invalidProps;
+export default function PublicSdk() {
+  const map = useRef<MapController>(null);
+  return <MapView {...props} ref={map} />;
+}
+`,
+    );
+    for (const [mode, key] of [
+      ['Bundler', 'publicSdkBundlerDeclarations'],
+      ['NodeNext', 'publicSdkNodeNextDeclarations'],
+    ]) {
+      const configFile = `tsconfig.public-${mode.toLowerCase()}.json`;
+      json(configFile, createNativePublicTypeConfig(mode));
+      const probe = spawnSync(process.execPath, [tsc, '-p', configFile], {
+        cwd: directory,
+        env: taskEnv,
+        encoding: 'utf8',
+        timeout: 180000,
+      });
+      report.checks[key] = summarizeDeclarationProbe(probe, { roots: [directory, root] });
+      console.log('NATIVE_PUBLIC_SDK_PROBE', key, JSON.stringify(report.checks[key]));
+    }
     const declarationProbe = spawnSync(
       process.execPath,
       [tsc, '-p', 'tsconfig.json', '--skipLibCheck', 'false'],
@@ -355,9 +434,12 @@ export default function App() {
     assert(metadata.fileMetadata?.ios?.bundle, 'iOS JS bundle missing');
     report.checks.androidJavaScriptExport = 'PASS';
     report.checks.iosJavaScriptExport = 'PASS';
-    report.overall =
-      report.checks.dependencyDeclarations.status === 'PASS' ? 'PASS' : 'PARTIAL_PASS';
-    report.releaseBlocked = report.checks.dependencyDeclarations.status !== 'PASS';
+    report.releaseBlocked = [
+      'publicSdkBundlerDeclarations',
+      'publicSdkNodeNextDeclarations',
+      'dependencyDeclarations',
+    ].some((key) => report.checks[key].status !== 'PASS');
+    report.overall = report.releaseBlocked ? 'PARTIAL_PASS' : 'PASS';
     console.log(
       `${report.overall}: isolated Native tarballs, strict app/API types with skipLibCheck, plugins and Android/iOS JS export`,
     );
@@ -378,6 +460,7 @@ export default function App() {
     }
   }
   // Preserve supported checks and diagnostics before refusing a release with incomplete declarations.
+  assertPublicSdkDeclarations(report.checks);
   assertConsumerDeclarations(report.checks.dependencyDeclarations);
 }
 

@@ -7,8 +7,10 @@ import test from 'node:test';
 import {
   assertConsumerManifest,
   assertConsumerDeclarations,
+  assertPublicSdkDeclarations,
   assertInstalledSdk,
   assertIntrospection,
+  createNativePublicTypeConfig,
   pinnedPeers,
 } from '../scripts/verify-native-consumer.mjs';
 import { summarizeDeclarationProbe } from '../scripts/declaration-probe.mjs';
@@ -20,7 +22,12 @@ const tarballs = Object.fromEntries(
   ]),
 );
 function manifest() {
-  return { private: true, main: 'index.js', dependencies: { ...pinnedPeers, ...tarballs } };
+  return {
+    private: true,
+    type: 'module',
+    main: 'index.js',
+    dependencies: { ...pinnedPeers, ...tarballs },
+  };
 }
 function introspection() {
   return {
@@ -81,6 +88,8 @@ test('consumer rejects source aliases, unpinned peers and install hooks', () => 
   assert.throws(() => assertConsumerManifest(unpinned, tarballs), /Unreviewed peer/);
   const hook = { ...manifest(), scripts: { postinstall: 'unexpected command' } };
   assert.throws(() => assertConsumerManifest(hook, tarballs), /hooks/);
+  const commonjs = { ...manifest(), type: 'commonjs' };
+  assert.throws(() => assertConsumerManifest(commonjs, tarballs), /ESM consumer/);
 });
 
 test('installed SDK must stay inside isolated consumer with dist-only public entrypoints', () => {
@@ -89,13 +98,16 @@ test('installed SDK must stay inside isolated consumer with dist-only public ent
     const consumer = resolve(temp, 'consumer');
     const installed = resolve(consumer, 'node_modules/korea-map-native');
     mkdirSync(resolve(installed, 'dist'), { recursive: true });
-    for (const name of ['index.js', 'index.d.ts'])
-      writeFileSync(resolve(installed, 'dist', name), '');
+    writeFileSync(resolve(installed, 'dist/index.js'), '');
+    writeFileSync(
+      resolve(installed, 'dist/index.d.ts'),
+      '/// <reference types="geojson" preserve="true" />\n',
+    );
     const pkg = {
       name: 'korea-map-native',
       main: './dist/index.js',
       types: './dist/index.d.ts',
-      dependencies: { 'korea-map-core': '0.1.0' },
+      dependencies: { 'korea-map-core': '0.1.0', '@types/geojson': '7946.0.16' },
     };
     assertInstalledSdk(pkg, installed, consumer);
     const leaked = resolve(temp, 'external');
@@ -104,11 +116,26 @@ test('installed SDK must stay inside isolated consumer with dist-only public ent
     assert.throws(
       () =>
         assertInstalledSdk(
-          { ...pkg, dependencies: { 'korea-map-core': 'workspace:*' } },
+          { ...pkg, dependencies: { ...pkg.dependencies, 'korea-map-core': 'workspace:*' } },
           installed,
           consumer,
         ),
       /local dependency/,
+    );
+    assert.throws(
+      () =>
+        assertInstalledSdk(
+          { ...pkg, dependencies: { 'korea-map-core': '0.1.0' } },
+          installed,
+          consumer,
+        ),
+      /GeoJSON type dependency/,
+    );
+    writeFileSync(resolve(installed, 'dist/index.d.ts'), '');
+    assert.throws(() => assertInstalledSdk(pkg, installed, consumer), /GeoJSON reference/);
+    writeFileSync(
+      resolve(installed, 'dist/index.d.ts'),
+      '/// <reference types="geojson" preserve="true" />\n',
     );
     mkdirSync(resolve(installed, 'src'));
     assert.throws(() => assertInstalledSdk(pkg, installed, consumer), /source/);
@@ -152,6 +179,43 @@ test('Native release gate accepts a completed compiler and rejects actual compil
   assert.equal(summary.status, 'FAIL');
   assert(summary.diagnosticCodes.includes('TS2411'));
   assert.throws(() => assertConsumerDeclarations(summary), /Native dependency declarations/);
+});
+
+test('public SDK declarations use full library checks with React-only ambient types in both modes', () => {
+  for (const mode of ['Bundler', 'NodeNext']) {
+    const config = createNativePublicTypeConfig(mode);
+    assert.deepEqual(config.compilerOptions, {
+      strict: true,
+      skipLibCheck: false,
+      module: mode === 'NodeNext' ? 'NodeNext' : 'ESNext',
+      moduleResolution: mode,
+      target: 'ES2022',
+      jsx: 'react-jsx',
+      types: ['react'],
+      lib: ['ES2022'],
+      noEmit: true,
+    });
+    assert.deepEqual(config.files, ['public-sdk.tsx']);
+  }
+  assert.throws(() => createNativePublicTypeConfig('Classic'), /Unsupported/);
+});
+
+test('public SDK declaration gates require both completed probes and do not clear the RN app gate', () => {
+  const pass = summarizeDeclarationProbe({ status: 0, signal: null });
+  const fail = summarizeDeclarationProbe({
+    status: 2,
+    signal: null,
+    stdout: 'public-sdk.tsx(1,1): error TS2503: Cannot find namespace GeoJSON.',
+  });
+  const incomplete = summarizeDeclarationProbe({ status: null, signal: null });
+  const checks = { publicSdkBundlerDeclarations: pass, publicSdkNodeNextDeclarations: pass };
+  assertPublicSdkDeclarations(checks);
+  for (const key of Object.keys(checks)) {
+    for (const result of [fail, incomplete, undefined])
+      assert.throws(() => assertPublicSdkDeclarations({ ...checks, [key]: result }), /Native/);
+  }
+  // A successful SDK boundary cannot suppress errors in the application's RN declarations.
+  assert.throws(() => assertConsumerDeclarations(fail), /Native dependency declarations/);
 });
 
 test('Native release gate never accepts a killed or timed-out compiler as a declaration pass', () => {
