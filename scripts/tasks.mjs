@@ -61,6 +61,7 @@ else if (task === 'check') {
     'test:map-quality',
     'test:browser-policy',
     'test:native-consumer',
+    'test:native-android',
     'changeset:status',
   ])
     pnpm('run', step);

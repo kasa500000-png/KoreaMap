@@ -71,7 +71,9 @@
     "verify:map-quality": "node scripts/verify-map-quality.mjs",
     "verify:map-frames": "node scripts/verify-map-frames.mjs",
     "verify:browser-lifecycle": "node scripts/verify-browser-lifecycle.mjs",
-    "test:browser-policy": "node --test tests/browser-lifecycle.test.mjs"
+    "test:browser-policy": "node --test tests/browser-lifecycle.test.mjs",
+    "verify:native-android": "node scripts/verify-native-android.mjs",
+    "test:native-android": "node --test tests/native-android.test.mjs"
   },
   "devDependencies": {
     "typescript": "6.0.3",

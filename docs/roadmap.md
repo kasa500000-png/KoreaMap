@@ -158,3 +158,6 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 
 
 10단계 실행의04는 [실제 프레임 환경 기록](research/stage-04-rendering.md)을 보강한다. 1000마커 p95 33ms 수락은 계속 FAIL이며 임시 설정은 채택하지 않았다.
+
+
+10단계05 [독립 APK](research/stage-05-android-consumer.md)는 실제offline build와Hermes/ELF/rawZIP확인까지PASS_BUILD_ONLY다. KVM/연결기기부재로앱실행은NOT_RUN, 전체RN선언은여전히FAIL이다.
