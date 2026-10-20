@@ -1,58 +1,50 @@
 # Korea Map Kit 로드맵
 
-기준일: 2026-10-19. [정책](../AGENTS.md), [아키텍처](architecture.md), [요구사항](requirements.md), [진행 기록](progress.md)을 기준으로 진행한다. 초기 정책 문서의 단계 1을 이번 **M0 기술 설계**로 구체화했다. 아래 순서는 달력 일정이나 구현된 기능을 뜻하지 않는다.
+기준일: 2026-10-20 KST. [정책](../AGENTS.md), [아키텍처](architecture.md), [요구사항](requirements.md), [진행 기록](progress.md)을 기준으로 진행한다. 아래 M 단계는 최초 설계의 책임 구분이며 첨부 개발 로드맵 STEP 00~14와 일대일 번호가 아니다. 남은 실제 작업 순서와 완료 기준은 [실행 계획](execution-plan.md) A~G를 따른다.
 
 ## 기반과 현재 작업
 
-- 0단계 정책 설정: main 반영 완료, 커밋 `38c36f84f1e62f0419583faa5b593a2d6a71daf8`.
-- GitHub 기본 브랜치는 마지막 확인 시 `chore/project-policy`이며 설정 변경은 연동 권한으로 차단됐다. 후속 PR의 base는 명시적으로 `main`을 사용한다.
-- M0: 공식 기술 조사, 도구 가용성 점검, 공개 예제 UX 관찰, 설계/ADR/요구사항 작성. [설계 검증](research/design-validation.md)과 커밋 후 완료 판정. 제품 코드와 플랫폼 통합 빌드는 미착수다.
+- 최초 정책만 main에 반영됐고, 이후 구현은 단계별 브랜치와 stacked Draft PR에 있다. 릴리스 후보 시작점은 `76b379b9dd2abbb6393e90f789a78ac2fd352762`다.
+- 마지막 GitHub 확인 시 저장소는 Public, 기본 브랜치는 `chore/project-policy`, Draft PR은 14개이며 후보 브랜치는 로컬 상태다. 기본 브랜치 조회가 전체 SDK의 설치 진입점을 제공하지 않는다. main 통합·공개 업로드·기본 브랜치 정렬은 검증된 구체적 대상에 대한 승인 이후다.
+- 사용자가 승인한 남은 작업 구현은 `feat/korean-map-completion`에서 진행한다. Web/Android/iOS와 SDK 5종 목표를 유지하며 Web Alpha는 중간 검증 단계다.
 
 ## 단계와 완료 조건
 
-**P0 전체 MVP = M1 + M2 + M3 + M4.** M2 완료는 Web preview다. M1의 Native spike로 모바일 호환성 위험을 초기에 발견한다. 실제 상태는 progress에 기록하며 테스트 미통과를 완료로 바꾸지 않는다.
+**P0 전체 MVP = M1 + M2 + M3 + M4.** 현재 Web/공통 계약 및 선택형 서비스 구현이 존재하지만 모든 플랫폼·실지도·보안 검증을 통과한 것은 아니다. 아래 표는 `76b379b`까지의 증거와 새 구현 착수 상태를 구분한다. 새 실행 결과는 [진행 기록](progress.md)에 연결한다. 서울 archive·glyph 및 현재 Native/실자료 검증 상태는 [실행 계획](execution-plan.md)과 [타일 가이드](tiles.md)에 구분한다.
 
 | 단계 | 범위/우선순위 | 요구사항 | 완료 조건 | 상태 |
 | --- | --- | --- | --- | --- |
-| M0 | 기술 조사·설계 | 모든 요구사항의 설계 근거 | 링크·추적성·상호 일관성 검사 및 수동 리뷰, 문서 커밋 | 설계 검증 통과; 커밋은 진행 기록의 식별 명령 참조 |
-| M1 | 코어·버전 잠금·모바일 spike / P0 | R01 R02 R03 R12 Z01 Z02 Z03 Z07 Z08 Z09 Z12 | exact version/lockfile, core tests, Web 최소 지도, Expo Android/iOS 최소 지도 실제 실행, 장비·메모리 예산 확정 | 진행 중: 모노레포/로컬 Web/JS export 검증, Native 실빌드·화면/예산 미완료 |
-| M2 | Web SDK·React/Next 예제 / P0 | R04 R05 R06 R07 Z05 | 브라우저 카메라·피처·스타일·SSR/lifecycle 테스트; fixture 검색/경로를 실서비스로 표시하지 않음 | 미착수 |
-| M3 | 한국 타일·한글·자체 호스팅 / P0 | R08 R09 R10 R11 R17 Z06 | 시범 bbox 배치·schema·글리프·라이선스·서버 smoke·rollback, 키 없는 별도 환경 재현 | 미착수 |
-| M4 | 모바일 parity·성능·MVP 패키징 / P0 | R13 R14 R15 R16 Z04 Z10 Z11 | 모든 P0의 Android/iOS 수락 기준, 실화면/접근성·성능, dry-run package 소비 검증 | 미착수 |
-| M5 | 검색·길찾기 adapter / P1 | R18 R19 | 자체 Nominatim/OSRM의 정규화·품질·오류/취소·출처 계약, provider 없는 회귀 | 미착수 |
-| M6 | 한국 공공 레이어·저장·직접 archive / P1 | R20 R21 R22 | 데이터별 권리, PostGIS query plan, RLS 격리, Native PMTiles range/cache 검증 | 미착수 |
-| M7 | 고도화 / P2 | R23 R24 | 수요·품질 평가·운영 비용·신규 ADR 확보 후 기능별 개발 | 보류 |
+| M0 | 기술 조사·설계 | 모든 요구사항의 설계 근거 | 링크·추적성·상호 일관성 검사 및 수동 리뷰 | 설계/ADR 존재; 현재 구현과 문서 정합성 갱신 진행 |
+| M1 | 코어·버전 잠금·모바일 spike / P0 | R01 R02 R03 R12 Z01 Z02 Z03 Z07 Z08 Z09 Z12 | exact version/lockfile, 독립 core tests, Expo Android/iOS 최소 지도 실제 실행, 장비·메모리 예산 확정 | core/모노레포/JS export 및 이전 Android x86_64 APK·제한적 emulator 성공; iOS·실기기/예산 미완료 |
+| M2 | Web SDK·React/Next 예제 / P0 | R04 R05 R06 R07 Z05 | 브라우저 카메라·피처·스타일·SSR/lifecycle 테스트; fixture를 실서비스로 표시하지 않음 | 구현·Chromium 19개 QA와 실제 타일 9화면·경로 통합 2화면 통과; Firefox/WebKit·물리 모바일 잔여 |
+| M3 | 한국 타일·한글·자체 호스팅 / P0 | R08 R09 R10 R11 R17 Z06 | 시범 bbox/profile/schema·glyph·라이선스·XYZ smoke·실패 복구/rollback, 별도 환경 재현 | private Planetiler/MBTiles/XYZ 구현, 4지역 archive·BMP256 glyph·Chromium 실제 9화면·서울 activate/rollback 통과; 전국 디스크 차단, Native/다른 브라우저/전체 성능 미검증 |
+| M4 | 모바일 parity·성능·MVP 패키징 / P0 | R13 R14 R15 R16 Z04 Z10 Z11 | Android/iOS 공통 수락 기준·실화면/접근성·성능·독립 패키지 소비·비용 감사 | bridge/5종 pack/Web 소비 검증; 새 Native 격리 설치·앱 코드/plugin/JS export 부분 성공, 상위 RN 선언 실패·실기기/iOS/glyph/OS egress 미검증·high 2 차단 |
+| M5 | 검색·길찾기 adapter / P1 | R18 R19 | 자체 PostGIS POI·Valhalla 3모드의 정규화·품질·오류/취소·출처, provider 없는 회귀 | 구현·합성 DB/Valhalla 및 실제 한국 4경로→서울 지도 2화면·6오류 통과; 실제 POI/전국 주소·규모 품질 미완료 |
+| M6 | 한국 공공 레이어·저장·직접 archive / P1 | R20 R21 R22 | 데이터별 권리·실파일·PostGIS query plan·선택 저장 격리·Native PMTiles range/cache | A CSV 3개 profile·합성 ETL/실파일 재검증 도구 구현; 공식 접근 HTTP503으로 원본 미확보, Supabase·Native PMTiles 직접 접근 미검증 |
+| M7 | 고도화 / P2 | R23 R24 | 수요·품질 평가·운영 비용·기능별 근거 | offline/background 지속 GPS/고급 주소 검색·내비게이션 등 보류 |
 
-모든 단계에서 N01~N07을 적용한다. M5/M6는 MVP 이후 필요에 따라 개별 선택하며 선후 관계는 해당 데이터·엔진에 한정한다. 고도화 완료는 0.x preview 공개의 선행 조건이 아니다.
+모든 단계에서 N01~N07과 Zero Publisher Cost를 적용한다. 현재 한국 POI/Valhalla 확장이 존재해도 core나 기본 설치에 서비스가 필수가 되지 않는다. 고도화 완료는 0.x preview의 선행 조건이 아니지만 전체 플랫폼 목표의 필수 검증을 preview 표현으로 대체하지 않는다.
 
-## 작업 크기와 중단 조건
+## 실행 순서와 중단 조건
 
-1. M1: monorepo/core/시험 앱까지만 만든다. New Architecture/Expo 호환 실패 시 의존 조합을 재검토한다. iOS 환경 부재 시 미검증으로 남기고 독립 Web 작업만 가능하다.
-2. M2: 지도 표시 → 카메라/선택 → 스타일 교체 순으로 작은 PR을 만든다. 지오코더 UI·대시보드·인증을 같이 구현하지 않는다.
-3. M3: 한 지역 z0~14, layer 6개, light 스타일 1개부터 시작한다. 범위 확대는 크기/생성 시간/비용 측정 후 결정한다. 미확인 공공데이터는 제외하고 OSM 기반 MVP를 유지한다.
-4. M4: 공통 계약과 플랫폼 차이를 확인한다. Native 버전·PMTiles 지원을 추정으로 통과시키지 않는다. 성능 실패 시 마커·레이어·배치 크기부터 조정한다.
-5. M5: 검색 1개, driving 경로 1개 엔진만 reference로 운영한다. Photon/Pelias/Valhalla를 동시에 기본 설치하지 않는다.
-6. M6/M7: 독립 패키지/데이터 release로 추가한다. PostGIS·Supabase·오프라인이 core 필수 설치로 역류하지 않게 검사한다.
+1. A: 오래된 구현 전 문구·엔진 선택·schema·검증 범위를 정리한다. 과거 검증 로그는 당시 증거로 보존한다.
+2. B/C: 보안 의존성 해결과 서울 한 지역 실제 OSM→Planetiler→HTTP XYZ·한글을 병행한다. 지원되는 안전한 수정 경로가 없으면 high 차단을 유지한다.
+3. C 후 D/E/F: 울산·부산·제주/갱신·rollback, 실제 허가 POI 1종의 DB·검색·지도, 독립 Native 소비와 기기 QA를 진행한다. 실파일·환경이 없으면 해당 행은 미검증이다.
+4. G: stacked PR 로컬 통합 예행과 최종 5종 소비·라이선스·보안·비용·실화면 회귀 결과를 정확한 SHA에 연결한다. 실제 전국 생성/기기 성능을 명령 제공·mock으로 대신하지 않는다.
 
 ## 릴리스와 승인
 
-단계별 브랜치·PR에서 테스트 통과 후 커밋한다. 현재 브랜치는 `docs/technical-architecture`, PR base는 `main`이다. 이전 첫 작업의 main 승인은 이번 설계나 이후 단계의 병합을 승인하지 않는다.
+가능한 작업을 검토 가능한 로컬 브랜치·커밋으로 준비한다. 현재 저장소가 Public이므로 새 후보 push/공개 PR도 공개 업로드다. 사용자가 지정한 공개 전 승인 조건을 적용한다. 이전 최초 정책의 main 승인은 후속 구현/릴리스의 병합·발행 승인이 아니다.
 
-M4 후 0.x release candidate를 만들 수 있지만 main 병합·운영 배포·공개 저장소 전환·npm 실제 발행은 각각 명시적 사용자 승인 후 수행한다. 저장소는 이미 공개 상태다. 승인 전에는 release notes, `npm pack --dry-run`, 로컬 tarball 소비 검증과 검토 가능한 PR까지 준비한다. 선택한 태그와 artifact hash에 승인을 연결한다.
-
-## 미해결 사항
-
-- 실제 Expo/RN/Native 호환성 및 iOS 환경: M1.
-- 시범 bbox는 아키텍처의 서울 주변 제안값으로 시작한다. 원본 OSM snapshot, 실제 추출 manifest, 시험 장비 및 메모리 예산 고정: M1~M3.
-- 공공데이터 원본별 권리, 폰트 산출물 고지: 각각 M6, M3.
-- 배치 속도·트래픽·한국어 검색 품질: 실제 입력 확보 후 측정. 예상치를 실측으로 표기하지 않는다.
-- GitHub 기본 브랜치 설정: 제품 개발 차단은 아니며 PR base를 명시해 진행 가능.
+main 통합·기본 브랜치 정렬·공개 업로드·npm 발행·GitHub tag/Release·운영 배포는 각각 해당 구체적 결과의 명시적 승인 후 수행한다. 승인 전에 최종 tree·검증·tarball SHA/SRI·릴리스 노트와 외부 작업 절차를 준비한다. [릴리스 절차](releases/process.md)와 [후보 보고서](releases/v0.1.0.md)를 따른다.
 
 ## Zero Publisher Cost 적용
 
-[비용 감사](cost-audit.md)와 [ADR-009](decisions/009-zero-publisher-cost.md)를 M1~M7 전체에 적용한다. 기존 아키텍처 PR 위의 `docs/zero-publisher-cost` 브랜치에서 정책·정적 감사 도구를 추가한다. 제품 설치·실행 네트워크 감사가 완료되기 전에는 Zero Publisher Cost 런타임 합격이나 발행 가능으로 표시하지 않는다.
+[ADR-009](decisions/009-zero-publisher-cost.md)와 [비용 감사](cost-audit.md)는 M1~M7 전체에 적용한다. 실제 타일·원천파일·폰트는 ignored 운영자 저장소에만 두고 기본 데모는 합성 fixture를 유지한다. SDK 설치·import·기본 테스트가 제작자 계정/유료 endpoint를 사용하지 않는지 실제 관측한다. 정적 검사·Web 요청0은 Native OS 전체 네트워크나 계정 청구 상태의 증거가 아니다.
 
-M1은 명시적 provider/설정 누락 실패/유료 계정 없는 기본 테스트, M2는 클라이언트 노출, M3는 로컬 fixture 데모, M4는 실제 npm·Web·Native 배포물과 설치/실행/테스트 요청 감사를 검증한다. P1 서비스와 공공데이터 수집도 운영자가 설정한 계정·인프라만 사용한다. SDK 이용자 수에 따라 제작자 서비스 API 사용량이 늘어나는 기본 경로는 허용하지 않는다.
+## 이전 단계별 구현 기록
+
+아래 절은 각 구현 당시의 범위·브랜치·제한을 남긴 이력이다. 현재 상태는 위 표와 최신 진행/검증 기록으로 판단한다.
 
 ## 모노레포 foundation 후속
 
@@ -80,7 +72,7 @@ Web 로컬 합성 데이터와 설치된 Noto CJK를 검증한다. Native 라벨
 
 ## 공통 Public API
 
-`feat/shared-public-api`에서 M4의 공통 `MapController`, 지리·스타일·GeoJSON·오류·취소·Provider 계약과 Web/Native bridge를 구현했다. [계약·기능 동등성](public-api.md), [생성 API 문서](api/core.md), [검증 기록](research/public-api-validation.md)을 따른다. 이전 Web API를 보존하고 Changesets minor로 신규 계약·오류 code 확장을 관리한다.
+`feat/shared-public-api`에서 M4의 공통 `MapController`, 지리·스타일·GeoJSON·오류·취소·Provider 계약과 Web/Native bridge를 구현했다. [계약·기능 동등성](public-api.md), [생성 API 문서](api/core.md), [검증 기록](research/public-api-validation.md)을 따른다. 당시 Web API를 보존하고 minor Changeset으로 계약·오류 code 확장을 기록했다. 미발행 초기 Changeset들은 이후 0.1.0 baseline CHANGELOG로 통합됐으며 현재 버전을 자동으로 0.2.0으로 올리지 않는다.
 
 Web은 실제 스타일 교체·overlay 유지까지 검증한다. Native 카메라/마커/도형/경로/ref는 구현했지만 실제 기기와 native renderer 수명 검증은 M4 잔여 작업이다. 당시 Native 외부 스타일은 미지원이었다. 아래 Native 확장에서 명시적 운영자 리소스 입력 검사를 추가하며 실제 기기 요청 감사는 계속 출시 조건으로 남긴다. 검색/GPS/DB/실제 routing 엔진은 인터페이스 구현과 별개이며 M5/M6에서 선택적으로 연결한다.
 ## 공공 POI ETL / M6 일부 구현

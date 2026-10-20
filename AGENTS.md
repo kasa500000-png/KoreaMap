@@ -137,3 +137,10 @@
 - MapLibre RN·Expo·React Native 및 native engine 버전을 정확히 고정하고 공식 호환성·New Architecture·config plugin 결과를 기록한다. Expo Go, JS export 또는 prebuild를 Android/iOS Development Build·실화면 검증으로 표시하지 않는다.
 - Native provider는 명시적 operator config로만 받는다. 리소스 입력 origin 검사를 native redirect 방화벽으로 표현하지 않는다. PMTiles의 엔진 문서상 지원과 RN/OS 실제 실행 결과를 구분하며 일반 HTTP XYZ 대체 설정을 유지한다.
 - Native 변경은 `docs/research/native-sdk-validation.md`에 APK/IPA 컴파일, 실기기/에뮬레이터, 한글 glyph, 제스처·회전·복귀·권한·메모리·테마 결과와 미검증 항목을 기록한다. 생성 프로젝트·서명·APK·지도/font payload는 Git/npm에 포함하지 않는다.
+
+## 운영자 타일·Glyph 검증 기준
+
+- `services/tiles`는 private 운영 도구다. JDK/Planetiler·실제 OSM·폰트·선택형 Python 이미지 도구를 SDK 기본 설치·빌드·테스트의 필수 요구로 만들지 않는다. 다운로드/수집은 원장 권리·기한·원본 SHA·기준일·명시적 opt-in 뒤에만 수행한다.
+- 생성 archive·glyph·실지도 캡처는 ignored 운영자 저장소에만 둔다. SDK MIT, OSM ODbL, 폰트/OFL 의무를 분리하고 라이선스 고지를 함께 보존한다. 글리프 endpoint가 존재한다는 사실을 모든 문자 지원으로 표시하지 않는다.
+- TypeScript 타일 도구 변경은 `pnpm test:tiles`로 검사한다. profile/glyph 변경은 선택형 `pnpm test:tile-profile`/`pnpm test:tile-glyphs`와 실제 renderer 통합을 별도로 실행한다. 필요한 도구·원본·자원이 없으면 미검증으로 기록한다.
+- immutable 새 세대를 검증한 뒤 수동 활성화하고 기존 성공본을 보존한다. 실제 전환·손상 거부·rollback과 HTTP XYZ/glyph/출처를 확인한다. 로컬 loopback 검증을 공개 호스팅·전국 coverage·Native 실행·운영 SLA 검증으로 확대하지 않는다.

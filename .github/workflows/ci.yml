@@ -10,6 +10,21 @@ concurrency:
   group: foundation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - run: npm install --global pnpm@12.14.0 --ignore-scripts --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit:dependencies
   linux:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -40,6 +55,7 @@ jobs:
       - run: sudo apt-get install --no-install-recommends --yes fonts-noto-cjk
       - run: node scripts/check-font.mjs --font /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc --face 1
       - run: pnpm verify:packages
+      - run: pnpm verify:native-consumer
       - run: pnpm test:web
       - run: pnpm test:geo
       - run: pnpm test:routing

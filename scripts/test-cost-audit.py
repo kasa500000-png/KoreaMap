@@ -68,6 +68,28 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit()
         self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
 
+    def test_operator_download_exception_is_exact_and_private(self):
+        url = "https" + "://download.geofabrik.de/asia/south-korea-latest.osm.pbf"
+        self.write("services/tiles/src/pipeline.ts", 'const url = "' + url + '";\n')
+        process, _, _ = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        self.write("packages/core/src/remote.ts", 'const url = "' + url + '";\n')
+        _, _, rules = self.run_audit()
+        self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+        self.write("packages/core/src/remote.ts", '')
+        self.write("services/tiles/src/pipeline.ts", 'const url = "' + url + '?key=x";\n')
+        _, _, rules = self.run_audit()
+        self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+
+    def test_attribution_anchor_exception_cannot_enable_a_sdk_endpoint(self):
+        url = "https" + "://www.openstreetmap.org/copyright"
+        self.write("services/tiles/src/config.ts", '<a href="' + url + '">OSM</a>')
+        process, _, _ = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        self.write("packages/core/src/remote.ts", 'const url = "' + url + '";')
+        _, _, rules = self.run_audit()
+        self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+
     def test_synthetic_token_is_detected_without_printing_value(self):
         sentinel = "gh" + "p_" + "a" * 36
         self.write("src/config.ts", 'export const value = "' + sentinel + '";\n')

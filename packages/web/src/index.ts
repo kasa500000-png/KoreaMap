@@ -46,6 +46,8 @@ export interface CreateMapOptions {
   state?: MapState;
   signal?: AbortSignal;
   loadTimeoutMs?: number;
+  /** False verifies/uses the configured glyph PBFs for CJK instead of system ideographs. */
+  useLocalIdeographs?: boolean;
   images?: readonly { id: string; image: { width: number; height: number; data: Uint8Array } }[];
 }
 export interface MapHandle {
@@ -87,6 +89,8 @@ const selectedLayer = 'kmk-marker-selected';
 export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
   const origin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin;
   const config = validateWebConfig(options.config, origin);
+  if (options.useLocalIdeographs !== undefined && typeof options.useLocalIdeographs !== 'boolean')
+    throw new KitError('INVALID_ARGUMENT', 'INVALID_IDEOGRAPH_MODE');
   if (typeof window === 'undefined') throw new KitError('UNAVAILABLE', 'CLIENT_ONLY');
   if (!/^\/(?!\/)[^\\\s?#]+\.mjs$/.test(options.workerUrl))
     throw new KitError('INVALID_ARGUMENT', 'LOCAL_WORKER_REQUIRED');
@@ -124,6 +128,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     maxPitch: 60,
     maxZoom: 22,
     attributionControl: false,
+    ...(options.useLocalIdeographs === false ? { localIdeographFontFamily: false } : {}),
     transformRequest: (url) => ({ url: resourceUrl(config, url, origin) }),
   });
   activeWorker = options.workerUrl;

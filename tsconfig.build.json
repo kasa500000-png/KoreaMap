@@ -24,6 +24,9 @@
     },
     {
       "path": "services/routing"
+    },
+    {
+      "path": "services/tiles"
     }
   ]
 }

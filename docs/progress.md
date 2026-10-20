@@ -572,3 +572,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 ## 릴리스 후보 준비 — 2026-10-19
 
 영문/국문·커뮤니티·설치·운영 문서, 5개 비스코프 후보 패키지 이름, 초기 CHANGELOG와 승인 제한 발행 자동화를 로컬 후보로 준비했다. 기능/패키지/실화면 검증은 보고서의 실제 실행 범위에서 통과했으나 공개 발행은 차단 상태다. 상세 구현 파일, 테스트, 실화면, 보안/라이선스, 차단 사항과 다음 단계는 [후보 보고서](releases/v0.1.0.md)를 따른다. 현재 high 취약점과 Native/registry 미검증은 공개 차단으로 유지한다. 브랜치 `release/v0.1.0-preparation`; 커밋은 `git log -1 --format=%H release/v0.1.0-preparation`로 식별한다. 제작자 provider를 추가하지 않았고 공개 npm 메타데이터 조회/의존성 설치만 수행한다. 원격 공개 업로드·배포·npm 발행·GitHub Release는 승인 전 실행하지 않는다.
+
+
+## 남은 작업 실행 — 2026-10-20 KST
+
+1. **구현:** private Planetiler/MBTiles/XYZ 타일 도구, 4지역 실제 지도, offline OFL glyph, immutable 갱신·검증·rollback, 명시적 opt-in Web 연결을 구현했다. 실제 Valhalla→서울 지도 통합, 독립 Native tarball 소비와 실공공 원본 검증 도구, CI 전체 보안 감사·발행 입력/경로 보호도 추가했다. [실행 보고](research/completion-validation.md)를 따른다.
+2. **파일:** `services/tiles` 전체, `examples/web/app/tiles`, Web 선택형 glyph 옵션, 실제 타일/경로/POI/Native 소비 verifier, 관련 단위/E2E, CI/발행/보안·출처 도구, runtime 15개 개별 검토 SHA, README/CHANGELOG/요구사항·ADR·가이드/검증 기록. 새 외부 payload 허용은 없다.
+3. **검사:** `pnpm check`(Vitest101/core1/data20/cost19/tiles17/release6/verifier9 포함), Next production·Expo 양 OS JS export, PostGIS19·Valhalla8·한국 실제 라우팅5, Web19, 실제타일9화면, profile40+실제19tiles/87features, glyph10+decoder256, 5개 pack/재현·격리 Web 소비, Native 지원 모드 소비 및 offline13manifest/29link를 실행했다. 최종 결과는 보고서와 commit의 검사 범위를 따른다. 전체 audit high2/exit1 및 Native 전체 상위 선언 3건 실패는 별도 차단이며 check 성공으로 덮지 않는다.
+4. **실화면:** Chromium 서울4테마·390/768/1440px 및 울산/부산/제주 실제 지도 9화면, 실제 도로 경로+마커1440/390px 통과. 한글 PBF·출처·연결 해제 정리, 외부 예상 밖 요청/HTTP 오류0 확인. screenshot은 ignored이고 일부를 직접 열어 확인했다. 현재 워크스페이스 Android x86_64 debug APK도 offline37.86초 빌드 통과했으며 독립tarballAPK/JS내장·설치/기기 실행 통과가 아니다. 새 Android/iOS 기기·Firefox/WebKit·장시간/센서 QA는 미검증이다.
+5. **라이선스/보안:** 자체 코드 MIT, OSM ODbL·Noto/OFL 분리. 공식 unpatched high2 유지, 강제 override/감사 제외 없음. 원본·JAR·font/glyph·실지도 캡처는 Git/npm에 넣지 않았다. 정확한 private operator 다운로드 URL만 좁게 검토해 비용 감사에 등록했다. 계정 결제/OS egress 전체 보장은 아니다.
+6. **잔여:** 보안 수정 그래프, 실제 공공 CSV HTTP503 해결 후 ETL/DB/검색/지도, Android ARM64·macOS/iOS Development Build/기기·XYZ/glyph/PMTiles·GPS/권한·메모리/OS egress·binary notice, Web NodeNext와 RN 상위 선언, 전국 자원 확보(현 여유4.7GiB<8GiB)·장기 운영 검증. 원격 main/default에는 아직 SDK가 없으며 이번 커밋의 원격CI/통합과 npm 권한·발행·registry 설치는 별도 남았다.
+7. **Git:** `feat/korean-map-completion`, 기반 `76b379b9dd2abbb6393e90f789a78ac2fd352762`. 구현 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: add verified operator tiles and completion gates$'`. 기능/패키지 검증 후 로컬 커밋하며 원격 push/PR·main merge·배포·발행·Release는 하지 않는다. [커넥터 통합 예행](research/integration-rehearsal.md)은 14개 기존 PR 및 기준 tree 범위이고 새 커밋 원격 CI 성공을 의미하지 않는다.
+8. **다음:** 차단과 추가 플랫폼·실원본 검증은 진행 가능하다. 공개 발행 판정은 **BLOCKED**이며 전체 계획 완료로 처리하지 않는다. 별도 외부 작업 승인은 정확한 검증 커밋과 남은 게이트를 검토한 뒤 적용한다.

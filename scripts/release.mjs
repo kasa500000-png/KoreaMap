@@ -20,14 +20,23 @@ export function artifactRecord(name, version, bytes) {
   };
 }
 export function verifyRecord(record, bytes) {
-  assert.equal(record.name, `korea-map-${record.name.slice('korea-map-'.length)}`);
+  artifactPath(record);
   assert.deepEqual(
     record,
     artifactRecord(record.name.slice('korea-map-'.length), record.version, bytes),
     'Artifact integrity mismatch',
   );
 }
+export function artifactPath(record, directory = resolve('artifacts')) {
+  assert.equal(typeof record?.name, 'string', 'Artifact name required');
+  const name = record.name.slice('korea-map-'.length);
+  assert(packageNames.includes(name) && record.name === `korea-map-${name}`, 'Unknown package');
+  assert.equal(record.version, '0.1.0', 'Review release baseline before changing version');
+  assert.equal(record.file, `korea-map-${name}-${record.version}.tgz`, 'Invalid artifact path');
+  return resolve(directory, record.file);
+}
 export function verifyApproval(manifest, { head, dirty, approved }) {
+  assert.match(head, /^[a-f0-9]{40}$/, 'Full source commit required');
   assert.equal(manifest.schemaVersion, 1);
   assert.equal(manifest.version, '0.1.0');
   assert.equal(manifest.sourceCommit, head, 'Source commit changed');
@@ -77,7 +86,7 @@ function run(mode) {
     const manifest = JSON.parse(readFileSync(resolve(target, 'integrity.json'), 'utf8'));
     verifyApproval(manifest, { head, dirty, approved: process.env.KMK_APPROVED_COMMIT });
     for (const record of manifest.packages)
-      verifyRecord(record, readFileSync(resolve('artifacts', record.file)));
+      verifyRecord(record, readFileSync(artifactPath(record)));
     console.log(
       'Approved commit binding and artifact integrity verified; external security/platform/ownership gates remain mandatory.',
     );

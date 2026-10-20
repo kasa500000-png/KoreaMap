@@ -47,5 +47,7 @@ it is not a required SDK dependency. Consent and foreground permission are requi
 stops collection; returning does not automatically restart it. No default transmission/storage.
 
 Full setup, source schema, Korean glyphs, PMTiles fallback and validation limitations:
-[Native guide](https://github.com/kasa500000-png/KoreaMap/blob/feat/native-sdk/docs/native-sdk.md).
+[Repository documentation](https://github.com/kasa500000-png/KoreaMap/tree/HEAD/docs),
+including `native-sdk.md` and `research/native-consumer-validation.md`, follows the integrated
+default branch. Before integration, use those paths in the reviewed candidate source checkout.
 Third-party fonts/data keep their own licenses and are not included in this package.

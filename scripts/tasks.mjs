@@ -55,6 +55,10 @@ else if (task === 'check') {
     'audit:cost',
     'test:audit',
     'test:release',
+    'test:tiles',
+    'test:real-poi',
+    'test:real-tiles',
+    'test:native-consumer',
     'changeset:status',
   ])
     pnpm('run', step);
@@ -64,7 +68,7 @@ else if (task === 'check') {
 } else if (task === 'clean') {
   for (const path of [
     ...sdkNames.map((name) => `packages/${name}/dist`),
-    ...['geo-data', 'search', 'routing'].map((name) => `services/${name}/dist`),
+    ...['geo-data', 'search', 'routing', 'tiles'].map((name) => `services/${name}/dist`),
     'examples/web/.next',
     'examples/web/out',
     'examples/web/tsconfig.tsbuildinfo',

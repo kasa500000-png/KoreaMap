@@ -1,5 +1,7 @@
 # Korea Map Kit 품질 감사 — 2026-10-19
 
+2026-10-20 실제 한국 타일·Glyph·롤백·Web 19개·독립 Native의 후속 결과는 [구현 보고](research/completion-validation.md)를 따른다. 이 문서의 이전 합성/단회 관찰 수치는 과거 증거로 보존한다. 새 Native 상위 선언 오류는 TYPE-03(P2), 실공공 원본 접근 실패와 전국 자원 차단은 미완료이며 high2 출시 차단은 유지한다.
+
 **판정: 수정한 Web/패키지 검증은 통과. 전체 플랫폼 QA와 공개 출시는 미완료·차단.**
 기준은 `feat/scenario-apps`의 `0d3a8d20bf490b841ca86e9e7854275862977edf`, 감사 브랜치는 `feat/quality-audit`다.
 검사하지 않은 항목과 실패 항목을 통과로 계산하지 않는다. npm 발행·main 병합·운영 배포는 수행하지 않았다.

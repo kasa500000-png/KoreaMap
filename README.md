@@ -1,6 +1,6 @@
 # Korea Map Kit
 
-[한국어](README.ko.md) · [Quick start](docs/quickstart.md) · [API](docs/public-api.md) · [Release status](docs/releases/v0.1.0.md)
+[한국어](README.ko.md) · [Quick start](docs/quickstart.md) · [API](docs/public-api.md) · [Implementation plan](docs/execution-plan.md) · [Release status](docs/releases/v0.1.0.md)
 
 An MIT TypeScript map SDK built on MapLibre, with shared Web and React Native APIs and Korean label support. Coordinates always use `[longitude, latitude]` in WGS84.
 
@@ -36,7 +36,7 @@ The candidate is not on npm. Follow [local tarball installation](docs/quickstart
 
 - [Next.js, styles, markers and routes](docs/web-guide.md)
 - [Expo Development Build](docs/native-sdk.md) — Expo Go is not supported evidence
-- [Public data and self-hosted tiles](docs/providers.md)
+- [Public data providers](docs/providers.md) and [local Korean tile generation / XYZ](docs/tiles.md)
 - [Search](docs/search.md), [GPS and tracks](docs/gps-tracks.md), [self-hosted routing](docs/routing.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Data licenses](DATA_LICENSES.md), [attribution](docs/attribution.md), [third-party notices](THIRD_PARTY_NOTICES.md)
@@ -58,4 +58,4 @@ pnpm test:web
 pnpm release:prepare
 ```
 
-Standard Linux/Windows/macOS CI is configured. Android physical devices, iOS, native PMTiles and native Korean glyph rendering remain unverified. Two high-severity development dependency advisories remain release blockers; see [candidate report](docs/releases/v0.1.0.md). No registry publication, tag, GitHub Release, deployment or visibility change is authorized by these commands.
+All five SDK packages and Web/Android/iOS remain the final target; Web Alpha is an intermediate gate. Actual OSM tiles for Seoul/Ulsan/Busan/Jeju, Korean glyphs, nine Chromium views, generation rollback and four real Valhalla routes rendered on the Seoul map passed their scoped checks; see the [tile guide](docs/tiles.md). Real public POI ingestion is blocked by unavailable source files. Isolated Native installation/plugin/JS exports passed, while full upstream React Native declaration checks failed, leaving Native consumer QA at `PARTIAL_PASS`. Standard Linux/Windows/macOS CI is configured. Android physical devices, iOS, native PMTiles and native Korean glyph rendering remain unverified. Two high-severity development dependency advisories remain release blockers; see [candidate report](docs/releases/v0.1.0.md). No registry publication, tag, GitHub Release, deployment or visibility change is authorized by these commands.

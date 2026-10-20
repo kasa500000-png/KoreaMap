@@ -339,3 +339,19 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 ## v0.1.0 릴리스 비용 경로 — 2026-10-19
 
 영문/국문·커뮤니티·설치·운영 문서, 5개 비스코프 후보 패키지 이름, 초기 CHANGELOG와 승인 제한 발행 자동화를 로컬 후보로 준비했다. 기능/패키지/실화면 검증은 보고서의 실제 실행 범위에서 통과했으나 공개 발행은 차단 상태다. 상세 구현 파일, 테스트, 실화면, 보안/라이선스, 차단 사항과 다음 단계는 [후보 보고서](releases/v0.1.0.md)를 따른다. 현재 high 취약점과 Native/registry 미검증은 공개 차단으로 유지한다. 브랜치 `release/v0.1.0-preparation`; 커밋은 `git log -1 --format=%H release/v0.1.0-preparation`로 식별한다. 제작자 provider를 추가하지 않았고 공개 npm 메타데이터 조회/의존성 설치만 수행한다. 원격 공개 업로드·배포·npm 발행·GitHub Release는 승인 전 실행하지 않는다.
+
+
+## 남은 작업 구현 감사 — 2026-10-20 KST
+
+대상 `feat/korean-map-completion`, 기반 `76b379b9dd2abbb6393e90f789a78ac2fd352762`. [실행 보고](research/completion-validation.md)·[실제 타일](research/real-tiles-validation.md)·[독립 Native](research/native-consumer-validation.md)에 실행 범위와 한계를 기록한다. 전체 공개 판정은 high2/Native·실자료 등의 게이트로 차단 유지다.
+
+- 기본 SDK/합성 예제는 제작자 endpoint·계정·유료 키를 추가하지 않았다. `/tiles/`는 빈 URL·미동의 상태에 provider 요청0이며 Connect 뒤 운영자가 지정한 origin만 사용한다. 브라우저 설정/URL은 공개 값으로 안내한다. Next static QA 서버의 추가 connect-src는 명시적인 exact loopback `--tile-origin` 옵션에만 적용되고 기본 CSP는 그대로다.
+- 새 private 타일 CLI만 공식 pinned Planetiler JAR 및 검토한 Geofabrik PBF URL을 가진다. import/SDK install/build/test는 다운로드하지 않는다. operator opt-in, SHA/크기/시간/권리/기준일 검사, source redirect 거부 및 tool의 제한된 공식 redirect, 실패 시 partial 제거·기존 성공본 보존을 테스트했다. 감사의 URL 예외도 exact source path+literal URL 2종 및 해당 mock 회귀로 한정했다. 같은 URL을 SDK에 넣거나 query/경로를 바꾸면 차단하는 회귀를 추가했다.
+- 이번 실제 생성은 기존 권리/해시 검증 한국 PBF를 재사용했다. JAR/선택형 도구 설치는 공개 GitHub/PyPI, 의존성 설치·공식 보안 metadata 조회는 공개 registry였다. 유료 지도/API 계정은 사용하지 않았다. 폰트는 로컬 검토본이며 자동 다운로드가 없다. 실제 PBF·OSM MBTiles·OFL glyph/폰트·실지도 screenshot·원본 파일·기기/개인 위치는 새 Git/npm에 포함하지 않았다.
+- 실제4지역 Web QA: style12/tile66/glyph353 HTTP200, 미확인 외부 origin·HTTP 오류·pageerror·console error·타일 서버 오류0. 별도 실제 Valhalla→서울 지도2폭 QA: style1/tile20/glyph52, 외부/HTTP/페이지/SDK 오류0. 로컬 서비스 요청은 운영자가 실행한 loopback만이다. 브라우저 기록은 OS 전체 egress 증명이 아니며 Native 실제 OS 요청은 미검증이다.
+- 기본 Chromium E2E19개와 격리 Web tarball 소비는 외부 browser 요청0, 새 offline설치는 준비된 store에서13manifest/29link·다운로드0·hook0을 확인했다. Native 실제 core/native/styles tarball 소비도 offline+ignore-scripts·앱 타입/plugin/JS export를 통과했으나 전체 상위 선언 실패3건으로 PARTIAL_PASS다. APK/IPA·Native glyph/PMTiles·OS egress·계정 청구 설정은 통과로 표시하지 않는다.
+- `pnpm audit:dependencies` 실제 exit1, high2/critical0. 공식 patch 없음과 최신 호환 상위 그래프의 동일 취약 경로를 기록했다. CI는 별도 표준 Linux audit job을 실행하고 ignore/continue-on-error가 없다. Linux 기능/발행 workflow에 독립 Native 소비도 추가했다. 발행은 manual main ref·정확한 승인 SHA·main ancestry·보호 환경·전체 audit/Web/pack 게이트 뒤에만 가능하며 현재 비활성이다.
+- Actions는 기존 무료 표준 runner 종류만 유지했다. 새로운 paid runner/cloud/EAS/배포·정기수집·cache/artifact 업로드·공개 proxy·공유 키·원격 쓰기를 활성화하지 않았다. 계정 무료 한도/결제 제한·branch protection required-check·보호 환경 실제 설정은 미검증이다.
+- 작업 트리/index/도달 가능한 로컬 Git 이력과5개 실제 tarball에 정적 검사, data publication 검사, cost 회귀19개를 실행한다. 발견0은 heuristic 범위다. 최종 staged 검사와 commit binding은 구현 보고 및 최종 커밋 결과를 따른다. 루프백 테스트를 제작자 유료 endpoint 무요청의 모든 OS/모든 실행에 대한 보증으로 확대하지 않는다.
+
+추가 점검: 실제 OSM 스타일의 클릭 가능한 공식 copyright/ODbL 고지를 제공했다. 이 exact 표시 링크는 private config 한 경로에만 정적 검토했으며 자동 fetch가 아니다. 현재 워크스페이스 Android debug APK의 offline compile도 성공했으나 JS 내장·독립tarballAPK/기기/OS egress 검증을 대신하지 않는다. 모바일 경로 QA의 resize 경쟁 조건을 수정하고 전체 경로 bounds와 실제 waypoint3개를 재검증했다.

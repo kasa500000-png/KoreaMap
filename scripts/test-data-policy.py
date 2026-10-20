@@ -135,6 +135,14 @@ class DataPolicyTest(unittest.TestCase):
         inv['runtimeSources'] = {p:dict(sha256=hashlib.sha256(b).hexdigest(), origin='project-authored', license='MIT') for p,b in files.items()}
         check_inventory(files, inv)
 
+    def test_tile_profile_code_requires_review_and_does_not_allow_payload(self):
+        files = {'services/tiles/profile/KoreaProfile.java': b'public class KoreaProfile {}\n'}
+        inv = {'schemaVersion':1, 'reviewedAt':'2026-10-20', 'thirdPartyPayloads':[], 'runtimeSources':{}}
+        with self.assertRaises(ValueError): check_inventory(files, inv)
+        inv['runtimeSources'] = {p:dict(sha256=hashlib.sha256(b).hexdigest(), origin='project-authored', license='MIT') for p,b in files.items()}
+        check_inventory(files, inv)
+        with self.assertRaises(ValueError): check_file('services/tiles/profile/raw.pbf', b'payload')
+
     def test_tarball_manifest_cannot_smuggle_extra_fields(self):
         manifest = {'name': 'korea-map-core', 'license': 'MIT',
                     'files': ['dist/**/*.js', 'dist/**/*.d.ts', 'dist/LICENSE', 'README.md']}

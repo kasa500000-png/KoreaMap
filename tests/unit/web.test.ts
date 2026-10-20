@@ -7,6 +7,24 @@ import {
 } from '../../packages/web/src/provider.js';
 import { validateGeoJSON } from '../../packages/web/src/geojson.js';
 const fixture = { mode: 'local-fixture', fixtureId: 'synthetic-v1' } as const;
+it('validates the explicit system versus operator glyph choice before loading the renderer', async () => {
+  await expect(
+    createMap({
+      container: {} as HTMLElement,
+      workerUrl: '/worker.mjs',
+      config: fixture,
+      useLocalIdeographs: 'false' as never,
+    }),
+  ).rejects.toThrow('INVALID_IDEOGRAPH_MODE');
+  await expect(
+    createMap({
+      container: {} as HTMLElement,
+      workerUrl: '/worker.mjs',
+      config: fixture,
+      useLocalIdeographs: false,
+    }),
+  ).rejects.toThrow('CLIENT_ONLY');
+});
 it('imports safely without DOM and fails missing config before construction', async () => {
   await expect(
     createMap({

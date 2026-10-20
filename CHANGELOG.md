@@ -71,6 +71,18 @@ Native resolves upstream declarations with Bundler mode and validates inline sty
 
 Add shared camera/marker/geometry contracts and a lifecycle-managed MapLibre web SDK with explicit operator configuration, batched markers, accessible place selection, overlays and client-only Next.js example. Replace the preview raw `map` escape hatch with controlled methods and `on`; use `createMapState` instead of the old `center` option.
 
+### Local completion work — 2026-10-20
+
+Add a private, explicit operator tile pipeline with a pinned Planetiler profile, verified OSM
+input, immutable MBTiles generations, manual activation/rollback, read-only loopback XYZ service
+and offline licensed glyph builder. Add the opt-in `/tiles/` Web example and the optional Web
+`useLocalIdeographs: false` setting for configured CJK glyph PBFs. Defaults and the 0.1.0 unpublished
+baseline remain unchanged; real map/font payloads are excluded from SDK packages and Git.
+
+Add independent Native tarball consumption and real-POI verification tools, enforce dependency
+audit in CI and bind release inputs to an approved main-integrated commit. See the
+[execution report](docs/research/completion-validation.md) for exact passes and external blockers.
+
 ### Release preparation
 
 English/Korean entry docs, community policies, source/asset license separation, package metadata, guarded manual publication preparation, tarball integrity manifest and release notes. Known high-severity advisories, strict Web NodeNext incompatibility, native device/iOS gaps, registry permissions and final publication validation remain open. See [release report](docs/releases/v0.1.0.md).

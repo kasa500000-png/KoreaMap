@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-10-19",
+  "reviewedAt": "2026-10-20",
   "thirdPartyPayloads": [],
   "runtimeSources": {
     "examples/expo/App.tsx": {
@@ -194,7 +194,7 @@
       "license": "MIT"
     },
     "packages/web/src/index.ts": {
-      "sha256": "a4a7f04d7781dd809b7bddcbc932d1acd3a42a3838d876f3d91ec0ce0eb1a3bc",
+      "sha256": "fdb76b0a2fbed7bb7c2ac0c5e6cae6f974a32b78eb64201a34f21a1c49b6767c",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -420,6 +420,76 @@
     },
     "packages/core/src/coordinate-bounds.ts": {
       "sha256": "53fb6880cebd2d536ed32411c39a26b9a6acb5f8b680a9b36b723d668d6c3b0b",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/config.ts": {
+      "sha256": "95fba14ea4ff9e4f3931cdd7996519c6ae9ebf475536c79aac7cabeb6b9beb30",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/archive.ts": {
+      "sha256": "9fae1c20aa7a5038ccc5a8c8bbdd22c5788aa5e19ec76051676fd6d15ff94def",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/pipeline.ts": {
+      "sha256": "b54adff52f268e955811ed75be6d4ce6e4186b46290496d43d862dec99370b36",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/server.ts": {
+      "sha256": "9a79221f8538403a223a2eb69eaee5c0c1140c6128a9ecad4f244d7a8dc45eb9",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/cli.ts": {
+      "sha256": "f729c5d9b8f7368883598562e0cf4c21b3498a0a23d904433dfed88c4958325f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaProfile.java": {
+      "sha256": "24190372657bc087029899a0b3963619d064b9b51e230843ac80aa420668276f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaProfileTest.java": {
+      "sha256": "8a3678049243b1bdb374b608178a3ee86516e12d9f362918d6c23fbe2bd33b56",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaArchiveTest.java": {
+      "sha256": "184f34ef658b2d03fba144b97efd009ce8419715e85f170cc7707c05d9cace30",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/fixture.mjs": {
+      "sha256": "3998e52d5af36bb4ad6fc6a4bc39f1a05c3c49b4c9aa7cac11a827092c1e3f4c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/verify-profile.mjs": {
+      "sha256": "a6567e80facf792893422058e3a54e1d3512d1b4254086bc5c1da65410363802",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/glyphs.py": {
+      "sha256": "02a102ad4f92db26d4a4236fa55ca95a95807d19667995ee7223793c8fd9d346",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/tiles/page.tsx": {
+      "sha256": "1de578c8a587bf47c78b33109d24159b34a75c31bc57888a8f3b584b8f64182d",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/tiles/tiles-client.tsx": {
+      "sha256": "4a874a4556fa643f635984e0f0bdab7373e96f03bc0a27f59e24c345ccd0995f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/tiles/tiles-demo.tsx": {
+      "sha256": "4b0b4f8757c6cecd87b47ab46b8e70e40b6ec991c60d0590997586d07e1ac31b",
       "origin": "project-authored",
       "license": "MIT"
     }

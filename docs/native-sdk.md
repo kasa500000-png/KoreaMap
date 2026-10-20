@@ -1,6 +1,6 @@
 # React Native SDK 설치·운영
 
-확인일: 2026-10-19. Expo **Development Build** 전용이다. Expo Go는 MapLibre 네이티브 모듈을 포함하지 않는다.
+설치 조합 확인일: 2026-10-19; 상태 정리: 2026-10-20 KST. Expo **Development Build** 전용이다. Expo Go는 MapLibre 네이티브 모듈을 포함하지 않는다.
 
 ## 고정 호환성
 
@@ -110,7 +110,8 @@ const source = createNativeVectorSource({
 const document = createThemeStyle({
   theme: 'outdoor', target: 'native',
   data: { mode: 'operator', source, attribution: '운영자 데이터 라이선스·출처',
-    sourceLayers: { road: 'roads', place: 'places', park: 'parks' } },
+    sourceLayers: { land: 'land', park: 'park', water: 'water', building: 'building',
+      boundary: 'boundary', road: 'road', trail: 'trail', place: 'place', poi: 'poi' } },
   typography: { mode: 'glyphs', fontStack: ['Noto Sans CJK KR'],
     url: `${origin}/fonts/{fontstack}/{range}.pbf` },
 });
@@ -119,7 +120,7 @@ const config = { mode: 'operator' as const,
   resources: { allowedOrigins: [origin] } };
 ```
 
-source-layer 이름과 `kind` 필드는 [디자인 시스템](design-system.md)의 스키마에 맞게 공급한다.
+위 source-layer 이름은 문서용 대응 예시이며 운영자 산출물의 실제 이름으로 모두 교체해야 한다. 9개 kind의 대응을 빠뜨리면 스타일 검증이 실패한다. `kind`/`class`/이름 필드는 [디자인 시스템](design-system.md)의 schema에 맞게 공급한다.
 라벨은 `name:ko` → `name` → `name:en` 순서다. Native에는 Web 로컬 폰트 fallback이 없다.
 한글 fontStack·glyph URL이 필요하다. `auditGlyphCoverage`로 실제 사용 문자 집합을 검사한 뒤
 각 기기에서 누락 글리프·줄바꿈·충돌을 확인한다. 예제 기본 테마는 glyph 요청이 없는 도형 모드이며,
@@ -157,3 +158,9 @@ XYZ fallback, 각 OS의 pan/zoom/테마 전환·재시작과 네트워크 기록
 동의/foreground 권한 이후만 수집하며 백그라운드에서는 중단하고 자동 재개하지 않는다.
 기본 외부 전송·저장은 없다. 정확도·경로·삭제·내보내기는 [GPS 가이드](gps-tracks.md)를 따른다.
 [검증 기록과 남은 기기 QA](research/native-sdk-validation.md)를 확인한 뒤 배포한다.
+
+## 현재 후보의 독립 소비·기기 게이트
+
+기존 APK/에뮬레이터 성공은 당시 커밋의 제한적 합성 화면 결과다. 이름을 변경한 현재 RC의 실제 XYZ·한글 glyph, Android ARM64 실기기와 iOS Development Build는 새 검증으로 남아 있다. [실행 계획](execution-plan.md) F의 공통 시나리오를 적용하고 새 결과는 해당 검증 기록에 연결한다. Expo JS export·prebuild·RN Text의 한글 표시는 네이티브 지도/폰트 수락 결과가 아니다. PMTiles는 공통 HTTP XYZ 통과 이후의 선택 실험이다.
+
+현재 새 독립 소비 도구는 실제 tarball의 offline 설치·strict 앱/API 검사(`skipLibCheck:true`)·Expo plugin·Android/iOS JS export를 통과했다. 상위 선언 전체(`skipLibCheck:false`)는 React Native 0.88.0의 TS2411/TS2344/TS2416으로 실패해 `PARTIAL_PASS`다. 이를 전체 strict·APK/IPA·실화면 성공으로 표시하지 않는다. 재현 명령과 정확한 범위는 [독립 Native 소비 검증](research/native-consumer-validation.md)을 따른다.

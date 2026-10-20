@@ -1,6 +1,6 @@
 # Korea Map Kit 요구사항
 
-기준일: 2026-10-19. [아키텍처](architecture.md)와 [로드맵](roadmap.md)의 검증 가능한 요구사항이다. **현재 기능 구현은 없다.** P0는 전체 MVP 필수, P1은 MVP 이후 선택 확장, P2는 수요·측정 근거가 생긴 뒤 결정한다. 전체 MVP는 M1~M4가 모두 통과해야 한다.
+기준일: 2026-10-20 KST. [아키텍처](architecture.md)와 [로드맵](roadmap.md)의 검증 가능한 요구사항이다. Web/공통 API·Native bridge·선택형 PostGIS/Valhalla는 구현되어 있다. 실제 한국 4지역 타일과 Chromium 지도/경로 표본은 통과했으며 원본 POI·다른 브라우저·전체 플랫폼 게이트는 [실행 계획](execution-plan.md)에서 보완한다. P0는 전체 MVP 필수, P1은 선택 확장, P2는 수요·측정 근거가 생긴 뒤 결정한다. 전체 MVP는 M1~M4의 필수 수락 기준이 모두 통과해야 한다.
 
 ## 사용자와 사용 시나리오
 
@@ -22,9 +22,9 @@
 | R05 | P0 | M2 | 카메라 move/fit, 논리 padding, gesture/api origin, 취소, 마지막 명령 우선, changed/idle을 검증한다. | ADR-002 |
 | R06 | P0 | M2 | GeoJSON 점/선/면, 1,000점 GPU layer, 안정 ID 선택·해제 및 마커 상세 접근이 작동한다. 대량 DOM marker를 기본으로 쓰지 않는다. | ADR-007 |
 | R07 | P0 | M2 | style URL/JSON 교체, 기본 스타일 색 변경, 지원 안 되는 expression/schema 오류, 교체 후 overlay 복구를 검증한다. | ADR-004 |
-| R08 | P0 | M3 | 한국 시범 지역 OSM PBF → Planetiler → MVT/PMTiles 배치를 고정 manifest로 재현한다. layer schema·경계·누락·타일 예산을 검사한다. | ADR-003 |
+| R08 | P0 | M3 | 한국 시범 지역 OSM PBF → Planetiler → MVT archive(PMTiles 또는 MBTiles) 배치를 고정 manifest로 재현한다. layer schema·경계·누락·타일 예산을 검사한다. | ADR-003 |
 | R09 | P0 | M3 | Noto 계열 허가된 폰트로 한글/자모/영문/숫자 glyph와 sprite 1x/2x를 자체 제공하고 tofu·깨진 URL이 없는지 확인한다. | ADR-004 |
-| R10 | P0 | M3 | core DB·유료 API key 없이 정적 서버+Martin으로 Web/모바일 공통 XYZ를 제공한다. 별도 PC에서 문서만으로 설치한다. | ADR-003 |
+| R10 | P0 | M3 | core DB·유료 API key 없이 정적 assets와 경량 archive 서버로 Web/모바일 공통 HTTP XYZ를 제공한다. Martin은 대체 가능한 호스팅 선택이다. 별도 PC에서 문서만으로 설치한다. | ADR-003 |
 | R11 | P0 | M3 | OSM/폰트/스타일/데이터별 license manifest를 검토하고 출처 UI가 작은 화면·패널에 가려지지 않는지 확인한다. | ADR-006 |
 | R12 | P0 | M1 | SearchProvider/RoutingProvider의 결과·취소·timeout·오류·capability 계약을 정의하고 합성 fixture로 검증한다. provider 없이 지도 사용 가능. | ADR-005 |
 | R13 | P0 | M4 | Android/iOS에서 카메라·피처·스타일·한글·출처·lifecycle 공통 수락 시나리오를 실제 실행한다. | ADR-001 |
@@ -32,17 +32,17 @@
 | R15 | P0 | M4 | 문서의 성능 예산을 고정 fixture/장비로 측정한다. Web preview 수치를 Native 측정값으로 대신하지 않는다. | ADR-008 |
 | R16 | P0 | M4 | 패키지 소비·exports·타입·라이선스·비밀정보·npm pack 검사를 통과한다. 실제 발행·main 병합은 별도 승인이다. | ADR-008 |
 | R17 | P0 | M3 | 데이터와 스타일 immutable release, checksum 검증, 실패 시 기존본 유지 및 직전 release rollback을 실행한다. | ADR-003 |
-| R18 | P1 | M5 | 자체 호스팅 Nominatim adapter의 검색·역지오코딩, 한국어 평가셋, 반환 attribution을 검증한다. 공용 서버를 기본값으로 넣지 않는다. | ADR-005 |
-| R19 | P1 | M5 | 자체 호스팅 OSRM driving adapter로 GeoJSON route·m/s 단위·snap·NoRoute·429·취소를 검증한다. walking 위장은 금지한다. | ADR-005 |
+| R18 | P1 | M5 | 자체 PostGIS POI SearchProvider의 이름/주소·주변·자동완성·한국어 평가셋·attribution을 검증한다. 정확한 주소 geocoding은 별도 Provider로 분리하며 공용 Nominatim을 기본/자동완성 서버로 넣지 않는다. | ADR-005 |
+| R19 | P1 | M5 | 자체 Valhalla RoutingProvider로 walking/cycling/driving의 GeoJSON route·거리 m/시간 s·snap·NoRoute·취소/timeout을 검증한다. 직선·다른 모드 fallback과 교통/안전 보장은 금지한다. | ADR-005 |
 | R20 | P1 | M6 | 선택 한국 공공데이터 1종을 이용허락/CRS/품질 확인 후 수집한다. PostGIS 공간 인덱스·공개 view·삭제/갱신 정책을 검증한다. | ADR-006 |
 | R21 | P1 | M6 | Supabase 저장 어댑터를 core 변경 없이 추가하고 RLS 사용자 격리·서버 키 비노출·다른 저장소 교체를 검증한다. | ADR-005 |
 | R22 | P1 | M6 | Web/Native PMTiles 직접 접근을 선택 기능으로 검증한다. Range/캐시 오류와 XYZ 전환 정책을 명시한다. | ADR-003 |
 | R23 | P2 | M7 | Photon/Pelias 한국어 자동완성·초성·오타·다중출처 검색은 평가셋과 운영 예산 확보 후 결정한다. | ADR-005 |
-| R24 | P2 | M7 | 오프라인 다운로드·보행/자전거·고급 내비게이션·terrain/MLT/스타일 GUI는 기능별 ADR과 라이선스/비용 검토 후 착수한다. | ADR-008 |
+| R24 | P2 | M7 | 오프라인 다운로드·background 지속 GPS·고급 내비게이션·terrain/MLT/스타일 GUI는 기능별 ADR과 라이선스/비용 검토 후 착수한다. 기본 보행/자전거는 R19의 선택형 Valhalla 범위다. | ADR-008 |
 
 ## Zero Publisher Cost 필수 요구사항
 
-Z01~Z12는 모든 provider·데모·배포물에 적용한다. 단계는 최초 검증 책임이며 후속 P1/P2에도 예외 없이 적용한다. 현재 SDK가 없으므로 정적 검사 외 실제 설치/실행 검증은 미검증이다.
+Z01~Z12는 모든 provider·데모·배포물에 적용한다. 단계는 최초 검증 책임이며 후속 P1/P2에도 예외 없이 적용한다. 현재 SDK/로컬 fixture와 독립 Web 소비 검증은 존재한다. Native OS egress·실기기·실제 provider 범위는 플랫폼별 결과를 별도 기록하며 미검증을 정적 성공으로 대체하지 않는다.
 
 | ID | 우선순위 | 단계 | 요구사항 및 수락 기준 | ADR |
 | --- | --- | --- | --- | --- |

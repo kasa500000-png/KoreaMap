@@ -38,8 +38,26 @@ OFFLINE_REFERENCE_URLS = {
     "scripts/check-design.py": {"https://registry.npmjs.org/"},
     "scripts/audit-cost-security.py": {"https://registry.npmjs.org/", PUBLIC_REPO},
 }
+# Individually reviewed private operator commands and mock regression input only.
+# Not SDK providers: explicit opt-in, checksum/size/time bounds, no import/install request.
+# Exact URLs and source paths; other paths/URLs still fail closed.
+OPERATOR_DOWNLOAD_URLS = {
+    "services/tiles/src/config.ts": {"https://github.com/onthegomap/planetiler/releases/download/v0.10.2/planetiler.jar"},
+    "services/tiles/src/pipeline.ts": {"https://download.geofabrik.de/asia/south-korea-latest.osm.pbf"},
+    "tests/tiles-security.test.mjs": {"https://download.geofabrik.de/asia/south-korea-latest.osm.pbf"},
+}
+OFFLINE_REFERENCE_URLS["scripts/audit-cost-security.py"].update(
+    url for values in OPERATOR_DOWNLOAD_URLS.values() for url in values
+)
+# Reviewed display-only attribution anchor in a private generated style, not a fetch.
+PUBLIC_ATTRIBUTION_LINKS = {
+    "services/tiles/src/config.ts": {"https://www.openstreetmap.org/copyright"},
+}
+OFFLINE_REFERENCE_URLS["scripts/audit-cost-security.py"].update(
+    url for values in PUBLIC_ATTRIBUTION_LINKS.values() for url in values
+)
 DOCUMENTATION_HOSTS = {
-    "docs.npmjs.com", "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
+    "docs.npmjs.com", "pypi.org", "www.localdata.go.kr", "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
     "www.w3.org", "www.topografix.com",  # Geolocation / GPX specifications, docs only.
     "www.postgresql.org",  # Reviewed SQL documentation, not a runtime endpoint.
     "csv.js.org",  # Reviewed parser documentation only; never a runtime provider.
@@ -129,13 +147,15 @@ def scan(path, data, scope):
         if documentation and host and host not in DOCUMENTATION_HOSTS and not local and not reserved:
             add("UNREVIEWED_DOCUMENTATION_URL", pos)
         reviewed_reference = match[0] in OFFLINE_REFERENCE_URLS.get(path, set())
+        reviewed_operator_download = match[0] in OPERATOR_DOWNLOAD_URLS.get(path, set())
+        reviewed_attribution_link = match[0] in PUBLIC_ATTRIBUTION_LINKS.get(path, set())
         reviewed_metadata = any(start <= match.start() < end for start, end in metadata_spans)
         namespace = "http" + "://www.topografix.com/GPX/1/1"
         namespace_line = text.splitlines()[text[:match.start()].count("\n")].strip()
         reviewed_namespace = (path in {"packages/core/src/track-formats.ts", "dist/track-formats.js"}
                               and match[0] == namespace
                               and namespace_line in {f"const GPX_NAMESPACE = '{namespace}';", f'const GPX_NAMESPACE = "{namespace}";'})
-        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_namespace and not reviewed_metadata:
+        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_operator_download and not reviewed_attribution_link and not reviewed_namespace and not reviewed_metadata:
             add("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", pos)
 
     if name == "package.json":

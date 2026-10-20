@@ -1,6 +1,6 @@
 # Korea Map Kit
 
-[English](README.md) · [빠른 설치](docs/quickstart.md) · [공통 API](docs/public-api.md) · [릴리스 후보 보고서](docs/releases/v0.1.0.md)
+[English](README.md) · [빠른 설치](docs/quickstart.md) · [공통 API](docs/public-api.md) · [실행 계획](docs/execution-plan.md) · [릴리스 후보 보고서](docs/releases/v0.1.0.md)
 
 MapLibre 기반 MIT TypeScript 지도 SDK입니다. Web과 React Native가 공통 모델/API를 사용하며 좌표는 WGS84 `[경도, 위도]` 순서입니다.
 
@@ -30,7 +30,7 @@ pnpm dev:web
 
 `http://localhost:3000`을 엽니다. `/themes/`, `/api/`, `/walk/`, `/trip/`에서 테마, 공통 API, 산책/여행 예제를 실행합니다. 기본 데이터는 직접 만든 합성 데이터이며 실제 한국 기본지도가 아닙니다. 유료 API 가입은 필요 없습니다. 최초 의존성 설치에는 npm 네트워크가 필요합니다.
 
-npm에는 아직 발행하지 않았습니다. [빠른 설치](docs/quickstart.md)의 로컬 tarball 방법을 사용하세요. [Next.js·마커·경로](docs/web-guide.md), [Expo](docs/native-sdk.md), [공공데이터·자체 타일 서버](docs/providers.md), [오류 해결](docs/troubleshooting.md)을 참고하세요.
+npm에는 아직 발행하지 않았습니다. [빠른 설치](docs/quickstart.md)의 로컬 tarball 방법을 사용하세요. [Next.js·마커·경로](docs/web-guide.md), [Expo](docs/native-sdk.md), [공공데이터](docs/providers.md)·[한국 타일 생성/XYZ](docs/tiles.md), [오류 해결](docs/troubleshooting.md)을 참고하세요.
 
 ## 비용과 라이선스
 
@@ -42,6 +42,6 @@ SDK 소스 배포는 MIT 무료 오픈소스입니다. 지도 데이터·타일�
 
 `pnpm check`, `pnpm pack:check`, `pnpm verify:packages`, `pnpm test:web`, `pnpm release:prepare`로 로컬 검증과 후보 생성을 실행합니다. 표준 Linux/Windows/macOS CI를 구성했습니다. 이번 후보의 새 원격 CI 실행은 공개 업로드 승인 후 가능합니다.
 
-높은 심각도 개발 의존성 취약점 2건, 실제 npm 발행 권한/설치, Android 실기기, iOS, Native PMTiles·한글 glyph 검증이 남아 있습니다. [최종 후보 보고서](docs/releases/v0.1.0.md)의 통과 항목만 완료로 취급합니다.
+[실행 계획](docs/execution-plan.md)의 범위에서 서울·울산·부산·제주 실제 OSM 타일·한글 glyph·Chromium 9화면, 세대 rollback과 실제 Valhalla 4경로의 서울 지도 표시를 검증했습니다. 명령·범위는 [타일 가이드](docs/tiles.md)를 따릅니다. 실제 공공 POI 적재는 원본 파일 미확보로 차단됐습니다. 독립 Native 설치·plugin·JS export는 통과했으나 상위 RN 선언 전체 검사가 실패해 `PARTIAL_PASS`입니다. Web·Android·iOS와 5개 패키지 목표를 유지하며 Web Alpha는 중간 검증 단계입니다. 높은 심각도 개발 의존성 취약점 2건, 실제 npm 발행 권한/설치, Android 실기기, iOS, Native PMTiles·한글 glyph 검증이 남아 있습니다. [최종 후보 보고서](docs/releases/v0.1.0.md)의 통과 항목만 완료로 취급합니다.
 
 [기여 방법](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md) · [보안 신고](SECURITY.md) · [변경 이력](CHANGELOG.md) · [MIT](LICENSE)

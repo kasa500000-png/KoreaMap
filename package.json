@@ -55,7 +55,18 @@
     "verify:packages": "node scripts/verify-packages.mjs",
     "test:release": "node --test tests/release.test.mjs",
     "release:prepare": "node scripts/release.mjs prepare",
-    "release:verify": "node scripts/release.mjs verify"
+    "release:verify": "node scripts/release.mjs verify",
+    "tiles": "node --use-env-proxy services/tiles/dist/cli.js",
+    "test:tiles": "node --test tests/tiles.test.mjs tests/tiles-security.test.mjs",
+    "test:native-consumer": "node --test tests/native-consumer.test.mjs",
+    "verify:native-consumer": "node scripts/verify-native-consumer.mjs",
+    "test:real-poi": "node --test tests/real-poi.test.mjs",
+    "verify:real-poi": "node scripts/verify-real-poi.mjs",
+    "test:tile-glyphs": "node scripts/python.mjs tests/tile-glyphs.test.py",
+    "test:tile-profile": "node services/tiles/profile/verify-profile.mjs",
+    "test:real-tiles": "node --test tests/real-tiles.test.mjs",
+    "verify:real-tiles": "node scripts/verify-real-tiles.mjs",
+    "verify:real-routing-map": "node scripts/verify-real-routing-map.mjs"
   },
   "devDependencies": {
     "typescript": "6.0.3",

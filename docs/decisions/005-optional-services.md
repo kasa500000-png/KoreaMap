@@ -1,6 +1,6 @@
 # ADR-005 — 검색·경로·저장 서비스 주입
 
-날짜: 2026-10-19. 상태: 설계 채택, 검색/라우팅 선택형 구현 추가. [전체 아키텍처](../architecture.md)
+날짜: 2026-10-19; 현재 구현 정리: 2026-10-20 KST. 상태: 설계 채택, 검색/라우팅 선택형 구현 추가. [전체 아키텍처](../architecture.md)
 
 ## 결정
 
@@ -14,12 +14,12 @@ Valhalla 기본 Docker 이미지 digest를 고정하며 scripted 이미지의 �
 
 ## 결과와 제약
 
-capability, AbortSignal/timeout, requestId, attribution, 단위·geometry 정규화를 공유한다. 미지원 profile은 실패해야 하며 다른 이동 모드로 바꾸지 않는다. 한국어 자동완성/도로명 품질은 엔진 이름만으로 보장하지 않는다. Nominatim public API 자동완성은 금지다.
+core의 DOM 없는 취소 신호/timeout·capability·attribution·단위·geometry 검증을 공유한다. Web AbortSignal이나 HTTP request 식별자는 어댑터/앱 경계에서 다루며 플랫폼 타입을 core로 넣지 않는다. 미지원 profile은 실패해야 하며 다른 이동 모드로 바꾸지 않는다. 현재 PostGIS 검색은 적재된 POI 이름/주소·범위/거리·카테고리·자동완성·페이지를 제공하며 reverseNearby는 주변 POI 주소다. 정확한 전국 주소 지오코딩은 별도 GeocodingProvider다. 한국어 자동완성/도로명 품질은 엔진 이름만으로 보장하지 않는다. Nominatim public API 자동완성은 금지다.
 
 ## 검증과 재검토
 
-R12 R18 R19 R21 R23. 취소·stale response·429·NoRoute·빈 검색·잘못된 JSON·키 비노출을 검사한다. Supabase 저장에는 RLS 사용자 격리가 필요하다. 검색 평가셋과 운영 자원 근거가 확보될 때 Photon/Pelias 도입을 검토한다.
+R12 R18 R19 R21 R23. 취소·stale response·429·NoRoute·빈 검색·잘못된 JSON·키 비노출을 검사한다. Supabase 저장에는 RLS 사용자 격리가 필요하다. 한국 공개 PBF graph의 실제 라우팅 표본 기록과 기본 CI 합성 graph를 구분한다. 실제 공공 POI 파일·전국 주소/규모 품질·Native 통합은 별도 미완료다. 검색 평가셋과 운영 자원 근거가 확보될 때 Photon/Pelias 도입을 검토한다.
 
 ## 근거
 
-[Nominatim API](https://nominatim.org/release-docs/latest/api/Overview/), [공용 서비스 정책](https://operations.osmfoundation.org/policies/nominatim/), [OSRM](https://project-osrm.org/docs/v5.24.0/api/), [Photon](https://github.com/komoot/photon), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).
+[PostGIS 검색](../search.md), [Valhalla 운영](../routing.md), [Nominatim API](https://nominatim.org/release-docs/latest/api/Overview/), [공용 서비스 정책](https://operations.osmfoundation.org/policies/nominatim/), [OSRM](https://project-osrm.org/docs/v5.24.0/api/), [Photon](https://github.com/komoot/photon), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).

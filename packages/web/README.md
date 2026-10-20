@@ -34,6 +34,8 @@ Markers use one GeoJSON source and batched circle layers, with a keyboard-access
 
 For a real provider, explicitly pass `mode: 'operator'`, `styleUrl`, `allowedOrigins` (exact origins covering style, TileJSON, tiles, glyphs and sprites), nonempty plain-text `attribution`, and `costAcknowledged: true`. HTTPS is required except local loopback tests. Provider configuration and all client values are public; never pass private credentials. The operator must verify source-specific rights and attribution in the style. Only reviewed A/B catalog uses may be adopted under project policy. No provider is automatically selected from that catalog.
 
+For operator CJK glyph packs, set `useLocalIdeographs: false` to render configured glyph PBFs rather than installed system ideographs. Omit the option to retain MapLibre’s default local CJK rendering. This option adds no font download or endpoint. The repository’s opt-in `/tiles/` example uses it to test the operator’s glyph coverage.
+
 Origin checks govern renderer requests, not arbitrary application code, HTTP redirects or custom layer fetches. Use trusted styles, operator-controlled redirects, restrictive CSP and service quotas. An origin allowlist is not a secret vault or a billing cap. Costs belong to the operator configuring the service. No public demo proxies or shared keys are provided.
 
 Next.js: importing the package is SSR-safe; call `createMap` only in a client effect. A client wrapper can use `dynamic(() => import('./map-view'), { ssr: false })`; the example demonstrates it. Abort in effect cleanup and handle `ready` rejection. Styles/markers/selection survive remount only when you retain the state; imperative overlays/custom layers must be reattached.
