@@ -170,3 +170,6 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 
 
 10단계 08: [타일 CRC·MVT 무결성](research/stage-08-tile-integrity.md). 해안선은 공식메타데이터 후보만 조사했으며A수집승인/통합하지 않았다. 전국8GiBgate·기존성공세대보존은 유지한다.
+
+
+10단계 09: [릴리스 운영 조건 사전검사](research/stage-09-release-preflight.md). 미발행0.1.0기준선은CHANGELOG로정리했고, high2·Web/RN선언·npm발행주체·GitHub기본브랜치/환경보호가 남는다. npmworkflow는현재defaultbranch에없어미등록이다.

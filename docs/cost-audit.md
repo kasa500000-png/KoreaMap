@@ -442,3 +442,10 @@ private ETL CLI가 data/raw 밖으로 이어지는 symlink/junction·일반파�
 모든archive행의 bounded gzip CRC/끝·MVT protobuf/geometry를 검증한다.4096fragment 상한과BOM이름보존으로 우회/과다할당을 거부한다. javac의 암묵적상위소스 컴파일도 제거한다. tile39회귀 PASS; 실제기존9archive/2348tiles 모두PASS·archive/PBF SHA불변. Java v1 40/v2 85·codec78tile267feature PASS, 새compile의 MBTiles byte동일. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-08-tile-integrity.md)를따른다.
 
 처음통합검사에서미검토공식docsURL2건으로감사가실패했다. JDK21 javac옵션과NaturalEarth약관host를문서전용으로개별검토하고같은host의runtime URL거부회귀를확장했다. 이는신규지도원본A등록이나수집허용이아니다. 기존실패로그를보존하고수정후전체검사를재실행한다.
+
+
+## 우선순위 10단계 — 09 릴리스 운영 조건 사전검사
+
+clean 최종SHA와24h이내 완료된 감사/소비/registry 근거·5tarball·버전·검토된workflow를 검사한다. 기본은로컬만, 명시적GitHub옵션은GET만 수행하며 publicationAuthorized:false다. preflight16개 PASS, 원격main조회실패·주석처리된발행guard·Native부분성공우회3건 회귀포함. 실제실행 BLOCKED/exit1을 유지한다. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-09-release-preflight.md)를따른다.
+
+최초미발행0.1.0기준선정리는기존CHANGELOG정책과사용자요청에따라3개기록본문을보존/소비했다. package버전·lock·발행workflow·보호조건은미변경이다. preflight의pending음성검사는삭제된실파일대신독립합성frontmatter로유지한다. 현재원격/보안/소비근거가없으면여전히BLOCKED다.

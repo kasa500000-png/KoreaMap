@@ -749,3 +749,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 해안선은 공식메타데이터 후보만 조사했으며A수집승인/통합하지 않았다. 전국8GiBgate·기존성공세대보존은 유지한다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
 7. **Git:** 브랜치 `fix/stage-08-mvt-validation`. commit조회 `git log -1 --format='%H %s' --grep='^fix: validate complete vector tile payloads$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
 8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.
+
+
+## 우선순위 10단계 — 09 릴리스 운영 조건 사전검사 — 2026-10-21 KST
+
+1. **구현:** clean 최종SHA와24h이내 완료된 감사/소비/registry 근거·5tarball·버전·검토된workflow를 검사한다. 기본은로컬만, 명시적GitHub옵션은GET만 수행하며 publicationAuthorized:false다. [세부 근거](research/stage-09-release-preflight.md).
+2. **파일:** scripts/release-preflight.mjs, tests/release-preflight.test.mjs, docs/research/stage-09-release-preflight.md 및 개별출처원장/명령연결/진행·로드맵·비용문서. SDK와운영자서비스 경계를 유지한다.
+3. **검사:** preflight16개 PASS, 원격main조회실패·주석처리된발행guard·Native부분성공우회3건 회귀포함. 실제실행 BLOCKED/exit1을 유지한다. 통합 pnpm check·preflight16회귀 PASS. 실제GitHub명시조회 BLOCKED/exit1, pending check PASS·defaultbranch발행workflow미등록을확인했다. Changeset소비에따른2개검사실패는독립합성fixture로보완후재검사PASS다. staged·정적감사는commit전에확인한다.
+4. **실화면:** CLI 변경으로 이번단계지도화면미실행이다. 이전JS export를 APK/IPA실행으로 재분류하지 않는다.
+5. **라이선스/보안:** 자체MIT코드만추가, 원본데이터·glyph·폰트·APK·키·개인정보·제작자endpoint는포함하지않았다. 새의존성·유료runner·외부배포없음. runtimeSHA는해당diff검토후개별검증했다.
+6. **차단:** 최초미발행0.1.0에3개Changeset본문을CHANGELOG로보존/소비했다. high2·Web/RN선언·npm발행주체·GitHub기본브랜치/환경보호가 남는다. npmworkflow는현재defaultbranch에없어미등록이다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
+7. **Git:** 브랜치 `chore/stage-09-release-readiness`. commit조회 `git log -1 --format='%H %s' --grep='^chore: verify release readiness without publishing$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
+8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.
