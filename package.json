@@ -73,7 +73,9 @@
     "verify:browser-lifecycle": "node scripts/verify-browser-lifecycle.mjs",
     "test:browser-policy": "node --test tests/browser-lifecycle.test.mjs",
     "verify:native-android": "node scripts/verify-native-android.mjs",
-    "test:native-android": "node --test tests/native-android.test.mjs"
+    "test:native-android": "node --test tests/native-android.test.mjs",
+    "test:service-quality": "node --test tests/service-quality.test.mjs",
+    "verify:service-quality": "node scripts/service-quality.mjs"
   },
   "devDependencies": {
     "typescript": "6.0.3",

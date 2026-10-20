@@ -430,3 +430,8 @@ QA 보고서의 실제 context 속성 수집은 측정·선택형 profiler 정�
 ## 우선순위 10단계 — 06 공공 POI 파일 입력 보호
 
 private ETL CLI가 data/raw 밖으로 이어지는 symlink/junction·일반파일 아닌 입력·크기초과를 거부하고 단일 fd로 읽는다. 합성 Vitest188/19·실제 Docker PostGIS19·compiled CLI 링크 거부3개 PASS. 공식8원본 URL은503, 실제CSV 미확보로 실자료통합 NOT_RUN. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-06-poi-ingestion.md)를따른다.
+
+
+## 우선순위 10단계 — 07 한국어 검색·라우팅 품질 평가
+
+최소100고유한국어질의와30경로의 독립정답·출처·권리·기간을 검사하는 offline 평가 도구다. 합성결과는 NON_ACCEPTANCE/releaseAcceptance:false다. Node14개 PASS, 자료없는 실제실행 NOT_RUN/exit2. 한국어질의 희석과 syntheticID 보고서 유출 회귀를 포함한다. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-07-service-quality.md)를따른다.

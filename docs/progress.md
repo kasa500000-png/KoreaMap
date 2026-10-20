@@ -725,3 +725,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 원본CSV exact URL·SHA·header·독립 좌표기준점 확보가 필요하다. A등급만으로 원본통합 성공을 주장하지 않는다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
 7. **Git:** 브랜치 `fix/stage-06-operator-files`. commit조회 `git log -1 --format='%H %s' --grep='^fix: constrain operator ETL file inputs$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
 8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.
+
+
+## 우선순위 10단계 — 07 한국어 검색·라우팅 품질 평가 — 2026-10-21 KST
+
+1. **구현:** 최소100고유한국어질의와30경로의 독립정답·출처·권리·기간을 검사하는 offline 평가 도구다. 합성결과는 NON_ACCEPTANCE/releaseAcceptance:false다. [세부 근거](research/stage-07-service-quality.md).
+2. **파일:** scripts/service-quality.mjs, tests/service-quality.test.mjs, docs/research/stage-07-service-quality.md 및 개별출처원장/명령연결/진행·로드맵·비용문서. SDK와운영자서비스 경계를 유지한다.
+3. **검사:** Node14개 PASS, 자료없는 실제실행 NOT_RUN/exit2. 한국어질의 희석과 syntheticID 보고서 유출 회귀를 포함한다. 통합 pnpm check·품질도구14회귀 PASS, 실제무입력평가 NOT_RUN/exit2 재확인. staged·정적감사는commit전에확인한다.
+4. **실화면:** offline 평가 도구로 지도UI는 미수정·이번단계 화면미실행이다.
+5. **라이선스/보안:** 자체MIT코드만추가, 원본데이터·glyph·폰트·APK·키·개인정보·제작자endpoint는포함하지않았다. 새의존성·유료runner·외부배포없음. runtimeSHA는해당diff검토후개별검증했다.
+6. **차단:** 허가된 실제 정답·관측자료가 없어 검색·경로 정확도 수락은 NOT_RUN이다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
+7. **Git:** 브랜치 `test/stage-07-search-routing`. commit조회 `git log -1 --format='%H %s' --grep='^test: evaluate Korean search and route observations$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
+8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.

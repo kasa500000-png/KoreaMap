@@ -164,3 +164,6 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 
 
 10단계 06: [공공 POI 파일 입력 보호](research/stage-06-poi-ingestion.md). 원본CSV exact URL·SHA·header·독립 좌표기준점 확보가 필요하다. A등급만으로 원본통합 성공을 주장하지 않는다.
+
+
+10단계 07: [한국어 검색·라우팅 품질 평가](research/stage-07-service-quality.md). 허가된 실제 정답·관측자료가 없어 검색·경로 정확도 수락은 NOT_RUN이다.
