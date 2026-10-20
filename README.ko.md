@@ -4,7 +4,7 @@
 
 MapLibre 기반 MIT TypeScript 지도 SDK입니다. Web과 React Native가 공통 모델/API를 사용하며 좌표는 WGS84 `[경도, 위도]` 순서입니다.
 
-**v0.1.0은 미발행 릴리스 후보이며, 현재 공개 배포 승인 조건을 충족하지 못했습니다.** 저장소는 이번 작업 전에 이미 Public이었습니다. 새 후보의 업로드·태그·GitHub Release·npm 발행은 별도 승인 이후 진행합니다. 현재 기본 브랜치 `chore/project-policy`에는 후보 내용이 없을 수 있습니다.
+**소스 프리뷰는 `main`에 통합됐습니다. v0.1.0은 미발행이며 릴리스는 차단 상태입니다.** 소스 통합은 운영 배포·npm 발행·태그·GitHub Release 승인이 아닙니다. 기본 브랜치는 여전히 `chore/project-policy`이므로 아래처럼 `main`을 명시해 clone하세요.
 
 ## 패키지와 지원 상태
 
@@ -20,17 +20,18 @@ MapLibre 기반 MIT TypeScript 지도 SDK입니다. Web과 React Native가 공�
 
 ## 외부 키 없이 실행
 
-후보 소스가 있는 체크아웃에서 Node 24.19.0, pnpm 12.14.0, Python 3을 준비합니다.
+Node **24.19.0**, pnpm **12.14.0**을 준비합니다. 저장소 검사에는 Python **3.12+**도 필요합니다.
 
 ```sh
+git clone --branch main https://github.com/kasa500000-png/KoreaMap.git
+cd KoreaMap
 pnpm install --frozen-lockfile
-pnpm build:sdk
 pnpm dev:web
 ```
 
 `http://localhost:3000`을 엽니다. `/themes/`, `/api/`, `/walk/`, `/trip/`에서 테마, 공통 API, 산책/여행 예제를 실행합니다. 기본 데이터는 직접 만든 합성 데이터이며 실제 한국 기본지도가 아닙니다. 유료 API 가입은 필요 없습니다. 최초 의존성 설치에는 npm 네트워크가 필요합니다.
 
-npm에는 아직 발행하지 않았습니다. [빠른 설치](docs/quickstart.md)의 로컬 tarball 방법을 사용하세요. [Next.js·마커·경로](docs/web-guide.md), [Expo](docs/native-sdk.md), [공공데이터](docs/providers.md)·[한국 타일 생성/XYZ](docs/tiles.md), [오류 해결](docs/troubleshooting.md)을 참고하세요.
+`pnpm dev:web`이 SDK 빌드와 로컬 MapLibre worker 준비를 수행합니다. 운영자 타일·원본·glyph/폰트·DB·QA 결과는 ignored 자료이므로 clone되지 않습니다. 실제 지도는 [타일 가이드](docs/tiles.md)에 따라 별도로 연결합니다. npm에는 아직 발행하지 않았습니다. [빠른 설치](docs/quickstart.md)의 로컬 tarball 방법을 사용하세요. [Next.js·마커·경로](docs/web-guide.md), [Expo](docs/native-sdk.md), [공공데이터](docs/providers.md)·[한국 타일 생성/XYZ](docs/tiles.md), [오류 해결](docs/troubleshooting.md)을 참고하세요.
 
 ## 비용과 라이선스
 
@@ -40,9 +41,9 @@ SDK 소스 배포는 MIT 무료 오픈소스입니다. 지도 데이터·타일�
 
 ## 검증과 참여
 
-`pnpm check`, `pnpm pack:check`, `pnpm verify:packages`, `pnpm test:web`, `pnpm release:prepare`로 로컬 검증과 후보 생성을 실행합니다. 표준 Linux/Windows/macOS CI를 구성했습니다. 이번 후보의 새 원격 CI 실행은 공개 업로드 승인 후 가능합니다.
+데모 실행과 별도로 `pnpm check`, `pnpm pack:check`, `pnpm test:web` 등으로 검증합니다. `pnpm audit:dependencies`, `pnpm verify:packages`, `pnpm verify:native-consumer`는 알려진 보안·상위 선언 오류 때문에 현재 nonzero exit하며 부분 성공을 릴리스 통과로 처리하지 않습니다. `pnpm release:prepare`는 로컬 후보 자료만 생성합니다. 표준 Linux/Windows/macOS CI는 main push와 PR에서 실행되며 자동 발행·배포는 하지 않습니다.
 
-[실행 계획](docs/execution-plan.md)의 범위에서 서울·울산·부산·제주 실제 OSM 타일·한글 glyph·Chromium 9화면, 세대 rollback과 실제 Valhalla 4경로의 서울 지도 표시를 검증했습니다. 명령·범위는 [타일 가이드](docs/tiles.md)를 따릅니다. 실제 공공 POI 적재는 원본 파일 미확보로 차단됐습니다. 독립 Native 설치·plugin·JS export는 통과했으나 상위 RN 선언 전체 검사가 실패해 `PARTIAL_PASS`입니다. Web·Android·iOS와 5개 패키지 목표를 유지하며 Web Alpha는 중간 검증 단계입니다. 높은 심각도 개발 의존성 취약점 2건, 실제 npm 발행 권한/설치, Android 실기기, iOS, Native PMTiles·한글 glyph 검증이 남아 있습니다. [최종 후보 보고서](docs/releases/v0.1.0.md)의 통과 항목만 완료로 취급합니다.
+[실행 계획](docs/execution-plan.md)의 범위에서 서울·울산·부산·제주 실제 OSM 타일·한글 glyph·Chromium 9화면, 세대 rollback과 실제 Valhalla 4경로의 서울 지도 표시를 검증했습니다. 명령·범위는 [타일 가이드](docs/tiles.md)를 따릅니다. 실제 공공 POI 적재는 원본 파일 미확보로 차단됐습니다. 독립 Native 설치·plugin·JS export는 통과했으나 상위 RN 선언 전체 검사가 실패해 `PARTIAL_PASS`입니다. Web·Android·iOS와 5개 패키지 목표를 유지하며 Web Alpha는 중간 검증 단계입니다. 보안 high 2건, Web NodeNext/RN 상위 선언 오류, 호스트 Chromium/SwiftShader 프레임 p95 **116.7ms(목표 33ms)**, 실제 npm 발행 권한/설치, Android 실기기, iOS, Native PMTiles·한글 glyph 검증이 남아 있습니다. 소스 프리뷰 통합으로 이 릴리스 게이트를 닫지 않습니다. [최종 후보 보고서](docs/releases/v0.1.0.md)의 통과 항목만 완료로 취급합니다.
 
 [기여 방법](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md) · [보안 신고](SECURITY.md) · [변경 이력](CHANGELOG.md) · [MIT](LICENSE)
 

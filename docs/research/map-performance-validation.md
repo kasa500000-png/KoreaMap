@@ -2,6 +2,8 @@
 
 기준일: 2026-10-20 KST. 브랜치 `perf/map-interactions`, 기반은 [1단계 PR 15](https://github.com/kasa500000-png/KoreaMap/pull/15)의 보안·타입 게이트 수정과 macOS 경로 회귀다. 전체 성능 목표와 공개 수락은 부분 최적화의 구현과 구분한다.
 
+현재 소스 통합 상태: 이후 사용자가 clone을 위한 미완료 preview 병합을 명시적으로 요청해 PR15/16을 main에 통합했다. 아래의 당시 병합 보류 문구는 역사적 판단이며, 성능 실패·보안/타입·기기 미검증과 발행 차단은 그대로다. [최신 clone 기록](clone-validation.md)을 따른다.
+
 ## 고정 조건과 기존 결과
 
 서울 Standard/balanced design-v2, z14,390×800px,DPR1, 실제 개별 마커1,000개, 완료한1초 왕복 이동5회, 최소30 RAF delta, p95 목표33ms를 유지한다. source generation은 `1792488349559-c91461a3`, 원본 OSM SHA는 `57e3ffd07e104d5b9ec511ac2b11cf784936b8982f0b4f30e6f5324928fc9f5e`, glyph manifest SHA는 `dc7c51fd0c45fbecff7f176aa3730d12ca2bb4d1fe09c281c77a3cc07c196c2b`다. 구체 archive/폰트/실지도 검증은 [기존 품질 기록](map-quality-validation.md)을 따른다. 데이터·폰트·스타일·클러스터 상한·카메라 경로·목표를 줄이지 않았다.

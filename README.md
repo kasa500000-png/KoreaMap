@@ -4,7 +4,7 @@
 
 An MIT TypeScript map SDK built on MapLibre, with shared Web and React Native APIs and Korean label support. Coordinates always use `[longitude, latitude]` in WGS84.
 
-**v0.1.0 is an unpublished release candidate, not approved for production or publication.** Package names are candidates, not reserved names. The GitHub repository was already public when this release preparation began; this candidate is local until approved for upload.
+**The source preview is available on `main`. v0.1.0 remains unpublished and blocked for release.** Source integration does not approve production deployment, npm publication, tags or a GitHub Release. Package names remain candidates, not reserved names.
 
 ## Packages
 
@@ -20,17 +20,18 @@ ES modules only. Web consumers use TypeScript `moduleResolution: "Bundler"`; str
 
 ## Run without external API keys
 
-From a checkout containing this candidate, install Node **24.19.0**, pnpm **12.14.0**, and Python 3, then:
+Install Node **24.19.0** and pnpm **12.14.0**. Repository checks also require Python **3.12+**. The default branch remains `chore/project-policy`, so explicitly clone `main`:
 
 ```sh
+git clone --branch main https://github.com/kasa500000-png/KoreaMap.git
+cd KoreaMap
 pnpm install --frozen-lockfile
-pnpm build:sdk
 pnpm dev:web
 ```
 
 Open `http://localhost:3000`. `/themes/`, `/api/` and `/walk/`, `/trip/` demonstrate themes, common APIs, dog walking and trip planning. All default map geometry and users are authored synthetic fixtures, **not a real Korean basemap**. No paid API registration is required. The initial dependency installation uses the public npm registry; normal fixture map use does not contact publisher-owned services.
 
-The candidate is not on npm. Follow [local tarball installation](docs/quickstart.md) now; registry install commands in that guide apply only after an approved publication. The repository default branch is currently `chore/project-policy`, so cloning the default branch does not guarantee this candidate's contents.
+`pnpm dev:web` builds the SDK and prepares the local MapLibre worker. Operator tile archives, source data, glyphs/fonts, databases and QA artifacts are ignored and are not included in a clone. Connect real map services explicitly using the [tile guide](docs/tiles.md). The packages are not on npm; [local tarball installation](docs/quickstart.md) is available now. Registry install commands apply only after an approved publication.
 
 ## Guides
 
@@ -50,15 +51,19 @@ Public browser/mobile configuration is visible to end users; keep secrets on ope
 
 ## Validation and release limits
 
+These checks are separate from starting the fixture demo. `audit:dependencies`, `verify:packages` and `verify:native-consumer` currently exit nonzero for the documented security and upstream declaration failures; their partial results do not pass the release gates.
+
 ```sh
 pnpm check
 pnpm pack:check
-pnpm verify:packages
 pnpm test:web
+pnpm audit:dependencies
+pnpm verify:packages
+pnpm verify:native-consumer
 pnpm release:prepare
 ```
 
-All five SDK packages and Web/Android/iOS remain the final target; Web Alpha is an intermediate gate. Actual OSM tiles for Seoul/Ulsan/Busan/Jeju, Korean glyphs, nine Chromium views, generation rollback and four real Valhalla routes rendered on the Seoul map passed their scoped checks; see the [tile guide](docs/tiles.md). Real public POI ingestion is blocked by unavailable source files. Isolated Native installation/plugin/JS exports passed, while full upstream React Native declaration checks failed, leaving Native consumer QA at `PARTIAL_PASS`. Standard Linux/Windows/macOS CI is configured. Android physical devices, iOS, native PMTiles and native Korean glyph rendering remain unverified. Two high-severity development dependency advisories remain release blockers; see [candidate report](docs/releases/v0.1.0.md). No registry publication, tag, GitHub Release, deployment or visibility change is authorized by these commands.
+All five SDK packages and Web/Android/iOS remain the final target; Web Alpha is an intermediate gate. Actual OSM tiles for Seoul/Ulsan/Busan/Jeju, Korean glyphs, nine Chromium views, generation rollback and four real Valhalla routes rendered on the Seoul map passed their scoped checks; see the [tile guide](docs/tiles.md). Real public POI ingestion is blocked by unavailable source files. Isolated Native installation/plugin/JS exports passed, while full upstream React Native declaration checks failed, leaving Native consumer QA at `PARTIAL_PASS`. Standard Linux/Windows/macOS CI is configured. Android physical devices, iOS, native PMTiles and native Korean glyph rendering remain unverified. Two high-severity dependency advisories, Web NodeNext/RN declaration failures and a host Chromium/SwiftShader frame p95 of **116.7ms against the 33ms target** remain open; see the [candidate report](docs/releases/v0.1.0.md). Source preview availability does not close these release gates. No registry publication, tag, GitHub Release, deployment or visibility change is authorized by these commands.
 
 ## Map quality work
 
