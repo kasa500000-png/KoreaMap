@@ -161,3 +161,6 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 
 
 10단계05 [독립 APK](research/stage-05-android-consumer.md)는 실제offline build와Hermes/ELF/rawZIP확인까지PASS_BUILD_ONLY다. KVM/연결기기부재로앱실행은NOT_RUN, 전체RN선언은여전히FAIL이다.
+
+
+10단계 06: [공공 POI 파일 입력 보호](research/stage-06-poi-ingestion.md). 원본CSV exact URL·SHA·header·독립 좌표기준점 확보가 필요하다. A등급만으로 원본통합 성공을 주장하지 않는다.
