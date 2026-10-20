@@ -420,3 +420,8 @@ SDK/예제/Provider/lockfile 변경 없이 합성 데이터 browser QA를 추가
 ## 우선순위 10단계 — 04 프레임 증거
 
 QA 보고서의 실제 context 속성 수집은 측정·선택형 profiler 정지 뒤 한 번만 수행한다. 기본 SDK 실행과 네트워크·비용 경로를 변경하지 않는다. 환경값은 ignored 로컬 보고서만 기록하고 외부 전송하지 않는다. 소프트웨어 GPU 단일 비교가33ms 목표를 통과하지 못했으므로 임시 SDK 설정을 제거했다. 실제 지도/glyph/PNG는 Git/npm에서 제외하며 프로파일링/하드웨어 미확인을 성능 수락으로 바꾸지 않는다.
+
+
+## 우선순위 10단계 — 05 Android APK
+
+선택형localtool을명시적으로설정한격리tarball APK빌드만수행했다. offlineGradle335tasks와내장Hermes/ELF/rawZIP검증은PASS_BUILD_ONLY이며전체RN선언/OS네트워크/기기/바이너리고지수락은미완료다. 기본pnpm check에는가짜APK단위회귀만연결하고JDK/SDK/Gradle/EAS/기기/클라우드요구를추가하지않았다. no-shell/PID시작시각확인·출력/시간상한을사용하나PPIDpolling이모든재부모화자손을발견함을보장하지않는다. 실제APK·번들·프로젝트는ignored로보존하고Git/npm에넣지않았다. 외부배포·유료runner·새endpoint·서명키없음.

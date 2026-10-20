@@ -701,3 +701,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 33ms 목표·하드웨어 GPU·장기 메모리는 미충족/미검증이다. 보안 high2·상위 선언·기기 수락 및 배포 대상도 별도다.
 7. **Git:** 03단계 PR20/commit05da9d8808ffefef842208ba5102d6261c859cb4/merge5f5c58ff7dcd92957500f87a62929c97276f42cc. 04브랜치 perf/stage-04-map-rendering, commit조회 `git log -1 --format='%H %s' --grep='^test: record actual frame rendering context$'`.
 8. **다음:** 진단 코드 검증 후 preview 소스 통합과 Android/데이터 단계를 계속한다. 성능 수락 완료가 아니다.
+
+
+## 우선순위 10단계 — 05 독립 Android APK — 2026-10-21 KST
+
+1. **구현:** 현재5tarball 중core/native/styles를격리설치하고명시적localtool로offline APK를빌드하는선택형QA다. 생성Hermes번들과APK내번들SHA일치·ELF64 MapLibre·ZIP전체rawstream/CRC/경계를검사한다. [근거](research/stage-05-android-consumer.md).
+2. **파일:** Android QA CLI·제한된프로세스감시·Pythonstdlib APK검사·Native export동기hook·Node/Python음성회귀·선택형명령/기본unit연결·단계/진행/로드맵/비용문서. SDKruntime·lock은불변이다.
+3. **검사:** Node17/Python9 PASS. 격리SDK strict Bundler/NodeNext·plugin·양OS JS export·prebuild·실제Gradle335tasks PASS. APK83,969,186B/Hermes1,871,700B·ELF11,207,424B·ZIP1330entry 검증PASS_BUILD_ONLY. 보존실APK를보강한rawZIP검사로재검증PASS. 전체RN선언3오류는PARTIAL_PASS/exit1이다. 통합pnpm check PASS, staged·정적감사도commit전에확인한다.
+4. **실화면:** adb연결0/KVM미지원으로에뮬레이터실행NOT_RUN. 물리Android와iOS는이번범위제외·미검증이며 APK나JSexport로화면통과를주장하지않는다.
+5. **라이선스/보안:** 자체MIT검증도구만추가. APK/생성프로젝트/번들/도구/키는ignored, 재배포하지않았다. Gradle9.4.1/JDK21/SDK37은명시적사용자local도구이며SDK기본설치요구가아니다. binarynotices/OSegress는NOT_RUN이다.
+6. **차단:** 전체RN/Web선언·high2·성능·앱실행수락이남는다. PPIDpolling은빠른재부모화자손을보장하지않아descendantCoverage UNKNOWN으로기록하며모든자손정리성공을주장하지않는다. 선택형QA의Windows launcher는미지원, SDKWindows지원과별개다.
+7. **Git:** 04 PR21/commitb6bdd4ca88fdbee1d066da357329c4df459a0b9f/merge729bf19bea53adc6aad4810bba8dd77fff5f2a8f. 05브랜치 test/stage-05-android-artifact, commit조회 `git log -1 --format='%H %s' --grep='^test: verify isolated Android APK payloads$'`.
+8. **다음:** 검증된빌드/검사도구를preview소스에반영하고데이터단계를계속한다. Native전체릴리스수락·실제외부배포완료가아니다.

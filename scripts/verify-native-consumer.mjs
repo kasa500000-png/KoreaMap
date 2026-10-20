@@ -146,7 +146,22 @@ export function assertIntrospection(config) {
   assert(!android.includes('FOREGROUND_SERVICE_LOCATION'), 'Android location service forbidden');
 }
 
-function runVerification() {
+export function invokeNativeExportHook(hook, context) {
+  if (hook === undefined) return;
+  assert(typeof hook === 'function', 'Native export hook must be a synchronous function');
+  assert.notEqual(
+    Object.prototype.toString.call(hook),
+    '[object AsyncFunction]',
+    'Native export hook must be synchronous',
+  );
+  const result = hook(context);
+  assert(
+    !result || typeof result.then !== 'function',
+    'Native export hook must complete synchronously',
+  );
+}
+
+export function runVerification({ afterJavaScriptExport } = {}) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
   const cli = process.env.npm_execpath;
   assert(cli, 'Run with pnpm verify:native-consumer (after pnpm pack:check)');
@@ -434,6 +449,12 @@ export default function PublicSdk() {
     assert(metadata.fileMetadata?.ios?.bundle, 'iOS JS bundle missing');
     report.checks.androidJavaScriptExport = 'PASS';
     report.checks.iosJavaScriptExport = 'PASS';
+    invokeNativeExportHook(afterJavaScriptExport, {
+      directory,
+      expo,
+      environment: taskEnv,
+      report,
+    });
     report.releaseBlocked = [
       'publicSdkBundlerDeclarations',
       'publicSdkNodeNextDeclarations',
@@ -446,7 +467,11 @@ export default function PublicSdk() {
     console.log(
       `Dependency declarations (skipLibCheck:false): ${report.checks.dependencyDeclarations.status}; see report`,
     );
-    console.log('NOT RUN: APK/IPA, devices, XYZ/glyph, PMTiles, OS network and native memory QA');
+    console.log(
+      report.native.androidDevelopmentBuild === 'PASS'
+        ? 'Android isolated APK built; NOT RUN: devices, iOS build, XYZ/glyph, PMTiles, OS network and native memory QA'
+        : 'NOT RUN: APK/IPA, devices, XYZ/glyph, PMTiles, OS network and native memory QA',
+    );
   } catch (error) {
     report.overall = 'FAIL';
     report.failed = true;
