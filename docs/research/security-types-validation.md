@@ -2,6 +2,8 @@
 
 확인일: 2026-10-20 19:46–19:47 KST (10:46–10:47 UTC). 조사 기준 커밋: `3cb1a37d9b2bebcd66586c614f681ded7aaeb116`.
 
+현재 소스 통합 상태: 이후 사용자가 clone을 위한 미완료 preview 병합을 명시적으로 요청해 PR15/16을 main에 통합했다. 아래의 당시 병합 보류 문구는 역사적 판단이며, 감사·공개 선언 실패와 발행 차단은 그대로다. [최신 clone 기록](clone-validation.md)을 따른다.
+
 ## 보안 결과: BLOCKED
 
 현재 전체 workspace의 `pnpm audit --json`은 **exit 1, high 2, critical 0**이다. 두 취약 패키지의 설치 버전과 공식 npm `latest`가 같고, GitHub Advisory와 npm audit 모두 공개 수정 버전을 제시하지 않는다. 지원되는 상위 패키지 업그레이드로 이 두 경로를 제거할 후보도 확인하지 못했다. 이번 조사로 보안 게이트를 완료 처리하지 않는다.

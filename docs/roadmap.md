@@ -4,15 +4,16 @@
 
 ## 기반과 현재 작업
 
+- 2026-10-20 사용자가 다른 컴퓨터에서 clone할 수 있도록 현재 작업의 병합을 명시적으로 요청했다. [PR15](https://github.com/kasa500000-png/KoreaMap/pull/15)는 `8d068bf6935b0290001695071db66d3e754c81b3`, [PR16](https://github.com/kasa500000-png/KoreaMap/pull/16)은 `49e8aac64d7b7f2de3236cfaaff2373da602999e`로 각각 main에 병합했다. 이는 미완료 preview 소스 통합이며 보안·타입·성능·Native 수락 완료가 아니다. 현재 clone 방법과 새 설치 검사는 [clone 검증 기록](research/clone-validation.md)을 따른다.
+- 저장소는 Public이고 SDK 전체 소스는 `main`에 있다. 기본 브랜치 `chore/project-policy`를 main으로 변경하는 요청은 GitHub 권한 부족 HTTP403으로 거부됐다. 따라서 `git clone --branch main https://github.com/kasa500000-png/KoreaMap.git`을 사용한다. 기본 브랜치 변경은 미반영이며 GitHub 관리 설정에서 별도로 처리할 수 있다. npm 발행·GitHub Release·운영 배포는 수행하지 않았다.
+
 - 사용자가 승인한 후속1단계는 `fix/security-and-public-types`에서 [보안·공개 타입 검증](research/security-types-validation.md)을 수행했다. 공식 수정 버전이 없어 high2·상위 선언 오류는 BLOCKED다. 부분 통과가 exit0으로 전달되던 자동화 결함은 수정했다. 후속2단계는 별도 브랜치/커밋/PR에서 성능 병목을 개선한다. 병합 승인이 있어도 실패 검사를 우회하지 않으며 npm/Release/배포는 이번 승인 범위가 아니다.
 
 - 후속2단계 `perf/map-interactions`에서 불필요한 Web query·탐색·DOM/React 작업을 줄이고 opt-in profile을 추가했다. [검증](research/map-performance-validation.md)은 실제100명령의 query100→0·Web25회귀 통과와 서울 fixed frame54표본/p95116.7ms 실패를 구분한다. 기본 지도 세부 정보·마커 수·프로토콜·33ms 목표는 유지한다. 1단계PR15 위의 별도 단계이며 보안/공개 타입 CI와 frame 수락은 계속 차단이다.
 
 - 지도 가독성과 조작 경험을 `feat/map-quality`에서 구현했다. [Q0–Q5 품질 계획](map-quality.md)과 [ADR-010](decisions/010-map-quality-and-interactions.md)은 기존 M1–M7을 대체하지 않는 구체 실행 범위다. `design-v1`·기존 API를 보존하고 새 `design-v2`/cartography/interaction을 선택형으로 추가했다. [최종 검증](research/map-quality-validation.md)은 도시 보존 수정 후240화면·단일 호스트 로딩 목표 통과, 1,000마커 frame 목표 실패를 구분한다. Q4 성능 수락과 실제 기기·육지 마스크·전국 생성·보안 게이트는 남는다.
 
-- 최초 정책만 main에 반영됐고, 이후 구현은 단계별 브랜치와 stacked Draft PR에 있다. 릴리스 후보 시작점은 `76b379b9dd2abbb6393e90f789a78ac2fd352762`다.
-- 마지막 GitHub 확인 시 저장소는 Public, 기본 브랜치는 `chore/project-policy`, Draft PR은 14개이며 후보 브랜치는 로컬 상태다. 기본 브랜치 조회가 전체 SDK의 설치 진입점을 제공하지 않는다. main 통합·공개 업로드·기본 브랜치 정렬은 검증된 구체적 대상에 대한 승인 이후다.
-- 사용자가 승인한 남은 작업 구현은 `feat/korean-map-completion`에서 진행한다. Web/Android/iOS와 SDK 5종 목표를 유지하며 Web Alpha는 중간 검증 단계다.
+- 최초 릴리스 후보 시작점 `76b379b9dd2abbb6393e90f789a78ac2fd352762`와 `feat/korean-map-completion`·`feat/map-quality`·후속 1/2단계의 누적 소스는 현재 main의 조상이다. 기존 stacked PR을 자동 정리하지 않았으며, 현재 상태는 최신 진행 기록으로 판단한다. Web/Android/iOS와 SDK 5종 목표를 유지하며 Web Alpha는 중간 검증 단계다.
 
 ## 단계와 완료 조건
 
@@ -40,7 +41,7 @@
 
 ## 릴리스와 승인
 
-가능한 작업을 검토 가능한 로컬 브랜치·커밋으로 준비한다. 현재 저장소가 Public이므로 새 후보 push/공개 PR도 공개 업로드다. 사용자가 지정한 공개 전 승인 조건을 적용한다. 이전 최초 정책의 main 승인은 후속 구현/릴리스의 병합·발행 승인이 아니다.
+가능한 작업을 검토 가능한 브랜치·커밋으로 준비한다. 현재 저장소가 Public이므로 push/PR도 공개 업로드다. 이번 명시적 요청은 현재 preview 소스의 main 통합과 clone 문서 반영을 승인했으며, 실패 검사를 통과 처리하거나 npm/Release/운영 배포를 승인한 것은 아니다.
 
 main 통합·기본 브랜치 정렬·공개 업로드·npm 발행·GitHub tag/Release·운영 배포는 각각 해당 구체적 결과의 명시적 승인 후 수행한다. 승인 전에 최종 tree·검증·tarball SHA/SRI·릴리스 노트와 외부 작업 절차를 준비한다. [릴리스 절차](releases/process.md)와 [후보 보고서](releases/v0.1.0.md)를 따른다.
 

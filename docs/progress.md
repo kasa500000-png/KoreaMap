@@ -641,3 +641,16 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** frame 목표·실제GPU/Android·Mac/iOS, 상위 공식 보안/타입 수정, 해안선/전국·장기 부하/OS 네트워크 검증은 남는다. 기능 회귀 성공을 전체 성능·출시 성공으로 처리하지 않는다.
 7. **Git:** 1단계 `39d77444154b3dfedf7971316df10a004526d30e`와 macOS 회귀 `0390182482a1c2b2da26eea353971ae603080e7b`를 [PR15](https://github.com/kasa500000-png/KoreaMap/pull/15)에 반영했다. CI21 Windows/macOS 성공, audit/Linux 공개타입 실패. 2단계 브랜치 `perf/map-interactions`; 커밋 조회 `git log -1 --format='%H %s' --grep='^perf: avoid redundant work during map interactions$'`. 별도 stacked PR의 실제번호·SHA·CI는 최종 보고한다. main·기본브랜치·배포/Release/npm은 변경하지 않는다.
 8. **다음:** 후속 개선은 가능하지만 두 단계 전체 수락·main 병합은 BLOCKED다. 사용자의 단계별 병합 승인은 기록했으며 실패 검사를 억제하지 않는다. 기존14개 stacked PR은 자동 정리하지 않았다.
+
+## 현재 소스 main 통합·다른 PC clone 준비 — 2026-10-20 KST
+
+이후 사용자가 현재 작업의 병합 커밋을 명시적으로 요청했다. 위 단계의 병합 보류 판단 이후, 실패를 미완료로 유지하는 preview 소스 통합을 진행했다. [상세 실행·제한](research/clone-validation.md)을 따른다.
+
+1. **구현:** GitHub 커넥터로 PR15·16을 각각 일반 merge commit으로 main에 반영했다. PR16 retarget·expected head SHA 확인을 거쳤으며 보호 우회·체크 억제는 없다. 다른 PC에서 `git clone --branch main`으로 전체 소스를 받는다.
+2. **파일:** README 양 언어·quickstart·개발/릴리스 안내·보안/성능 기록 주석·로드맵·비용/진행 기록·새 clone 검증 보고서다. 문서 후속 단계는 runtime·lockfile·출처 원장을 변경하지 않는다.
+3. **검사:** 원격 main `49e8aac`를 별도 폴더에 새 clone하고 frozen install(기존 store645재사용), `pnpm check`(Vitest181/18·Next production·Expo 양OS JS 포함), 5pack·기존 해시 일치, staged 출처 검사·Web25 E2E 통과. dev:web 실제 실행도 확인했다. 별도 dependency audit는 high2/exit1 실패다. 문서 검사·최종 staged/정적 감사는 이 단계 커밋 전에 실행한다.
+4. **실화면:** Chromium154/SwiftShader의 새 clone Web390/768/1440 E2E 통과. E2E의1000마커/장소1팝업 캡처와 별도 dev390px 기본 화면(86개 visible·선택 없음·ready/출처)을 각각 직접 확인했다. dev브라우저 외부 요청/pageerror0. 합성 fixture이며 실제240화면·frame·실기기/iOS·다른 물리 PC 검증은 이번에 수행하지 않았다.
+5. **라이선스/보안:** MIT/ODbL/OFL 분리·제3자payload 금지 유지. 새 키/개인정보/제작자provider·유료 인프라·발행 trigger 없음. npm workflow 승인·감사 게이트를 유지한다. 초기 registry 네트워크와 운영자 지도 서비스 비용은 별개다.
+6. **차단:** high2·Web/RN 상위 선언·p95116.7ms>33ms·실제Android/iOS·해안선/전국·POI/릴리스 계정 검증은 남는다. 기본 브랜치 main 변경은 GitHub HTTP403으로 거부돼 기존 `chore/project-policy` 그대로이며 `--branch main`이 필요하다. 독립 소비 결과는 기존 PARTIAL_PASS/exit1이다.
+7. **Git:** PR15 병합 `8d068bf6935b0290001695071db66d3e754c81b3`, PR16 병합 `49e8aac64d7b7f2de3236cfaaff2373da602999e`. 문서 브랜치 `docs/clone-ready-preview`, 커밋 조회 `git log -1 --format='%H %s' --grep='^docs: document clone-ready main preview$'`. 최종 문서 PR/병합 SHA는 완료 보고에서 제공한다.
+8. **다음:** main clone 후 후속 개발 가능. 소스 통합을 전체 기능 수락/릴리스로 보고하지 않는다. npm·tag·GitHub Release·운영 배포·visibility 변경은 하지 않았다.

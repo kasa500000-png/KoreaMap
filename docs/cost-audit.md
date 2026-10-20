@@ -382,3 +382,14 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 [성능 기록](research/map-performance-validation.md)의 Web query/DOM/index·예제 idle 변경은5개 기존 자체MIT runtime 경로만 개별 검토·SHA 갱신했다. 새 dependency/lockfile·제작자endpoint·credential·기본 서비스·외부 Provider·다운로드·CI/과금 설정은 없다. Web25 E2E·격리 tarball 브라우저·실제 서울 unprofiled/profile 검사에서 예상 밖 외부 origin0을 확인했다. profile은 opt-in 운영자 로컬 자료와 동일 loopback 소비자만 사용하고 CPU+trace를64MiB로 제한한다. 수집 report는NON_ACCEPTANCE/exit2, 기본성능 report는FAIL/exit1로 남겨 발행 수락과 혼동하지 않는다.
 
 실지도/OSM·glyph/폰트·브라우저 screenshot·원본 trace는 ignored 저장소에만 있다. 새 Web tarball19,672B와 나머지4개 모두 pack 출처/비밀/비용 검사 및 byte 동일 재현을 확인했다. 독립 Web 전체 검증은 NodeNext 오류로exit1, 전체 의존 audit도high2로차단이다. 원격PR15의 Windows/macOS CI는 성공했고 audit/Linux 공개 타입은 실패하며 억제하지 않았다. 두 단계의 공개 PR 작업만 사용자 승인에 따라 수행하고 main 병합·기본브랜치 설정·npm/Release/운영 배포·유료 인프라는 실행하지 않는다. Static findings0이나 loopback Web 요청0을 Native OS egress/청구 설정/전체 보안 보증으로 확대하지 않는다.
+
+## main 소스 통합·새 clone 비용 검증 — 2026-10-20 KST
+
+사용자가 이후 다른 컴퓨터에서 clone할 수 있도록 현재 작업의 병합을 명시적으로 요청했다. 이에 PR15/16을 main에 각각 `8d068bf6935b0290001695071db66d3e754c81b3`·`49e8aac64d7b7f2de3236cfaaff2373da602999e`로 통합했다. 보안·타입·성능 실패를 유지하는 preview 소스 병합이며 발행 수락은 아니다. [clone 검증 기록](research/clone-validation.md)에 범위를 남긴다.
+
+- 원격 main을 별도 빈 폴더에 clone해 frozen install(기존 store645재사용/다운로드0)·check·5pack·Web25 E2E를 통과했다. dev:web을 실제 실행한390px 브라우저의 외부 HTTP 요청/pageerror0도 확인했다. 로컬 폰트·Chromium·pnpm store는 기존 호스트 도구이며 다른 물리 PC/Native 전체 OS 결과로 확대하지 않는다.
+- 실제 타일/font/glyph/원본·DB·환경/서명·개인기록·QA 자료는 복사하거나 Git에 넣지 않았다. 새 clone의 5개 tarball은 기존 검증 SHA와 동일하고, pack 내 정적 비밀/비용 findings0이다. 최종 문서 커밋 전에는 작업 트리/index/도달 이력·5개 실제 tarball을 다시 스캔한다. 휴리스틱 통과를 모든 비밀 부재/계정 청구 보증으로 보지 않는다.
+- runtime·SDK 의존성·lockfile·기본 provider·공유 키·제작자endpoint·CI runner/발행 조건 변경이 없다. main push는 Foundation CI만 실행하며 npm은 manual/main/enabled/approved SHA/보호 환경/전체 감사 조건을 유지한다. npm publish·Release·tag·운영 배포·visibility 변경·유료 인프라를 실행하지 않았다. 실제 audit는 high2/exit1이며 그대로 실패한다.
+- 기본 브랜치 변경 도구가 커넥터에 없어 gh API로 main 설정을 시도했지만 HTTP403(Resource not accessible by integration)으로 거부됐다. 권한 우회는 하지 않았고 기본 브랜치는 여전히 `chore/project-policy`다. 명시적 `git clone --branch main`을 안내한다. 이는 과금·발행 설정 변경을 요구하지 않는다.
+
+최종 문서 커밋 전 작업 트리349파일/index349blob/도달 가능한 로컬32커밋838blob·실제5tarball 정적 스캔은 `PASS_STATIC_ONLY`/findings0이다. 새 main CI `49e8aac`는 Windows/macOS 성공, audit high2 및 Linux 상위 NodeNext TS2834 실패로 종료됐으며 억제하지 않았다. 문서 변경 이후 CI 결과는 별도 실행에서 판단한다.

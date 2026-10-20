@@ -1,6 +1,8 @@
 # 모노레포 개발 가이드
 
-2026-10-19 기준. STEP 00 설계를 구현하기 시작한 foundation 범위다. M1 전체 완료(실제 Android/iOS 최소 지도와 장비 예산 확정)는 아니다.
+현재 전체 소스는 `main`에 병합되어 있다. 기본 브랜치 변경은 GitHub 권한 부족으로 반영하지 못했으므로 [빠른 설치](quickstart.md)의 `git clone --branch main`을 사용한다. 새 clone 검증과 미해결 게이트는 [clone 검증 기록](research/clone-validation.md)을 따른다.
+
+아래 경계/API 표는 2026-10-19 foundation 도입 당시의 기록이다. 현재 공통 API·서비스 구현 범위는 [공개 API](public-api.md)와 [로드맵](roadmap.md)이 기준이며, M1 전체 완료(실제 Android/iOS 최소 지도와 장비 예산 확정)는 아니다.
 
 ## 도구와 재현
 
