@@ -1,0 +1,62 @@
+{
+  "name": "korea-map-native",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Korea Map Kit native foundation",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/LICENSE",
+    "README.md"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "korea-map-core": "workspace:*",
+    "korea-map-styles": "workspace:*",
+    "@maplibre/maplibre-gl-style-spec": "26.2.1"
+  },
+  "devDependencies": {
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "@maplibre/maplibre-react-native": "11.5.0",
+    "@types/react": "19.3.0",
+    "@types/geojson": "7946.0.16"
+  },
+  "peerDependencies": {
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "@maplibre/maplibre-react-native": "11.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kasa500000-png/KoreaMap.git",
+    "directory": "packages/native"
+  },
+  "homepage": "https://github.com/kasa500000-png/KoreaMap",
+  "bugs": {
+    "url": "https://github.com/kasa500000-png/KoreaMap/issues"
+  },
+  "keywords": [
+    "maplibre",
+    "korea",
+    "map",
+    "typescript",
+    "native"
+  ]
+}

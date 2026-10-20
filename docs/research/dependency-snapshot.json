@@ -1,0 +1,126 @@
+{
+  "checkedAt": "2026-10-19",
+  "status": "registry metadata only; installation and platform compatibility unverified",
+  "packages": [
+    {
+      "name": "maplibre-gl",
+      "version": "6.15.0",
+      "published": "2026-10-18T13:01:20.618Z",
+      "license": "BSD-3-Clause",
+      "engines": {
+        "npm": ">=8.1.0",
+        "node": ">=16.14.0"
+      },
+      "peers": null,
+      "source": "https://registry.npmjs.org/maplibre-gl"
+    },
+    {
+      "name": "@maplibre/maplibre-react-native",
+      "version": "11.5.0",
+      "published": "2026-10-04T19:02:55.822Z",
+      "license": "MIT",
+      "engines": null,
+      "peers": {
+        "expo": ">=54.0.0",
+        "react": ">=19.1.0",
+        "@types/react": ">=19.1.0",
+        "react-native": ">=0.80.0",
+        "@types/geojson": "^7946.0.0"
+      },
+      "source": "https://registry.npmjs.org/@maplibre/maplibre-react-native"
+    },
+    {
+      "name": "pmtiles",
+      "version": "4.5.0",
+      "published": "2026-08-10T20:12:24.430Z",
+      "license": "BSD-3-Clause",
+      "engines": null,
+      "peers": null,
+      "source": "https://registry.npmjs.org/pmtiles"
+    },
+    {
+      "name": "expo",
+      "version": "58.0.14",
+      "published": "2026-10-16T19:51:22.633Z",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || ^26.0.0 || >=27.0.0"
+      },
+      "peers": {
+        "react": "*",
+        "react-dom": "*",
+        "react-native": "*",
+        "react-native-web": "*",
+        "@expo/dom-webview": "*",
+        "@expo/metro-runtime": "*",
+        "react-native-webview": "*"
+      },
+      "source": "https://registry.npmjs.org/expo"
+    },
+    {
+      "name": "react-native",
+      "version": "0.88.0",
+      "published": "2026-10-15T14:08:56.115Z",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peers": {
+        "react": "^19.3.0",
+        "@types/react": "^19.1.1"
+      },
+      "source": "https://registry.npmjs.org/react-native"
+    },
+    {
+      "name": "react",
+      "version": "19.3.1",
+      "published": "2026-10-14T16:47:15.290Z",
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "peers": null,
+      "source": "https://registry.npmjs.org/react"
+    },
+    {
+      "name": "next",
+      "version": "16.4.2",
+      "published": "2026-10-15T20:57:24.007Z",
+      "license": "MIT",
+      "engines": {
+        "node": ">=20.9.0"
+      },
+      "peers": {
+        "sass": "^1.3.0",
+        "react": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0",
+        "react-dom": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0",
+        "@playwright/test": "^1.51.1",
+        "@opentelemetry/api": "^1.1.0",
+        "babel-plugin-react-compiler": "*"
+      },
+      "source": "https://registry.npmjs.org/next"
+    },
+    {
+      "name": "typescript",
+      "version": "7.0.2",
+      "published": "2026-07-08T15:55:18.431Z",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "peers": null,
+      "source": "https://registry.npmjs.org/typescript"
+    },
+    {
+      "name": "pnpm",
+      "version": "12.14.0",
+      "published": "2026-10-15T13:39:41.432Z",
+      "license": "MIT",
+      "engines": {
+        "node": ">=18.*"
+      },
+      "peers": null,
+      "source": "https://registry.npmjs.org/pnpm"
+    }
+  ]
+}

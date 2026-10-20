@@ -1,0 +1,49 @@
+# Local operator settings and credentials must not enter Git.
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+credentials*.json
+service-account*.json
+# Local/build artifacts; publish allowlists must also be defined per package.
+node_modules/
+dist/
+build/
+.next/
+.expo/
+__pycache__/
+*.pyc
+*.tgz
+coverage/
+playwright-report/
+test-results/
+# Generated map archives and source data belong to operator-managed storage.
+*.pmtiles
+*.mbtiles
+*.osm.pbf
+
+# Workspace-generated local artifacts.
+artifacts/
+**/out/
+*.tsbuildinfo
+examples/expo/android/
+examples/expo/ios/
+**/next-env.d.ts
+examples/web/public/vendor/
+
+# Operator-owned raw/derived data; forced additions are also checked in CI.
+data/raw/
+data/downloads/
+data/derived/
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.osm
+*.osc

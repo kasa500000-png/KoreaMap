@@ -1,0 +1,564 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-20",
+  "thirdPartyPayloads": [],
+  "runtimeSources": {
+    "examples/expo/App.tsx": {
+      "sha256": "971f119373579fdfacd9dc6bf96d24c5992ab3e4c0bf75d69d7663274cd09767",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/expo/index.js": {
+      "sha256": "af10e01cf5fa6d399a83829926cc80d935c1dca8fb01313ab7cb54aab84c028b",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/api/api-client.tsx": {
+      "sha256": "428bed3a28a6c829115ac37ad9068dbf7dd954d7300a3e76a6ee820140b4ae67",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/api/api-demo.tsx": {
+      "sha256": "53f0c46c490a3596a8ab19519a5695cbc6216332c80813e29e099a2dfb27550f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/api/page.tsx": {
+      "sha256": "e3854920c40f6bb75a00023fcf35881f4ed2d8c9f17c4f508fca6b2c40965d8c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/assets.d.ts": {
+      "sha256": "da5bf71d48cf909584a01c80b445f730507068f5b34c920f352e2bfcf0315e4c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/layout.tsx": {
+      "sha256": "4d0db82aa4b6307989f43d68943a469bbe0ab73c7096b830a65d5490bdb44124",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/map-client.tsx": {
+      "sha256": "f918a207165042bd8c14e9b9defe97da459df227856f868b7019d20a6b8eaac1",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/map-demo.tsx": {
+      "sha256": "75f2ea96cf6c198951d897597b250714a5924e314937e80b34ad33237d6b759b",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/page.tsx": {
+      "sha256": "65db7c87085974eecc66e5fb25989f96427ed802113f00718ef86e44c8b33518",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/search/page.tsx": {
+      "sha256": "40269bbb753e690261e02f60b6467c513922a72172ab335c1867b1e85bf7f675",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/search/search-client.tsx": {
+      "sha256": "23421c50824e0a96c19ab8d8b1af7e89ff04a7e193f7c3ef519430d7e8f211c1",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/search/search-demo.tsx": {
+      "sha256": "fa43387aab94c3ffd48ec2ea7ec249d5dff50b2ed2be4981ab5e9cb7218526ab",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/style.css": {
+      "sha256": "a5bdaf6c039d490b37816b7601c4ba8a966508e72fa0c9ede33065b5e9292adf",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/themes/page.tsx": {
+      "sha256": "49260e3072697f0b23bf7bae9f8d325586faf9a0e211fd27282cf329fa4bbbc3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/themes/theme-client.tsx": {
+      "sha256": "c2eee3eac872698555f76944802cfeb059ebf581d121c43818514a7a6e9e9cc6",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/themes/theme-gallery.tsx": {
+      "sha256": "4712c598307cf9380a2a764c5252d5b10f80492546c51685654c856186a5bd17",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/base.ts": {
+      "sha256": "566cd7c375779bd512bf6dfbb7380addb23d9220f373190a7ba1ee28718622cf",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/contracts.ts": {
+      "sha256": "1ec81e87413f26080ce8c22111068aaf1f1e5d7808c1b6171f5edc627acc7393",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/controller.ts": {
+      "sha256": "baca1ce3f9692d3535b26eb3aff85c926f4d000a95eee4f1f7a8b0778b8e4635",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/index.ts": {
+      "sha256": "f2dcce73cb0db9a9f29e6739773f369be92fd8c57923471391466beb0d8bb19e",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/operations.ts": {
+      "sha256": "7a08538a9d421f860f70c247bd6f1c189b79bd2f3b3122b82431da4649f11839",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/places.ts": {
+      "sha256": "72518db2aff4d7671f0a574409275b4869b58bdab624fff4d9d8311aefd6c467",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/search.ts": {
+      "sha256": "5c2b2247b8917b3edec35e3cb56570a00c5707ea3efaa1b0be021261298f7274",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/validation.ts": {
+      "sha256": "1fd9233234def3b9695416d246eeefee754b1d64f586978e7b057ec85d5c4c35",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/index.ts": {
+      "sha256": "5c5d0fc2e039d5ff694843c34cc765a33cf2679b3c69da0fb9a17b0f453ed8ba",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/places.ts": {
+      "sha256": "11b99ce641f9e5834425fab7b4b70b99a836c612d579f7b20b9ef5306f8aeed3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/search.ts": {
+      "sha256": "c278f0f604992aa231b29aca05f40ff715c4fdc79359dfb5201d6c7c52eefb6f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/native/src/controller.ts": {
+      "sha256": "4c568d866837c01d94c1237c2a7853e503ef3ff8b8c2e4d72be7ef519a477b57",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/native/src/index.tsx": {
+      "sha256": "ecae3a7a844c3be8934c96acde2e90067fe687899497ff9e26841555a68993d6",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/design-fixture.ts": {
+      "sha256": "3a415c09724ec596cfd41ed2486cf37535652bf43fe8c3cbf7ffb5ce78a669d8",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/font-coverage.ts": {
+      "sha256": "50e55367c0c58c6cb3a751d1e575fd8647d8ea12731826e8028a929124c0e36a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/icons.ts": {
+      "sha256": "d70670056129827f13b47fc47a9e1712a56519682fd38efa2bee4e2727ec8e7a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/index.ts": {
+      "sha256": "07c538dfbefacd6e4be02f8a559a3a0f9ba07d37b06aeed0bf07558e0c8cf66c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/labels.ts": {
+      "sha256": "9290ee7a367351381f0b628d5c2593d90e8e2d4300d702b73fe5618a9192d042",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/themes.ts": {
+      "sha256": "966d101399db8a9998b9d4f6785acd8b7f6269c9a3d100859de42f51064014b6",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/tokens.ts": {
+      "sha256": "d730d1638a6bb7b2261107ce9146d3cc9a426b4a758b3e68b199cf3910fbdcd6",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/geojson.ts": {
+      "sha256": "426bd672d89d89551774302d119ef3cf2d34cbdcfd7237435f21a787494b316c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/index.ts": {
+      "sha256": "80e76fd4e339e94599d8060dbe5bf5008a70cc5cb7620a75edc23d975a11b725",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/provider.ts": {
+      "sha256": "60b75750ddc65441e4e454b589df32a6b514bba77d03f88734e4eb7a30f80c29",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/public-api.ts": {
+      "sha256": "b679ff4ed002ff2132c0c6db4a3dd9e938d3beff5c2ae3a3fdd26f6ae1f2c4d3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/state.ts": {
+      "sha256": "157b3fe6627e3a455900d3afb77cf41d08ed08d173703ac9a93d8949cfbb48f1",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/cli.ts": {
+      "sha256": "613e8a6af26d602453bdd35e7a576703dd20902f2a81dc4efc32ecf853adaf13",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/database.ts": {
+      "sha256": "7ec33245c4e5e8ade99e6a64409f0c40772028b5bcb598c9c6cd402b7f5d0af3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/etl.ts": {
+      "sha256": "457b4d1e6970536070712c742b621beafd8f191d6216e9ca6acfb652f9bef731",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/fixture.ts": {
+      "sha256": "acf8d9ab20b29ca112665ae9b366da51bad615b96e38aa26c53a81c368af94b3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/index.ts": {
+      "sha256": "8967c3ddaae75b18224421ae817859f6e3202d21fc3b566595c6b425fc730519",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/ingestion.ts": {
+      "sha256": "5f80c65ee276aad1afe502450634429a9c869eb15afacd75205b67451b56d2bd",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/repository.ts": {
+      "sha256": "8012f1ab3bf7b6d7d6929a926cf0ac5dc4b2694d73546d5dcc5abbaf129167f2",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/server.ts": {
+      "sha256": "1ca24bcc041aaba0d99f53b087809a37e8a45662f845044433dee16e79a17c80",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/routing/src/index.ts": {
+      "sha256": "ff644beea02e45541eed9b17911ddb8c633a2c71279406794c11bc8d381ca3ef",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/cli.ts": {
+      "sha256": "2908cda91ee20ec359655a4b07a10562e8f0ded3f4e58d4ff369ace3bffc7916",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/index.ts": {
+      "sha256": "9de6135c823d34508642c67802f6eaa8e28e8b4b9f6f81f0135ed7f237b94be2",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/migration.ts": {
+      "sha256": "d1914db6ea00c42b17d8153452d3472e14d5071f87592d6d972637dd83cc3f62",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/provider.ts": {
+      "sha256": "97bbd29bb5a6307f3c4c619a3da445afb93d1b30637db79f5979813fb9415e02",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/search/src/server.ts": {
+      "sha256": "a32e394d90e265041334d2eee37c646426ee0c6220bc894a8bb1e019be9f2139",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/location.ts": {
+      "sha256": "f1417f0c704493a0f9281d6e82a21bc97749522465b1249960a64506db540aec",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/tracks.ts": {
+      "sha256": "3a92df04c12388f9cff2370fe5e77358944bbf6a56d0aeb414957ce5d576c55c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/track-formats.ts": {
+      "sha256": "dc4afefee9dc67a0eb63dd0f48287337b5fa13939871b355ba5d17a262bca868",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/replay.ts": {
+      "sha256": "14b9b8912ed659bd4889eaaa79f92a548249c54971a4bc08d64496f9dc3bf1a3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/location.ts": {
+      "sha256": "ad462e2dfac8dc415d9e849fb8746612e336edb7ddb1daf2de112a99b9863a81",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/native/src/location.ts": {
+      "sha256": "ddd901aa24758a4d88b1e5fa5b3f40a29441f8d87bc5743b4a1634423f82a14c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/location.ts": {
+      "sha256": "85c75921a42b33f9ffbbfbfa092ffe6d0aac01e88bc8cdf1239b20f259abf9a5",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/gps/page.tsx": {
+      "sha256": "37b514272f70fbe4d8d34be35f19e833135566dbeb04d8416c6652698713239b",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/gps/gps-client.tsx": {
+      "sha256": "22d7b4e37cf79dd0fb2823369d96d1359663b7618917095d103f1f20acf8f27f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/gps/gps-demo.tsx": {
+      "sha256": "ae6e545cd36d0514a70116253e3cb36e72f6af65260aa83c3c186d09324cfb26",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/expo/gps-demo.tsx": {
+      "sha256": "d198d424fdef0eb93f191decbfdb81bbcb2f525cc96dda32703483901f0fd3a4",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/expo/metro.config.cjs": {
+      "sha256": "1b801de05c908cc3d91b95d8e4f271e0bcb43c63cf40339f9813f3fbf73cc72c",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/routing.ts": {
+      "sha256": "fb5c4357414cf094cc94531ae3ced0f127f0c87da680d5545f9d067925607273",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/data-adapters/src/routing.ts": {
+      "sha256": "d481380c86e6d6de29d38768b1bab38bad57a88bf8dcb32f9c9073db77a718b9",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/routing/src/server.ts": {
+      "sha256": "0a745a8d746d214aa3148e065cd75e8044eb5f5d748107692ae103710836b799",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/routing/src/cli.ts": {
+      "sha256": "cebc6ff2b428076b2664319f743b531f74b87fe2257432f14ae9e8264066799a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/routing/page.tsx": {
+      "sha256": "45bec1116b645710ce232110214180f6b06a09317215f9f8e5837ef57ec22ae9",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/routing/routing-client.tsx": {
+      "sha256": "e558a60da51249b99191ec0aae85b04d5193606ca0a09544500852dd3da50aba",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/routing/routing-demo.tsx": {
+      "sha256": "8d84c019b09b3752b5235fa4665273b68ba11f439b117fd7a300765506aea504",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/native/src/resources.ts": {
+      "sha256": "a5f7e632c7637424b0c3627cf6cfe980324491b648b3c458a5f7bdefada7b9e1",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/expo/scenario-screen.tsx": {
+      "sha256": "30a1c991bb0b34bca413b871cbb9755409888fe03fd02a2451aae483bb9517ed",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/scenarios/src/index.ts": {
+      "sha256": "7db095eb4aa793ca1362018e3af2addc7da9f51857204d54817c2044be4fc7cc",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/scenarios/scenario-app.tsx": {
+      "sha256": "91981e4e397a84d5fd575c49f65f3f0f3f553c35223bd23d81775ad2a6406856",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/scenarios/scenario-client.tsx": {
+      "sha256": "b978cd3d656128565fe0a09fbb31b830a7baf274a78894252987ec8b8293245f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/scenarios/scenarios.css": {
+      "sha256": "cc75cba469bc954d9d0f5aaa39d16952995f3d1389f225951065db8d714b6203",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/trip/page.tsx": {
+      "sha256": "4c478b721399a8768871dd3cd08266b9532fc5a33dfa3110db22a6a757691fdb",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/walk/page.tsx": {
+      "sha256": "47f55c2c8e5c819cd4f282a28226132c1addc6ce3c2d44ecc9847dded75f8634",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/coordinate-bounds.ts": {
+      "sha256": "53fb6880cebd2d536ed32411c39a26b9a6acb5f8b680a9b36b723d668d6c3b0b",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/config.ts": {
+      "sha256": "9a2d025552eee518a3613783926910d22b173105e21a2c0f557182df6d1e88a8",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/archive.ts": {
+      "sha256": "ecb8fc96ccb59a2f28be45706f62fc57c1895fb272e12552364a5934bba8534d",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/pipeline.ts": {
+      "sha256": "7df74f3336676663a27105ac68fd93c0a00371d454d3db13948f11bb0868e2bf",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/server.ts": {
+      "sha256": "070ea7afe0d089b0418e1c67699832348ac29e0c910c53d8689f53797d13f943",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/cli.ts": {
+      "sha256": "5170cfc234ba25ad9fd6845fa9dce471a57cbc9c5e53096209c0975f48a32aef",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaProfile.java": {
+      "sha256": "24190372657bc087029899a0b3963619d064b9b51e230843ac80aa420668276f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaProfileTest.java": {
+      "sha256": "8a3678049243b1bdb374b608178a3ee86516e12d9f362918d6c23fbe2bd33b56",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaArchiveTest.java": {
+      "sha256": "f349d4f4149ab0f32d72b92a16ca11ce04a2cda0f6f841972821b0167cc73971",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/fixture.mjs": {
+      "sha256": "67823556f8fa31c630cebc02f935aba91e65f60d0485fc93c2172697ea29d4dc",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/verify-profile.mjs": {
+      "sha256": "d99d6cca5cfb4991f958d7ddf74499eebd2619bd9b59fd96428d0a40ae60eae0",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/glyphs.py": {
+      "sha256": "02a102ad4f92db26d4a4236fa55ca95a95807d19667995ee7223793c8fd9d346",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/tiles/page.tsx": {
+      "sha256": "1de578c8a587bf47c78b33109d24159b34a75c31bc57888a8f3b584b8f64182d",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/tiles/tiles-client.tsx": {
+      "sha256": "4a874a4556fa643f635984e0f0bdab7373e96f03bc0a27f59e24c345ccd0995f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "examples/web/app/tiles/tiles-demo.tsx": {
+      "sha256": "288a580ec10a8f11e7367de124ccafa27882dc2dce5d7a83ef35554827079592",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/core/src/interaction.ts": {
+      "sha256": "11b81404c473a9cd3938e0abfec0d80dbbc61dd70ce47e11ea5a42dead66aee7",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/native/src/features.ts": {
+      "sha256": "368ba095d833e642ab9b501ae386a2e33c0f5cf15fd4411dcf68fbcf5effc925",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/cartography-fixture.ts": {
+      "sha256": "3b4de3d4bf1b6ad0197c9e3977418d14286236a409cc29646d25679ef04fc815",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/cartography-schema.ts": {
+      "sha256": "e757ff976ab88a9bb8065c38803160c56f26808c32e085d7fe89577a9d555e5a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/styles/src/cartography.ts": {
+      "sha256": "fe222768486e00567b568175a2f5a747dfc974c27d508e03ee86673b94b2328e",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "packages/web/src/interaction.ts": {
+      "sha256": "7f38bff4bf85062d435eba7a6cdd0cc2cedafce7b8d276d14c4d5cd20bc34818",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaProfileV2.java": {
+      "sha256": "ef94f5ab80d5e7e981ebf120ec693beadbd5d9c0316eafa036bf4e07a18b5523",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/profile/KoreaProfileV2Test.java": {
+      "sha256": "c8e2ecb3aa660b0fb8a7b47d22f8363b4f6fde60d93ea0358b48b3231d2d8d5f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/tiles/src/http-assets.ts": {
+      "sha256": "1768949de7dc66ae05c570eae79ce85c79f02ed4cd6984a9a4f77c9a23f4b24f",
+      "origin": "project-authored",
+      "license": "MIT"
+    }
+  },
+  "screenshots": {
+    "docs/screenshots/themes/standard.png": {
+      "sha256": "9cf7281d0db1f663694d1f2cb59eede1037cfa1dee7d2a4af2754617f0a21082",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "docs/screenshots/themes/dark.png": {
+      "sha256": "96b437e696cb6b545ccc3936e3c0fb82ac2a35b7a0d3ec97eadf949f10fecec3",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "docs/screenshots/themes/pastel.png": {
+      "sha256": "9a3e5eded20356cadbdc5d40bdd4651f1d07e43cf60ac81b21b12414e1b8249a",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "docs/screenshots/themes/outdoor.png": {
+      "sha256": "71b2573809421011bf6b229b7dc68e3def3e3535c3bf8eb0fae6c17e36470833",
+      "origin": "project-authored",
+      "license": "MIT"
+    }
+  }
+}

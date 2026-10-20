@@ -1,0 +1,18 @@
+{
+  "name": "@korea-map-kit/service-routing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "korea-map-core": "workspace:*",
+    "korea-map-data-adapters": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2"
+  }
+}

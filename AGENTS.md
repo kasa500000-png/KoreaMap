@@ -26,10 +26,34 @@
 9. 지도 데이터 라이선스와 SDK 코드 라이선스를 분리한다.
 10. 특정 상용 지도 서비스의 비공개 코드, 타일, DB, API 키, 디자인 에셋을 복제하지 않는다.
 
+## Zero Publisher Cost 정책
+
+사용자 지정 필수 정책이다. SDK 사용자가 100명에서 10만 명으로 늘더라도 기본 설치·실행·테스트가 제작자 소유 과금 가능 서비스의 사용량을 증가시키는 구조를 만들지 않는다. 이 정책은 SDK, 예제, 데모, 배치 도구, CI, 배포물에 적용한다. 코드 제공 비용과 서비스 운영 비용은 별개이며 모든 인프라 비용이 항상 0원이라는 뜻은 아니다.
+
+1. SDK 사용자 요청은 제작자 소유 API 키, DB, 타일 서버, 백엔드 또는 유료 계정을 기본적으로 사용하지 않아야 한다.
+2. 지도 타일·검색·경로·공공데이터 Provider는 사용자 설정 기반으로 구현한다.
+3. 필수 설정이 없으면 안전하게 실패하거나 별도로 허가된 로컬 테스트 데이터를 사용한다. 제작자 계정으로 자동 연결하지 않는다.
+4. API Secret, 토큰, 개인 서버 주소, 결제 관련 설정이 패키지와 Git에 포함되지 않도록 검증한다.
+5. 브라우저·모바일 앱 환경변수에 넣는 값도 외부에 노출될 수 있음을 고려해 설계한다.
+6. 데모 웹사이트는 제작자에게 유료 API 사용량을 발생시키지 않도록 제한한다.
+7. SDK 기본 기능은 유료 클라우드 계정 없이 빌드·테스트할 수 있어야 한다.
+8. 선택형 외부 서비스 사용 시 비용과 사용 책임을 해당 서비스를 설정한 운영자에게 명확히 안내한다.
+9. GitHub Actions는 무료 표준 Runner를 기본 사용하고 과금 가능 기능은 별도 승인 없이 활성화하지 않는다.
+10. 배포 전 보안 검사와 비용 발생 경로 감사 결과를 `docs/cost-audit.md`에 작성한다.
+11. 공개 SDK 설치/실행/테스트 과정에서 제작자 소유의 과금 가능 엔드포인트로 요청이 발생하지 않는지 검증한다.
+12. 소스코드 배포 비용과 지도·검색·라우팅 서비스 운영 비용을 `README.md`에 구분한다.
+
+- 네트워크 설정은 명시적 provider 주입으로만 받는다. import/설치만으로 요청하지 않으며 필수 지도 설정 검증 전에 renderer를 mount하지 않는다. 상위 MapLibre의 기본 demo style도 그대로 사용하지 않는다.
+- style/source뿐 아니라 TileJSON, glyph/font, sprite/image, terrain, worker, telemetry, 업데이트 확인, remote build cache, install hook의 요청도 감사한다. 문서 출처 URL과 실행 endpoint는 구분한다.
+- 기본 예제/공개 데모는 허가된 소형 로컬 fixture 모드다. 외부 provider는 운영자 opt-in과 비용 고지 후에만 사용한다. 공개 데모에 범용 proxy, 공유 API 키, 토큰 발급 경로를 두지 않는다.
+- `NEXT_PUBLIC_*`, `EXPO_PUBLIC_*`, 앱 bundle/소스맵/native resource에 들어간 값은 공개 정보로 취급한다. 비공개 키는 운영자 서버에만 보관한다. SDK가 암묵적으로 제작자의 환경변수를 탐색하지 않는다.
+- 보안·비용 감사는 작업 트리·Git index/이력·실제 npm tarball 및 Web/모바일 배포물을 포함한다. 정적 검사 통과를 실제 네트워크 무요청 증거로 대체하지 않는다. 제품/플랫폼 미구현으로 실행할 수 없으면 배포 차단 항목으로 기록한다.
+- Actions 표준 runner의 무료 조건을 도입 시 확인한다. larger/GPU/self-hosted 유료 인프라, remote cache, 초과 artifact/cache, 유료 빌드/배포 및 상시 스케줄은 별도 승인 없이 활성화하지 않는다. 계정 결제 설정의 안전 상태를 코드 검사만으로 보장하지 않는다.
+
 ## 개발 운영 규칙
 
 - 프로젝트 루트의 `AGENTS.md`를 작업 시작 시 읽는다.
-- `docs/roadmap.md`와 `docs/progress.md`를 유지하고 각 단계의 범위, 검증, 미완료 사항을 갱신한다.
+- `docs/roadmap.md`, `docs/progress.md`, `docs/cost-audit.md`를 유지하고 각 단계의 범위, 검증, 미완료 사항 및 비용 경로를 갱신한다.
 - 최신 공식 문서에 근거해 의존성 버전을 선택 및 고정한다. 선택 시 공식 문서/릴리스 URL, 확인일, 호환성 근거를 기록하고 정확한 버전과 lockfile을 관리한다. 확인할 수 없는 버전을 최신 또는 검증됨으로 표현하지 않는다.
 - 단계별 기능을 구현하고 실제 테스트한다. 변경에 맞는 테스트 및 필수 검사를 실행한다.
 - 테스트 미통과 시 완료 처리하지 않는다. 실패를 해결한 후 관련 테스트를 다시 실행한다.
@@ -62,3 +86,61 @@
 8. 다음 단계 진행 가능 여부
 
 동일 커밋에 자기 자신의 해시를 기록할 수 없으므로, 진행 문서에는 해당 단계 커밋을 식별할 명령을 남기고 커밋 직후 사용자 보고에서 실제 해시를 제공할 수 있다.
+
+## 모노레포 운영 기준
+
+- SDK는 `packages/core`, `packages/web`, `packages/native`, `packages/styles`, `packages/data-adapters`; 소비 앱은 `examples/web`, `examples/expo`; 서버는 `services/*`에 둔다. root/예제/서비스는 private다.
+- core는 외부 의존성 및 DOM/React Native/Supabase 타입·runtime import를 갖지 않는다. 경계 검사와 TypeScript strict 설정을 유지한다.
+- Node/pnpm 버전과 exact 의존성·lockfile을 함께 관리한다. 의존성 install hook은 기본 차단하며 이유 없이 해제하지 않는다.
+- 변경 후 `pnpm check`를 실행하고 패키지 변경은 `pnpm pack:check`, Web 동작 변경은 `pnpm test:web`으로 확인한다. Expo JS export를 Native 앱 컴파일/QA로 보고하지 않는다.
+- 자체 코드와 합성 fixture는 루트 LICENSE의 MIT를 적용한다. 외부 데이터/라이브러리는 별도 조건을 유지한다.
+
+## 데이터 공급원·공개 차단 정책
+
+- `data/sources.json`과 `docs/data-sources.md`, `docs/data-licenses.md`, `docs/attribution.md`를 함께 유지한다. A는 확인된 자체 DB 저장·재배포 후보, B는 확인된 API-only, C는 조건 확인 필요, D는 해당 용도 제외다. API 전달 방식만으로 B를 부여하지 않는다.
+- 자동 수집 자격은 A만, B는 명시적 운영자 설정의 선택형 외부 API 어댑터만 허용한다. C/D는 기본 및 선택형 실행에서 제외한다. A도 기본 활성화하거나 제작자 계정으로 요청하지 않는다.
+- 기관 전체·포털 전체를 승인하지 않는다. 개별 데이터/필드/미디어 범위의 권리, 기준일, 출처, 비용·쿼터와 접근 실패를 기록한다. 검토 만료 및 변경된 약관은 재확인한다.
+- 현재 제3자 지도 데이터·사진·폰트 payload는 A도 Git/npm에 포함하지 않는다. 운영자 데이터 저장소와 SDK를 분리한다. 합성 fixture의 출처를 실제 공공데이터로 표시하지 않는다.
+- `pnpm check:data`, `pnpm test:data`, `pnpm check:data-docs`를 통과해야 한다. runtime source 수정은 `data/publication.json`의 출처·해시 검토를 함께 갱신한다. 해시 일괄 재생성으로 권리 검토를 대신하지 않는다.
+- 공개 전 실제 npm tarball을 `pnpm pack:check`로 검사하고, 커밋 전 `pnpm check:data --staged`로 index를 검사한다. 자동 검사가 법적 권리와 모든 위장 데이터를 증명하지 못한다는 한계를 보고한다.
+
+## 지도 디자인 QA 산출물
+
+- 사용자가 요청한 자체 합성 4종 테마 스크린샷은 `docs/screenshots/themes/{standard,dark,pastel,outdoor}.png` 네 경로에 한해 허용한다. `data/publication.json`의 `screenshots` 출처·SHA-256과 실제 PNG 구조를 검증한다. 다른 이미지·폰트·지도 payload 허용으로 확대하지 않는다.
+- 스크린샷은 실제 렌더러 캡처 후 직접 확인하고 해시를 갱신한다. 폰트 파일·glyph PBF는 여전히 Git/npm에 포함하지 않으며 로컬 QA 파일의 라이선스와 해시를 문서에 기록한다.
+- Web 로컬 폰트 결과를 Android/iOS 결과로 대신하지 않는다. Native glyph 공급원 누락은 실패시키고, 실기기/시뮬레이터 없이 해당 렌더링을 통과로 표시하지 않는다.
+## 공공 POI ETL 검증
+
+- `services/geo-data`는 private 운영자 서비스다. pg/CSV parser/DB 자격증명을 SDK에 넣지 않는다.
+- 현재 CSV 수집 프로파일은 원장 A 등급의 `yongsan-parking`, `mois-animal-hospitals`, `bukgu-walking`만 지원한다. 미지원 A도 자동 활성화하지 않는다. 기한·권리·CRS·해시·필드 검증은 우회하지 않는다.
+- 실제 원천 파일과 합성 fixture를 구분한다. 위치 미제공은 null, 이미지·불필요 개인 필드는 보존하지 않는다. 실제 파일 접근·헤더·기준점 미검증은 합성 테스트로 대체 완료 처리하지 않는다.
+- DB/ETL/조회 SQL·권한 변경 시 `pnpm test:geo`로 임시 Docker PostGIS 실제 통합 검사를 추가 실행한다. Docker가 없으면 미검증/차단으로 보고한다. 기존 check/pack/staged 규칙은 유지한다.
+- 원본 데이터/설정/DB 암호는 ignored 운영자 저장소만 사용하고 출력하지 않는다. Git/npm의 제3자 payload 금지 규칙을 유지한다. Supabase·외부 DB 배포나 공개 HTTP 노출은 자동으로 수행하지 않는다.
+
+## GPS와 사용자 경로 개인정보
+
+- 위치 수집은 인스턴스별 명시적 동의와 OS 권한 뒤에만 시작한다. 기본 외부 전송·위치 로그·자동 장기 저장은 금지한다.
+- 현재 GPS 어댑터는 foreground 전용이다. 비활성/철회/삭제/종료 시 구독을 정리하고 자동 재개하지 않는다. background 지속 수집 지원으로 표시하지 않는다.
+- 사용자 경로/좌표/시각/기기 식별자를 Git·공개 screenshot·CI 로그에 넣지 않는다. 합성 테스트와 실센서 검증을 구분한다.
+- core의 경로 변환은 데이터만 처리한다. 파일·DB 보관/동기화/암호화/영구 삭제는 소비 앱 정책이며 앱 외부 내보내기 파일도 별도 삭제 대상이다.
+- GPS 변경 시 모의 필터/단위/파일·취소/권한 검사를 수행하고 실제 Android/iOS 및 OS background 미실행은 명확히 미검증으로 남긴다.
+
+## 선택형 자체 라우팅
+
+- Valhalla graph/OSM PBF/admin DB는 운영자 저장소에만 둔다. SDK/core는 URL·Docker·DB 기본 의존성이 없고 제작자/공용 routing endpoint로 fallback하지 않는다.
+- 모든 모드·경유점·스냅·오류를 검증한다. 실패를 직선이나 다른 이동 모드로 대체하지 않는다. 실제 교통·안전·현장 통행 가능성을 보장하지 않는다.
+- 라우팅 엔진/어댑터/운영 스크립트 변경 시 `pnpm test:routing`의 실제 Docker 통합 검사를 실행한다. 합성 그래프·한국 공개 OSM 표본·현장 검증 결과를 구분한다.
+- 지역 갱신은 A 원장/검토기한/해시/기준일/ODbL opt-in과 새 graph smoke 뒤 진행한다. 실패 시 이전 세대를 보존하고 전환/롤백은 명시적으로 수행한다.
+
+## Native SDK 검증 기준
+
+- MapLibre RN·Expo·React Native 및 native engine 버전을 정확히 고정하고 공식 호환성·New Architecture·config plugin 결과를 기록한다. Expo Go, JS export 또는 prebuild를 Android/iOS Development Build·실화면 검증으로 표시하지 않는다.
+- Native provider는 명시적 operator config로만 받는다. 리소스 입력 origin 검사를 native redirect 방화벽으로 표현하지 않는다. PMTiles의 엔진 문서상 지원과 RN/OS 실제 실행 결과를 구분하며 일반 HTTP XYZ 대체 설정을 유지한다.
+- Native 변경은 `docs/research/native-sdk-validation.md`에 APK/IPA 컴파일, 실기기/에뮬레이터, 한글 glyph, 제스처·회전·복귀·권한·메모리·테마 결과와 미검증 항목을 기록한다. 생성 프로젝트·서명·APK·지도/font payload는 Git/npm에 포함하지 않는다.
+
+## 운영자 타일·Glyph 검증 기준
+
+- `services/tiles`는 private 운영 도구다. JDK/Planetiler·실제 OSM·폰트·선택형 Python 이미지 도구를 SDK 기본 설치·빌드·테스트의 필수 요구로 만들지 않는다. 다운로드/수집은 원장 권리·기한·원본 SHA·기준일·명시적 opt-in 뒤에만 수행한다.
+- 생성 archive·glyph·실지도 캡처는 ignored 운영자 저장소에만 둔다. SDK MIT, OSM ODbL, 폰트/OFL 의무를 분리하고 라이선스 고지를 함께 보존한다. 글리프 endpoint가 존재한다는 사실을 모든 문자 지원으로 표시하지 않는다.
+- TypeScript 타일 도구 변경은 `pnpm test:tiles`로 검사한다. profile/glyph 변경은 선택형 `pnpm test:tile-profile`/`pnpm test:tile-glyphs`와 실제 renderer 통합을 별도로 실행한다. 필요한 도구·원본·자원이 없으면 미검증으로 기록한다.
+- immutable 새 세대를 검증한 뒤 수동 활성화하고 기존 성공본을 보존한다. 실제 전환·손상 거부·rollback과 HTTP XYZ/glyph/출처를 확인한다. 로컬 loopback 검증을 공개 호스팅·전국 coverage·Native 실행·운영 SLA 검증으로 확대하지 않는다.

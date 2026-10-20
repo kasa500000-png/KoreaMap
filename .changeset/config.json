@@ -1,0 +1,22 @@
+{
+  "changelog": ["@changesets/cli/changelog", {}],
+  "commit": false,
+  "fixed": [
+    [
+      "korea-map-core",
+      "korea-map-styles",
+      "korea-map-data-adapters",
+      "korea-map-web",
+      "korea-map-native"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [],
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
+}
