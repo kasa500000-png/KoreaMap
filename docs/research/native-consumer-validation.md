@@ -19,7 +19,9 @@ pnpm test:native-consumer
 세 tarball의 이름·버전·크기·SHA256, 소스 커밋/dirty 여부와 단계별 결과를 기록한다.
 설치·앱 코드·플러그인·export 실패는 종료 코드가 0이 아니고 이미 통과한 단계만 남긴다.
 의존성 선언 전체 검사는 독립 probe다. 이 probe가 실패하면 별도 `FAIL`과 `PARTIAL_PASS`를
-기록하며 앱 코드 검사 성공으로 덮어쓰지 않는다. 임시 소비 앱은 성공·실패 모두 삭제한다.
+기록하며 앱 코드 검사 성공으로 덮어쓰지 않는다. 최신 [Step 1 수정](security-types-validation.md)부터
+이 경우에도 명령은 nonzero exit로 끝나며 발행 게이트를 차단한다. timeout·signal·실행 실패는
+`NOT_RUN`으로 남긴다. 임시 소비 앱은 report 쓰기 성공·실패와 관계없이 삭제를 시도한다.
 
 ## 검증 범위
 

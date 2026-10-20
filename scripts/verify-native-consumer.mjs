@@ -15,6 +15,7 @@ import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { assertDeclarationProbe, summarizeDeclarationProbe } from './declaration-probe.mjs';
 
 const sdkNames = ['core', 'native', 'styles'];
 export const pinnedPeers = Object.freeze({
@@ -25,6 +26,11 @@ export const pinnedPeers = Object.freeze({
   react: '19.3.0',
   'react-native': '0.88.0',
 });
+
+/** Only a completed successful compiler run can clear the Native declaration release gate. */
+export function assertConsumerDeclarations(summary) {
+  assertDeclarationProbe(summary, 'Native dependency declarations');
+}
 
 export function assertConsumerManifest(manifest, tarballs) {
   assert.equal(manifest.private, true, 'Consumer must never be publishable');
@@ -132,8 +138,10 @@ function runVerification() {
   const directory = mkdtempSync(resolve(tmpdir(), 'kmk-native-consumer-'));
   const report = {
     schemaVersion: 1,
-    sourceCommit: execute('git', ['rev-parse', 'HEAD'], root).trim(),
-    sourceDirty: execute('git', ['status', '--porcelain'], root).trim().length !== 0,
+    sourceCommit: null,
+    sourceDirty: null,
+    overall: 'NOT_RUN',
+    releaseBlocked: true,
     packages: [],
     checks: {},
     native: {
@@ -148,6 +156,8 @@ function runVerification() {
   };
   const target = resolve(root, 'artifacts/qa/native-consumer.json');
   try {
+    report.sourceCommit = execute('git', ['rev-parse', 'HEAD'], root).trim();
+    report.sourceDirty = execute('git', ['status', '--porcelain'], root).trim().length !== 0;
     const tarballs = Object.fromEntries(
       sdkNames.map((name) => {
         const manifest = JSON.parse(readFileSync(resolve(root, 'packages', name, 'package.json')));
@@ -310,19 +320,9 @@ export default function App() {
       [tsc, '-p', 'tsconfig.json', '--skipLibCheck', 'false'],
       { cwd: directory, env: taskEnv, encoding: 'utf8', timeout: 180000 },
     );
-    assert(!declarationProbe.error, 'Dependency declaration probe could not execute');
-    report.checks.dependencyDeclarations = {
-      status: declarationProbe.status === 0 ? 'PASS' : 'FAIL',
-      exitCode: declarationProbe.status,
-      diagnosticCodes: [...new Set((declarationProbe.stdout ?? '').match(/TS\d+/g) ?? [])],
-      diagnosticFiles: [
-        ...new Set(
-          [...(declarationProbe.stdout ?? '').matchAll(/^([^\n(]+)\(\d+,\d+\): error TS/gm)].map(
-            ([, file]) => file,
-          ),
-        ),
-      ],
-    };
+    report.checks.dependencyDeclarations = summarizeDeclarationProbe(declarationProbe, {
+      roots: [directory, root],
+    });
     console.log('NATIVE_DECLARATION_PROBE', JSON.stringify(report.checks.dependencyDeclarations));
     const expo = resolve(dirname(require.resolve('expo/package.json')), 'bin/cli');
     const introspection = JSON.parse(
@@ -357,8 +357,9 @@ export default function App() {
     report.checks.iosJavaScriptExport = 'PASS';
     report.overall =
       report.checks.dependencyDeclarations.status === 'PASS' ? 'PASS' : 'PARTIAL_PASS';
+    report.releaseBlocked = report.checks.dependencyDeclarations.status !== 'PASS';
     console.log(
-      'PASS: isolated Native tarballs, strict app/API types with skipLibCheck, plugins and Android/iOS JS export',
+      `${report.overall}: isolated Native tarballs, strict app/API types with skipLibCheck, plugins and Android/iOS JS export`,
     );
     console.log(
       `Dependency declarations (skipLibCheck:false): ${report.checks.dependencyDeclarations.status}; see report`,
@@ -369,10 +370,15 @@ export default function App() {
     report.failed = true;
     throw error;
   } finally {
-    mkdirSync(dirname(target), { recursive: true });
-    writeFileSync(target, `${JSON.stringify(report, null, 2)}\n`);
-    rmSync(directory, { recursive: true, force: true });
+    try {
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, `${JSON.stringify(report, null, 2)}\n`);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
   }
+  // Preserve supported checks and diagnostics before refusing a release with incomplete declarations.
+  assertConsumerDeclarations(report.checks.dependencyDeclarations);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href)

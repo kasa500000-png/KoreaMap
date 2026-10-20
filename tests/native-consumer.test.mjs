@@ -1,14 +1,17 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import test from 'node:test';
 import {
   assertConsumerManifest,
+  assertConsumerDeclarations,
   assertInstalledSdk,
   assertIntrospection,
   pinnedPeers,
 } from '../scripts/verify-native-consumer.mjs';
+import { summarizeDeclarationProbe } from '../scripts/declaration-probe.mjs';
 
 const tarballs = Object.fromEntries(
   ['core', 'native', 'styles'].map((name) => [
@@ -132,4 +135,50 @@ test('Expo introspection must prove foreground-only permissions and reviewed Map
   const missingGradle = introspection();
   missingGradle._internal.modResults.android.gradleProperties = [];
   assert.throws(() => assertIntrospection(missingGradle));
+});
+
+test('Native release gate accepts a completed compiler and rejects actual compiler diagnostics', () => {
+  const success = spawnSync(process.execPath, ['-e', 'process.exit(0)'], { encoding: 'utf8' });
+  assertConsumerDeclarations(summarizeDeclarationProbe(success));
+  const failure = spawnSync(
+    process.execPath,
+    [
+      '-e',
+      "console.error('App.tsx(1,1): error TS2411: Synthetic declaration failure'); process.exit(2)",
+    ],
+    { encoding: 'utf8' },
+  );
+  const summary = summarizeDeclarationProbe(failure);
+  assert.equal(summary.status, 'FAIL');
+  assert(summary.diagnosticCodes.includes('TS2411'));
+  assert.throws(() => assertConsumerDeclarations(summary), /Native dependency declarations/);
+});
+
+test('Native release gate never accepts a killed or timed-out compiler as a declaration pass', () => {
+  const killed = spawnSync(process.execPath, ['-e', "process.kill(process.pid, 'SIGTERM')"], {
+    encoding: 'utf8',
+  });
+  const timeout = spawnSync(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], {
+    encoding: 'utf8',
+    timeout: 50,
+  });
+  // Windows can report forced termination as a nonzero status without a POSIX signal.
+  const killedSummary = summarizeDeclarationProbe(killed);
+  assert.notEqual(killedSummary.status, 'PASS');
+  assert.throws(() => assertConsumerDeclarations(killedSummary), /Native dependency declarations/);
+  const timeoutSummary = summarizeDeclarationProbe(timeout);
+  assert.equal(timeoutSummary.status, 'NOT_RUN');
+  assert.equal(timeoutSummary.completed, false);
+  assert.throws(() => assertConsumerDeclarations(timeoutSummary), /Native dependency declarations/);
+});
+
+test('Native release gate rejects startup failure and missing completion even without TypeScript diagnostics', () => {
+  for (const result of [
+    { status: null, signal: null, error: { code: 'ENOENT' }, stdout: '', stderr: '' },
+    { status: null, signal: null, stdout: '', stderr: '' },
+  ]) {
+    const summary = summarizeDeclarationProbe(result);
+    assert.equal(summary.status, 'NOT_RUN');
+    assert.throws(() => assertConsumerDeclarations(summary), /Native dependency declarations/);
+  }
 });

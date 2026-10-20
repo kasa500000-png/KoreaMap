@@ -53,7 +53,7 @@
     "check:licenses": "node scripts/check-licenses.mjs",
     "audit:dependencies": "pnpm audit --audit-level=high",
     "verify:packages": "node scripts/verify-packages.mjs",
-    "test:release": "node --test tests/release.test.mjs",
+    "test:release": "node --test tests/release.test.mjs tests/declaration-probe.test.mjs",
     "release:prepare": "node scripts/release.mjs prepare",
     "release:verify": "node scripts/release.mjs verify",
     "tiles": "node --use-env-proxy services/tiles/dist/cli.js",

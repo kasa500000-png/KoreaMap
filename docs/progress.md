@@ -619,3 +619,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 ### 8. 다음 단계 진행 가능 여부
 
 검증된 SDK 기능과 운영 도구를 바탕으로 후속 작업은 가능하다. 성능·보안/선언·실기기·해안선/전국 수락이 남아 있어 전체 Q0–Q5 완료 또는 공개 릴리스 가능으로 표시할 수 없다. 사용자가 추후 장비/저장 자원을 확보한다는 선호를 유지하며 승인 없는 유료 인프라를 만들지 않는다.
+
+## 후속 1단계 — 보안·공개 타입 게이트 — 2026-10-20 KST
+
+1. **구현:** 실패한 공개 선언 검사가 exit0으로 끝나던 결함을 수정했다. Web/Native는 지원 검사·진단·PARTIAL_PASS를 보존하고 오류/중단/미실행에 nonzero exit한다. 상위 취약점/선언 자체를 해결한 단계 완료는 아니다.
+2. **파일:** `scripts/declaration-probe.mjs`, 두 tarball verifier·회귀 테스트·test:release 명령, [보안·타입 근거](research/security-types-validation.md), 독립 Native 가이드·로드맵·비용/진행 기록. SDK 소스·의존성·lockfile은 변경하지 않았다.
+3. **검사:** 전체 `pnpm check` 통과(Vitest177, release12, Native consumer6 포함). 실제5tarball byte 동일 재빌드·격리 Bundler/core/SSR/browser PASS, Web NodeNext TS2834로 verifier exit1. Native offline 설치·앱타입/plugin/양OS JS export PASS, 상위 RN3건으로 verifier exit1. `pnpm audit:dependencies` high2/critical0·exit1 유지.
+4. **실화면:** 독립 Web 소비 앱에서 지도 표시·선택·종료 및 외부 요청0 확인. 이 단계는 SDK renderer를 변경하지 않았다. Native APK/IPA/실기기 및 OS 네트워크는 미검증이다.
+5. **라이선스/보안:** 신규 도구는 자체MIT, 원본 지도/font payload·키·제작자 endpoint 추가 없음. 공식 registry/advisory 및 새 MapLibre 선언만 ignored 저장소에서 조사했다. 감사 제외·강제 override·shim·Native 제거·유료 인프라는 추가하지 않았다.
+6. **차단:** node-forge1.4.0/braces3.0.3에 공식 패치 없음. 최신 지원 RN/MapLibre 경로에도 전체 선언 오류가 남는다. CI 실패를 우회한 main 병합이나 단계 전체 완료를 하지 않는다.
+7. **Git:** `fix/security-and-public-types`, 기반 `3cb1a37d9b2bebcd66586c614f681ded7aaeb116`. 단계 커밋: `git log -1 --format='%H %s' --grep='^fix: fail closed on public declaration verification$'`. 사용자가 두 단계의 commit/PR/main merge를 승인했다. 최초 PR은 main에 없는 기존 SDK 기반도 포함하며, 실제 PR/CI/병합 상태는 최종 사용자 보고로 연결한다.
+8. **다음:** 독립적인 성능 개선은 가능하다. 보안·전체 타입은 BLOCKED이며 병합·발행 수락으로 처리하지 않는다. npm 발행/Release/운영 배포 승인은 없다.

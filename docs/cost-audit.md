@@ -368,3 +368,9 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 - `pnpm audit`는 high2/critical0·exit1이며 공개 차단이다. 공식 지원 수정·Native 기기/상위 타입·해안선·전국/장기 성능이 남아 있다. audit ignore/continue-on-error, paid runner/EAS/cloud/remote cache/cron/artifact 업로드/배포/발행·GitHub 원격 쓰기를 추가하지 않았다. SDK 코드 배포와 운영자의 지도·검색·라우팅 서비스 비용은 계속 분리한다.
 
 최종 커밋 전 검사에서 작업 트리342파일·index342blob·도달 가능한 로컬26커밋/739blob과 실제5개 tarball의 정적 findings는0(`PASS_STATIC_ONLY`)이다. staged 데이터 검사16원천/342파일과 diff 검사도 통과했다. 결과는 ignored `artifacts/map-quality-final-cost.json`, 커밋 식별은 [진행 기록](progress.md)의 최신 단계를 따른다. 정적 findings0·브라우저 외부 요청0을 모든 Native OS 트래픽·운영자 청구 설정·상용 서비스 전체 검증으로 확대하지 않는다.
+
+## 후속 1단계 — 2026-10-20 KST
+
+[보안·타입 조사](research/security-types-validation.md)에서 공식 registry·advisory·지원 버전을 재확인했다. high2/critical0와 공개 선언 오류는 유지된다. Web/Native 독립 소비 명령이 PARTIAL_PASS를 exit0으로 넘기던 결함을 수정해 실패/미실행에서 발행을 차단한다. 정상 Bundler/core/SSR/browser·Native 앱/plugin/JS 결과와 source commit·진단은 보존한다. 키·제작자 서비스·SDK 의존성·lockfile·기본 provider·CI runner/발행 승인 조건은 바꾸지 않았다. 공식 MapLibre tarball 및 실진단/프로파일은 ignored artifacts에만 있다.
+
+사용자는1·2단계의 공개 commit/PR·main merge를 승인했다. 실패 감사/선언을 억제한 병합이나 npm/Release/운영 배포는 승인 범위로 확대하지 않는다. 이번 독립 Web 브라우저의 외부 요청0은 OS 전체/Native 실행 감사가 아니다. 최종 staged·로컬 이력·실제5tarball 비밀/비용 스캔은 단계 커밋 전에 실행한다.
