@@ -94,3 +94,11 @@ pnpm view micromatch@4.0.8 dependencies --json
 실제 `dist/maplibre-gl.d.ts`는 746,446 bytes이며 3행에서 `@maplibre/geojson-vt`, 5행에서 `@maplibre/vt-pbf`를 여전히 외부 import한다. 두 의존성의 공식 최신은 각각 [6.3.0](https://registry.npmjs.org/@maplibre/geojson-vt), [4.3.2](https://registry.npmjs.org/@maplibre/vt-pbf)로 현재 설치와 같다. 실제 의존 선언의 확장자 없는 상대 import가 유지된다.
 
 6.15.0의 실제 선언을 현재 검토된 의존 그래프에 연결한 별도 무설치 probe에서 TypeScript 6.0.3, strict, NodeNext, `skipLibCheck:false`, 공식 geojson 타입을 사용했다. compiler는 **exit 2 / TS2834**를 두 의존성의 `dist/index.d.ts`에서 반환했다. 원본 선언·설치 의존성·타입 검사를 수정하지 않았다. 증거는 ignored `artifacts/research/security-types/maplibre-6.15.0-probe.json`이다. 이는 실제 6.15.0 전체 설치/플랫폼 호환성 검증과 구분되는 선언 조사이며, 단순 metadata 비교보다 직접적인 upstream 제약 증거다. 6.15.0 업그레이드만으로 현재 Web NodeNext blocker를 해결한다는 근거는 확인하지 못했다.
+
+## PR 15 macOS 임시 경로 회귀
+
+[PR 15](https://github.com/kasa500000-png/KoreaMap/pull/15)의 원격 macOS CI에서 `tests/tiles-security.test.mjs`의 source download 검사가 실패했다. macOS의 임시 경로 별칭 `/var/folders/...`를 테스트가 그대로 기대했으나, 런타임은 보안 경로 검증으로 실제 위치인 `/private/var/folders/...`를 반환했다. 다운로드 내용이나 권한 검사의 실패가 아닌 테스트 기대 경로의 불일치였다.
+
+기대값만 `resolve(realpathSync(store), 'source.pbf')`로 수정했다. 런타임의 canonical path·symlink 차단, 원본 URL·opt-in·SHA·기준일 검사는 변경하지 않았고 기존 테스트를 생략하지 않았다. 보안 감사와 공개 선언의 차단 상태도 유지한다.
+
+`fix/security-and-public-types`의 격리 worktree에서 core/styles/tiles TypeScript 재빌드와 Linux 타일 테스트 **34/34**가 통과했다. 별칭 symlink를 가리키는 `TMPDIR`로 같은 경로 차이를 재현한 실행도 **34/34** 통과했다. 기존 로컬 도구만 사용했고 의존성 설치·외부 요청·실제 데이터 다운로드는 없었다. macOS/Windows 실제 재실행은 로컬 Linux 결과로 대체하지 않으며 수정 커밋의 원격 CI에서 별도로 확인해야 한다.

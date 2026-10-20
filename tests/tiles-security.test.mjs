@@ -11,6 +11,7 @@ import {
   symlinkSync,
   copyFileSync,
   existsSync,
+  realpathSync,
 } from 'node:fs';
 import { resolve } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -368,7 +369,7 @@ test('source download uses only the reviewed URL after opt-in and verifies PBF t
     };
     const result = await downloadSource(options);
     assert.equal(result.dataAsOf, '2026-10-18T00:00:00.000Z');
-    assert.equal(result.input, resolve(store, 'source.pbf'));
+    assert.equal(result.input, resolve(realpathSync(store), 'source.pbf'));
     assert.equal(JSON.parse(readFileSync(result.manifestPath)).verified, true);
     await downloadSource(options);
     assert.equal(calls, 1);
