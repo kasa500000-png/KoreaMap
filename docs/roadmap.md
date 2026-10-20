@@ -4,6 +4,8 @@
 
 ## 기반과 현재 작업
 
+- 03단계의 [브라우저/생명주기 QA](research/stage-03-browser-lifecycle.md)는 기존 Chromium25와 세 Linux 브라우저12 검사를 분리하고 실제PNG/20회 정리·표준 CI matrix를 추가한다. Safari/iOS·전체 메모리·장기 운영 수락과 구분한다.
+
 - 현재 후속 작업은 사용자 요청에 따라 [우선순위별 10단계](ten-stage-plan.md)로 실행한다. 각 단계의 독립 commit/PR/main 반영과 지정 대상 배포를 준비하며, 실제 Android 기기·macOS/iOS는 제외 범위다. 기존 보안·타입·성능 게이트를 유지하고 완료·부분 성공·외부 차단을 구분한다.
 - 01단계는 [PR18](https://github.com/kasa500000-png/KoreaMap/pull/18)로 CI 소비 게이트를 격리했으며 보안 high2는 미해결이다. 02단계의 [Native 공개 GeoJSON 선언](research/stage-02-public-types.md)은 SDK strict Bundler/NodeNext 검사를 개선하고 전체 RN/Web 상위 선언 실패는 유지한다.
 

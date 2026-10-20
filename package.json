@@ -69,7 +69,9 @@
     "verify:real-routing-map": "node scripts/verify-real-routing-map.mjs",
     "test:map-quality": "node --test tests/map-quality.test.mjs tests/quality-consumer.test.mjs",
     "verify:map-quality": "node scripts/verify-map-quality.mjs",
-    "verify:map-frames": "node scripts/verify-map-frames.mjs"
+    "verify:map-frames": "node scripts/verify-map-frames.mjs",
+    "verify:browser-lifecycle": "node scripts/verify-browser-lifecycle.mjs",
+    "test:browser-policy": "node --test tests/browser-lifecycle.test.mjs"
   },
   "devDependencies": {
     "typescript": "6.0.3",
