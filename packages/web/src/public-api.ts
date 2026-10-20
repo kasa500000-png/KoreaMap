@@ -6,19 +6,19 @@ import {
   type MapBounds,
   type OperationContext,
 } from 'korea-map-core';
-import type { MapHandle } from './index.js';
+import type { MapHandle, MapStatus } from './index.js';
 /** Web bridge keeps legacy synchronous methods available; api is the portable async surface. */
 export function createWebController(
   handle: MapHandle,
   replaceStyle: (style: MapStyle, context: OperationContext) => Promise<void>,
   bounds: () => MapBounds,
   fitBounds: (bounds: MapBounds, padding: number) => void,
+  getStatus: () => MapStatus = () => handle.diagnostics().status,
 ): MapController {
   return createMapController(
     {
       execute(command, context) {
-        if (handle.diagnostics().status !== 'ready')
-          throw new KitError('UNAVAILABLE', 'MAP_NOT_READY');
+        if (getStatus() !== 'ready') throw new KitError('UNAVAILABLE', 'MAP_NOT_READY');
         switch (command.type) {
           case 'center':
             return handle.panTo(command.center);

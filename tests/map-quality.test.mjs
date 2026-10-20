@@ -9,8 +9,14 @@ import {
   qualityTargets,
 } from '../scripts/map-quality-cases.mjs';
 import { parseQualityOptions, tileSizeSummary } from '../scripts/verify-map-quality.mjs';
-import { parseMapFrameOptions, evaluateMarkerFrameSeries } from '../scripts/verify-map-frames.mjs';
-import { mkdtempSync, rmSync } from 'node:fs';
+import {
+  parseMapFrameOptions,
+  evaluateMarkerFrameSeries,
+  frameReportPolicy,
+  startFrameProfile,
+} from '../scripts/verify-map-frames.mjs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { EventEmitter } from 'node:events';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -141,4 +147,154 @@ test('frame-only probe keeps opt-in explicit and cannot pass incomplete or insuf
     evaluateMarkerFrameSeries(trials.map((t) => ({ ...t, deltas: Array(6).fill(150) }))).status,
     'FAIL',
   );
+});
+
+test('optional CPU/trace profiling requires explicit inputs and always selects a separate non-acceptance report', () => {
+  const flags = ['--operator-opt-in', '--store=/operator/tiles', '--glyphs=/operator/glyphs'];
+  assert.deepEqual(parseMapFrameOptions(flags), {
+    store: '/operator/tiles',
+    glyphs: '/operator/glyphs',
+  });
+  assert.equal(parseMapFrameOptions([...flags, '--profile']).profile, true);
+  for (const args of [
+    [...flags.slice(1), '--profile'],
+    [...flags, '--profile', '--profile'],
+    [...flags, '--profile=true'],
+  ])
+    assert.throws(() => parseMapFrameOptions(args));
+  assert.deepEqual(frameReportPolicy(), { file: 'frames-report.json', acceptanceEligible: true });
+  assert.deepEqual(frameReportPolicy(true), {
+    file: 'frames-profile-report.json',
+    acceptanceEligible: false,
+    status: 'NON_ACCEPTANCE',
+  });
+  assert.equal(qualityTargets.frameP95Ms, 33);
+  assert.throws(() => frameReportPolicy('false'));
+});
+
+class ProfileSession extends EventEmitter {
+  calls = [];
+  detached = 0;
+  index = 0;
+  cpu = { nodes: [{ id: 1 }], samples: [1], timeDeltas: [1000], startTime: 0, endTime: 1000 };
+  constructor({
+    chunks = [
+      {
+        data: Buffer.from('{"traceEvents":[]}').toString('base64'),
+        base64Encoded: true,
+        eof: true,
+      },
+    ],
+    fail,
+    dataLossOccurred = false,
+  } = {}) {
+    super();
+    this.chunks = chunks;
+    this.fail = fail;
+    this.dataLossOccurred = dataLossOccurred;
+  }
+  async send(method, options) {
+    this.calls.push({ method, options });
+    if (method === this.fail) throw Error('Synthetic CDP failure');
+    if (method === 'Profiler.stop') return { profile: this.cpu };
+    if (method === 'Tracing.end')
+      Promise.resolve().then(() =>
+        this.emit('Tracing.tracingComplete', {
+          stream: 'synthetic-stream',
+          dataLossOccurred: this.dataLossOccurred,
+        }),
+      );
+    if (method === 'IO.read') return this.chunks[this.index++];
+    return {};
+  }
+  async detach() {
+    this.detached++;
+  }
+}
+
+test('profile capture streams bounded ignored artifacts and detaches without changing normal reports', async () => {
+  const directory = mkdtempSync(resolve(tmpdir(), 'kmk-profile-'));
+  const session = new ProfileSession();
+  try {
+    const capture = await startFrameProfile(session, directory);
+    const result = await capture.stop();
+    assert.equal(result.status, 'CAPTURED');
+    assert.equal(result.maxBytes, 64 * 1024 ** 2);
+    assert(result.totalBytes <= result.maxBytes);
+    assert.deepEqual(JSON.parse(readFileSync(resolve(directory, 'cpu.cpuprofile'))), session.cpu);
+    assert.deepEqual(JSON.parse(readFileSync(resolve(directory, 'trace.json'))), {
+      traceEvents: [],
+    });
+    for (const file of result.files) {
+      assert.match(file.sha256, /^[a-f0-9]{64}$/);
+      assert.equal(readFileSync(resolve(directory, file.file)).length, file.bytes);
+    }
+    assert(
+      session.calls.some(
+        (call) => call.method === 'Tracing.start' && call.options.transferMode === 'ReturnAsStream',
+      ),
+    );
+    assert(
+      session.calls
+        .filter((call) => call.method === 'IO.read')
+        .every((call) => call.options.size <= 1024 ** 2),
+    );
+    assert.equal(session.listenerCount('Tracing.tracingComplete'), 0);
+    assert.equal(session.detached, 1);
+    await capture.abort();
+    assert(
+      existsSync(resolve(directory, 'trace.json')),
+      'Completed artifacts must survive idempotent teardown',
+    );
+    assert.equal(session.detached, 1);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('profile size overflow and interrupted streams remove partial artifacts, preserve acceptance evidence and detach CDP', async () => {
+  for (const setup of [
+    { chunks: [{ data: 'x'.repeat(2048), eof: true }] },
+    { fail: 'IO.read' },
+    { dataLossOccurred: true },
+    { chunks: [{ data: '', eof: false }] },
+  ]) {
+    const directory = mkdtempSync(resolve(tmpdir(), 'kmk-profile-failure-'));
+    const report = resolve(directory, 'frames-report.json');
+    writeFileSync(report, 'Authored acceptance evidence must remain unchanged');
+    const owned = mkdtempSync(resolve(directory, 'capture-'));
+    const session = new ProfileSession(setup);
+    try {
+      const capture = await startFrameProfile(session, owned, { maxBytes: 512 });
+      await assert.rejects(capture.stop());
+      assert.equal(existsSync(owned), false);
+      assert.equal(
+        readFileSync(report, 'utf8'),
+        'Authored acceptance evidence must remain unchanged',
+      );
+      assert.equal(session.listenerCount('Tracing.tracingComplete'), 0);
+      assert.equal(session.detached, 1);
+      assert(session.calls.some((call) => call.method === 'IO.close'));
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  }
+});
+
+test('failed profile initialization and caller abort stop profiler/trace state and remove their owned directory', async () => {
+  for (const fail of ['Tracing.start', undefined]) {
+    const directory = mkdtempSync(resolve(tmpdir(), 'kmk-profile-abort-'));
+    const session = new ProfileSession({ fail });
+    if (fail) await assert.rejects(startFrameProfile(session, directory));
+    else {
+      const capture = await startFrameProfile(session, directory);
+      await capture.abort();
+      await capture.abort();
+    }
+    assert.equal(session.detached, 1);
+    assert(session.calls.some((call) => call.method === 'Profiler.stop'));
+    assert(session.calls.some((call) => call.method === 'Profiler.disable'));
+    assert.equal(session.listenerCount('Tracing.tracingComplete'), 0);
+    assert.equal(existsSync(directory), false);
+  }
 });

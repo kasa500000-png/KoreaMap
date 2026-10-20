@@ -47,6 +47,8 @@ pnpm verify:map-quality --operator-opt-in --store=/operator/tiles --glyphs=/oper
 pnpm verify:map-frames --operator-opt-in --store=/operator/tiles --glyphs=/operator/glyphs
 ```
 
+병목 진단이 필요하면 같은 명령에 `--profile`을 추가한다. CPU profile과 스트림 trace의 합계를64MiB로 제한해 ignored 저장소에 쓰며, 별도 `frames-profile-report.json`의 최상위 상태는 `NON_ACCEPTANCE`/`acceptanceEligible:false`다. 정상 수집도 종료 코드2로 끝나며 성능 통과가 아니다. 기본 `frames-report.json`을 덮어쓰지 않는다. 목표 판정은 프로파일링을 끈 동일한5회 프로토콜로 수행한다. [후속 성능 검증](research/map-performance-validation.md)을 따른다.
+
 `--context`는 검증·활성화된 context archive가 있을 때만 사용한다. `--performance`가 없으면 30회 성능 수락은 실행하지 않는다. 선택형 도구는 Vite production build의 loopback 정적 소비 앱과 타일 서버를 시작하고 public dist API를 사용한다. 프레임 전용 도구는 동일한 서울 balanced z14/390px와5회1초 왕복 이동·실제1,000개 표시·최소30 delta를 고정한다. 목표33ms를 완화하지 않으며 source/화면내 범위/실제 marker IDs/완료를 모두 요구한다. 실제 npm 독립 설치 검증은 별도 `verify:packages`/`verify:native-consumer`다. 데이터·폰트·240개 이미지·JSON 결과는 `artifacts/qa/map-quality`에만 저장되며 공개 패키지에 포함하지 않는다.
 
 현재 결과와 잔여 게이트는 [검증 기록](research/map-quality-validation.md), 계약 이유는 [ADR-010](decisions/010-map-quality-and-interactions.md)을 따른다.

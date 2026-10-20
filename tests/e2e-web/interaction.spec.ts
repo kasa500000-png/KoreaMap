@@ -23,10 +23,11 @@ test.beforeAll(async () => {
     `<!doctype html><html lang="ko"><meta charset="utf-8"><link rel="icon" href="data:,"><style>body{margin:0}#map{width:100%;height:600px;position:relative}</style><div id="map"></div><script type="module">
 import { createMap, createMapState } from 'korea-map-web';
 import { createCancellationSource } from 'korea-map-core';
+import { Map as LibreMap, GeoJSONSource } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 const state = createMapState({camera:{center:[126.978,37.5665],zoom:10,bearing:0,pitch:0}});
 const map = await createMap({container:document.getElementById('map'),state,workerUrl:'/worker.mjs',clustering:{},interactionPoiLayers:['qa-poi'],config:{mode:'inline',allowedOrigins:[],costAcknowledged:true,attribution:'자체 합성 상호작용 QA · MIT',style:{version:8,sources:{qa:{type:'geojson',data:{type:'FeatureCollection',features:[{type:'Feature',properties:{fid:'synthetic-poi','name:ko':'합성 시설',unrelatedPayload:'never-return'},geometry:{type:'Point',coordinates:[126.978,37.5665]}}]}}},layers:[{id:'background',type:'background',paint:{'background-color':'#eef2ed'}},{id:'qa-poi',type:'circle',source:'qa',paint:{'circle-color':'#115e59','circle-radius':7}}]}}});
-const qa = window.interactionQa = {map,events:[],notifications:0,createCancellationSource,makeMarkers:(count)=>Array.from({length:count},(_,i)=>({id:'m'+String(i).padStart(4,'0'),label:'합성 장소 '+i,coordinate:[126.978+(i%10)*0.000001,37.5665+Math.floor(i/10)*0.000001]}))};
+const qa = window.interactionQa = {map,engineTypes:{Map:LibreMap,GeoJSONSource},events:[],notifications:0,createCancellationSource,makeMarkers:(count)=>Array.from({length:count},(_,i)=>({id:'m'+String(i).padStart(4,'0'),label:'합성 장소 '+i,coordinate:[126.978+(i%10)*0.000001,37.5665+Math.floor(i/10)*0.000001]}))};
 let previous = state.getSnapshot().markers;
 state.subscribe(()=>{const next=state.getSnapshot().markers;if(next!==previous){qa.notifications++;previous=next;}});
 map.interactions.onEvent(event=>qa.events.push(event));
@@ -246,4 +247,60 @@ test('system reduced motion is immediate; extension destruction preserves base m
   );
   expect(cleanup).toMatchObject({ status: 'destroyed', listeners: 0, observing: false });
   await expect(page.locator('canvas')).toHaveCount(0);
+});
+
+test('100 camera commands retain 1000 markers without feature queries, source writes or selector rebuilds', async ({
+  page,
+}) => {
+  await page.evaluate(`(async()=>{
+    const qa=window.interactionQa;
+    await qa.map.interactions.transitionCamera({center:[126.978,37.5665],zoom:16,bearing:0,pitch:0},{durationMs:0});
+    await qa.map.interactions.setMarkers(qa.makeMarkers(1000));
+  })()`);
+  await expect
+    .poll(() => page.evaluate(`window.interactionQa.map.diagnostics().renderedMarkers`))
+    .toBe(1000);
+  const result = await page.evaluate<{
+    queries: number;
+    sourceWrites: number;
+    mutations: number;
+    cameraEvents: number;
+    sameOptions: boolean;
+    markers: number;
+    rendered: number;
+    longitude: number;
+  }>(`(async()=>{
+    const {map,engineTypes}=window.interactionQa;
+    const selector=document.querySelector('.kmk-place-selector'), options=[...selector.options];
+    let queries=0,sourceWrites=0,mutations=0,cameraEvents=0;
+    const originalQuery=engineTypes.Map.prototype.queryRenderedFeatures;
+    const originalSetData=engineTypes.GeoJSONSource.prototype.setData;
+    engineTypes.Map.prototype.queryRenderedFeatures=function(...args){queries++;return originalQuery.apply(this,args)};
+    engineTypes.GeoJSONSource.prototype.setData=function(...args){sourceWrites++;return originalSetData.apply(this,args)};
+    const observer=new MutationObserver(records=>mutations+=records.length);
+    observer.observe(selector,{childList:true,subtree:true,characterData:true});
+    const off=map.on('camera',()=>cameraEvents++);
+    try{
+      for(let i=1;i<=100;i++) await map.api.setCenter([126.978+i*0.0000001,37.5665]);
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    }finally{
+      mutations+=observer.takeRecords().length;observer.disconnect();off();
+      engineTypes.Map.prototype.queryRenderedFeatures=originalQuery;
+      engineTypes.GeoJSONSource.prototype.setData=originalSetData;
+    }
+    return {queries,sourceWrites,mutations,cameraEvents,
+      sameOptions:selector.options.length===1001&&options.every((option,i)=>option===selector.options[i]),
+      markers:map.state.getSnapshot().markers.length,rendered:map.diagnostics().renderedMarkers,
+      longitude:map.state.getSnapshot().camera.center[0]};
+  })()`);
+  expect(result).toMatchObject({
+    queries: 0,
+    sourceWrites: 0,
+    mutations: 0,
+    cameraEvents: 100,
+    sameOptions: true,
+    markers: 1000,
+    rendered: 1000,
+  });
+  expect(result.longitude).toBeCloseTo(126.97801, 7);
 });

@@ -44,7 +44,7 @@
       "license": "MIT"
     },
     "examples/web/app/map-demo.tsx": {
-      "sha256": "75f2ea96cf6c198951d897597b250714a5924e314937e80b34ad33237d6b759b",
+      "sha256": "e5bee759d69e1ab02c9531938131f50de55bec0012fe503d437bd65d92038a9a",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -64,7 +64,7 @@
       "license": "MIT"
     },
     "examples/web/app/search/search-demo.tsx": {
-      "sha256": "fa43387aab94c3ffd48ec2ea7ec249d5dff50b2ed2be4981ab5e9cb7218526ab",
+      "sha256": "daac227dbcd5aa958b843406e19f796c67e206b9ea63930248a4763074e0eb0e",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -194,7 +194,7 @@
       "license": "MIT"
     },
     "packages/web/src/index.ts": {
-      "sha256": "80e76fd4e339e94599d8060dbe5bf5008a70cc5cb7620a75edc23d975a11b725",
+      "sha256": "ce735ab1d043fa22a2e9bbdba9b7a62dbff061d767ebdc93df950eb2a4fe1635",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -204,7 +204,7 @@
       "license": "MIT"
     },
     "packages/web/src/public-api.ts": {
-      "sha256": "b679ff4ed002ff2132c0c6db4a3dd9e938d3beff5c2ae3a3fdd26f6ae1f2c4d3",
+      "sha256": "9753f2fb29c3167679469acf89a605995dd35eb156e6f9ded606321d42366b0b",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -519,7 +519,7 @@
       "license": "MIT"
     },
     "packages/web/src/interaction.ts": {
-      "sha256": "7f38bff4bf85062d435eba7a6cdd0cc2cedafce7b8d276d14c4d5cd20bc34818",
+      "sha256": "dfc24d5107f66a47135afdc215db40dd03282a602643629943374595e4220444",
       "origin": "project-authored",
       "license": "MIT"
     },

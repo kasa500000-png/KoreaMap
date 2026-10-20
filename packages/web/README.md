@@ -58,3 +58,5 @@ functions and the repository's `docs/gps-tracks.md`. No persistence or remote up
 클러스터링은 `clustering: {radius:48,maxZoom:13}`을 명시할 때 켭니다. `setMarkers`로 일괄 교체하고 `pickFeatures({x,y})`/`selectFeature`로 최대 8개의 분리된 선택 결과를 다룹니다. basemap 선택은 `interactionPoiLayers`(최대 8개)를 명시해야 합니다. v1의 `korea-label-poi`와 v2의 `korea-poi-priority-1`~`4`는 서로 다른 레이어입니다. 카드 UI·선택 목록·저장 정책은 소비 앱에 둡니다.
 
 [공통 계약](../../docs/public-api.md), [Next 소비 예제](../../examples/web/app/tiles/tiles-demo.tsx), [품질 검증 범위](../../docs/research/map-quality-validation.md)를 참고하세요.
+
+`diagnostics()`는 현재 화면의 마커를 실제로 조회합니다. 프레임마다 호출하지 말고 필요한 시점에 사용하세요. SDK 내부 명령의 준비 상태 확인은 이 조회를 실행하지 않습니다. 마커 목록은 한 번에 갱신하고, 선택은 같은 마커 배열의 ID 인덱스를 재사용합니다. `camera` 이벤트는 계속 전달되지만 좌표 텍스트만 표시하는 React UI는 `idle`에서 최신 `state.getSnapshot().camera`를 읽으면 이동 중 화면 전체의 재렌더링을 줄일 수 있습니다. 이 변경은 모든 장치의 프레임 성능을 보장하지 않습니다.

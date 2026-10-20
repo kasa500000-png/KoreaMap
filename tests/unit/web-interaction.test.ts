@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createCancellationSource, type CameraState } from 'korea-map-core';
+import { createCancellationSource, type CameraState, type MapMarker } from 'korea-map-core';
 import type { Map as LibreMap, MapGeoJSONFeature } from 'maplibre-gl';
 import { createMapState } from 'korea-map-web';
 import {
@@ -268,6 +268,69 @@ describe('Web interaction renderer adapter', () => {
     await expect(h.controller.pickFeatures({ x: 1, y: 1 })).rejects.toMatchObject({
       code: 'UNAVAILABLE',
     });
+  });
+  it('indexes all 1000 marker candidates once per marker reference without changing capped results', async () => {
+    const h = harness();
+    const markers = Array.from({ length: 1000 }, (_, index) => ({
+      id: `m-${index}`,
+      label: `M${index}`,
+      coordinate: [127, 37] as const,
+    }));
+    h.state.setMarkers(markers);
+    const snapshot = h.state.getSnapshot.bind(h.state);
+    let original: readonly MapMarker[] | undefined;
+    let observed: readonly MapMarker[] = [];
+    let idReads = 0;
+    vi.spyOn(h.state, 'getSnapshot').mockImplementation(() => {
+      const value = snapshot();
+      if (original !== value.markers) {
+        original = value.markers;
+        observed = Object.freeze(
+          value.markers.map((marker) =>
+            Object.freeze({
+              get id() {
+                idReads++;
+                return marker.id;
+              },
+              label: marker.label,
+              coordinate: marker.coordinate,
+            }),
+          ),
+        );
+      }
+      return { ...value, markers: observed };
+    });
+    h.engine.queryRenderedFeatures.mockReturnValue(
+      [...markers].reverse().map((marker) => ({
+        source: 'kmk-markers',
+        layer: { id: 'kmk-marker-points' },
+        properties: { id: marker.id },
+        geometry: { type: 'Point', coordinates: [127, 37] },
+      })) as never,
+    );
+    const expected = ['m-0', 'm-1', 'm-10', 'm-100', 'm-101', 'm-102', 'm-103', 'm-104'];
+    const first = await h.controller.pickFeatures({ x: 127, y: 37 });
+    expect(first.map((marker) => marker.id)).toEqual(expected);
+    expect(idReads).toBeLessThanOrEqual(4000); // Full candidate processing stays linear, not 1000 linear searches.
+    idReads = 0;
+    expect(await h.controller.pickFeatures({ x: 127, y: 37 })).toEqual(first);
+    expect(idReads).toBeLessThanOrEqual(2500);
+    h.state.setCamera({ ...h.state.getSnapshot().camera, zoom: 12 });
+    idReads = 0;
+    expect(await h.controller.pickFeatures({ x: 127, y: 37 })).toEqual(first);
+    expect(idReads).toBeLessThanOrEqual(2500); // Camera snapshots must not invalidate the marker index.
+    h.state.setMarkers(
+      markers.map((marker) => (marker.id === 'm-0' ? { ...marker, label: 'Changed' } : marker)),
+    );
+    idReads = 0;
+    expect((await h.controller.pickFeatures({ x: 127, y: 37 }))[0]?.label).toBe('Changed');
+    expect(idReads).toBeLessThanOrEqual(4000);
+    h.state.setMarkers(markers.slice(1));
+    const removed = await h.controller.pickFeatures({ x: 127, y: 37 });
+    expect(removed[0]?.id).toBe('m-1');
+    expect(removed.some((marker) => marker.id === 'm-0')).toBe(false);
+    expect(h.engine.queryRenderedFeatures).toHaveBeenCalledTimes(5);
+    h.controller.destroy();
   });
   it('does not emit stale cluster selection after a completed expansion is superseded in the same turn', async () => {
     const h = harness(),

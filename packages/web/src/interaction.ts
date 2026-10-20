@@ -6,6 +6,7 @@ import {
   type MapInteractionController,
   type MapInteractionEvent,
   type MapSelection,
+  type MapMarker,
   type NormalizedCameraTransition,
   type OperationContext,
 } from 'korea-map-core';
@@ -78,7 +79,19 @@ export function createWebInteractions(options: {
   let selected: MapSelection | null = null;
   let pending: { cancel(): void } | undefined;
   let gesture = false;
+  // MapState snapshots keep marker arrays immutable and stable across camera-only updates.
+  // Weak keys let replaced batches be collected without waiting for another pick.
+  let markerIndexes = new WeakMap<readonly MapMarker[], ReadonlyMap<string, MapMarker>>();
   const map = options.map;
+  function currentMarkerIndex() {
+    const markers = options.state.getSnapshot().markers;
+    let index = markerIndexes.get(markers);
+    if (!index) {
+      index = new Map(markers.map((marker) => [marker.id, marker]));
+      markerIndexes.set(markers, index);
+    }
+    return index;
+  }
   function emit(event: MapInteractionEvent) {
     for (const listener of [...listeners]) listener(event);
   }
@@ -295,6 +308,7 @@ export function createWebInteractions(options: {
           { layers },
         );
         const selections: MapSelection[] = [];
+        let markers: ReadonlyMap<string, MapMarker> | undefined;
         for (const feature of features) {
           const coordinate = pointCoordinate(feature);
           if (!coordinate) continue;
@@ -322,9 +336,8 @@ export function createWebInteractions(options: {
                 priority: 1,
               });
           } else if (feature.layer.id === markerLayerId) {
-            const marker = options.state
-              .getSnapshot()
-              .markers.find((item) => item.id === feature.properties['id']);
+            markers ??= currentMarkerIndex();
+            const marker = markers.get(feature.properties['id']);
             if (marker)
               selections.push({
                 ...common,
@@ -412,6 +425,7 @@ export function createWebInteractions(options: {
         if (map.getLayer(pickedLayer)) map.removeLayer(pickedLayer);
         if (map.getSource(pickedSource)) map.removeSource(pickedSource);
         selected = null;
+        markerIndexes = new WeakMap();
         emit({ type: 'destroyed' });
         listeners.clear();
       },
