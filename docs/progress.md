@@ -737,3 +737,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 허가된 실제 정답·관측자료가 없어 검색·경로 정확도 수락은 NOT_RUN이다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
 7. **Git:** 브랜치 `test/stage-07-search-routing`. commit조회 `git log -1 --format='%H %s' --grep='^test: evaluate Korean search and route observations$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
 8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.
+
+
+## 우선순위 10단계 — 08 타일 CRC·MVT 무결성 — 2026-10-21 KST
+
+1. **구현:** 모든archive행의 bounded gzip CRC/끝·MVT protobuf/geometry를 검증한다. 기존8MiB저장상한에더해SQL BLOB타입을첫payload조회전에검사한다.4096fragment 상한과BOM이름보존으로 우회/과다할당을 거부한다. javac의 암묵적상위소스 컴파일도 제거한다. [세부 근거](research/stage-08-tile-integrity.md).
+2. **파일:** services/tiles/src/archive.ts, services/tiles/src/pipeline.ts, services/tiles/src/mvt.ts, tests/tiles-fixture.mjs, tests/tiles.test.mjs, tests/tiles-security.test.mjs, tests/tiles-v2.test.mjs, tests/tiles-http-v2.test.mjs, docs/research/stage-08-tile-integrity.md 및 개별출처원장/명령연결/진행·로드맵·비용문서. SDK와운영자서비스 경계를 유지한다.
+3. **검사:** tile40회귀 PASS; 실제기존9archive/2348tiles 모두PASS·archive/PBF SHA불변. Java v1 40/v2 85·codec78tile267feature PASS, 새compile의 MBTiles byte동일. 통합 pnpm check·tile40회귀·5pack PASS. 실제현재컴파일러로9archive/2348tile을재검증해SHA불변 PASS. 최초공식문서host2건 감사실패를보존하고문서전용검토/회귀후전체재실행PASS. staged·정적감사는commit전에확인한다.
+4. **실화면:** 이번단계renderer변경없음. 실제archive구조검증을 지도UI 또는 전국coverage 검증으로 표시하지 않는다.
+5. **라이선스/보안:** 자체MIT코드만추가, 원본데이터·glyph·폰트·APK·키·개인정보·제작자endpoint는포함하지않았다. 새의존성·유료runner·외부배포없음. runtimeSHA는해당diff검토후개별검증했다.
+6. **차단:** 해안선은 공식메타데이터 후보만 조사했으며A수집승인/통합하지 않았다. 전국8GiBgate·기존성공세대보존은 유지한다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
+7. **Git:** 브랜치 `fix/stage-08-mvt-validation`. commit조회 `git log -1 --format='%H %s' --grep='^fix: validate complete vector tile payloads$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
+8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.

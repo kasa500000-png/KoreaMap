@@ -5,6 +5,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'nod
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { authoredMvt } from './tiles-fixture.mjs';
 import { inspectArchive, tileRow } from '../services/tiles/dist/archive.js';
 import {
   buildLimits,
@@ -28,7 +29,7 @@ async function fixture() {
   mkdirSync(directory, { recursive: true });
   const archive = resolve(directory, 'base.mbtiles');
   const db = new DatabaseSync(archive);
-  // Normalized Planetiler MBTiles layout; payload is authored HTTP test text, not a rendered tile.
+  // Normalized Planetiler MBTiles layout with project-authored synthetic MVT geometry.
   db.exec(`CREATE TABLE metadata(name TEXT,value TEXT);
     CREATE TABLE tiles_shallow(zoom_level INTEGER,tile_column INTEGER,tile_row INTEGER,tile_data_id INTEGER,PRIMARY KEY(zoom_level,tile_column,tile_row)) WITHOUT ROWID;
     CREATE TABLE tiles_data(tile_data_id INTEGER PRIMARY KEY,tile_data BLOB);
@@ -51,7 +52,7 @@ async function fixture() {
   }))
     put.run(key, value);
   db.prepare('INSERT INTO tiles_data VALUES(1,?)').run(
-    Buffer.from('original authored normalized layout test'),
+    authoredMvt('original authored normalized layout test', 'design-v2'),
   );
   db.exec('INSERT INTO tiles_shallow VALUES(16,0,0,1)');
   db.close();

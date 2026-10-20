@@ -340,7 +340,17 @@ export async function buildGeneration(options: BuildOptions): Promise<Generation
     writeFileSync(snapshot, profileSource, { flag: 'wx', mode: 0o600 });
     await executeTileTool(
       options.javac,
-      ['-proc:none', '-cp', resolve(options.jar), '-d', classes, snapshot],
+      [
+        '-proc:none',
+        '-implicit:none',
+        '-sourcepath',
+        '',
+        '-cp',
+        resolve(options.jar),
+        '-d',
+        classes,
+        snapshot,
+      ],
       options.root,
       signal,
     );
