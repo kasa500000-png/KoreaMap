@@ -59,6 +59,7 @@ OFFLINE_REFERENCE_URLS["scripts/audit-cost-security.py"].update(
 )
 DOCUMENTATION_HOSTS = {
     "www.typescriptlang.org", "reactnative.dev",  # Reviewed official type-reference/strict API docs only; never runtime providers.
+    "playwright.dev", "deb.debian.org",  # Reviewed browser/verified OS dependency docs only; no SDK endpoint.
     "osmdata.openstreetmap.de",  # Reviewed OSM-derived land polygon/license docs only; no runtime provider.
     "docs.npmjs.com", "pypi.org", "www.localdata.go.kr", "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
     "www.w3.org", "www.topografix.com",  # Geolocation / GPX specifications, docs only.

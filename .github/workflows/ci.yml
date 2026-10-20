@@ -112,6 +112,34 @@ jobs:
       - run: pnpm build:sdk
       - run: pnpm pack:check
       - run: pnpm verify:native-consumer
+  browser-portability:
+    name: Browser ${{ matrix.browser }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      EXPO_NO_TELEMETRY: '1'
+      EXPO_OFFLINE: '1'
+      EXPO_NO_DOTENV: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - run: npm install --global pnpm@12.14.0 --ignore-scripts --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:sdk
+      - run: pnpm --dir examples/web build
+      - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      - run: sudo apt-get install --no-install-recommends --yes fonts-noto-cjk
+      - run: xvfb-run --auto-servernum pnpm verify:browser-lifecycle --browser=${{ matrix.browser }} --headed
   windows:
     runs-on: windows-2025
     timeout-minutes: 20

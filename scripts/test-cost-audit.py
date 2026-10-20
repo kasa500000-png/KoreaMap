@@ -69,7 +69,7 @@ class AuditTests(unittest.TestCase):
         self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
 
     def test_official_type_reference_docs_do_not_authorize_runtime_requests(self):
-        for host in ['www.typescriptlang.org', 'reactnative.dev']:
+        for host in ['www.typescriptlang.org', 'reactnative.dev', 'playwright.dev', 'deb.debian.org']:
             self.write('docs/types.md', 'https://' + host + '/docs/\n')
             self.write('packages/core/src/provider.ts', '')
             process, _, _ = self.run_audit()

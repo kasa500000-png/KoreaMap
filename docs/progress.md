@@ -678,3 +678,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** Web TS2834·전체 RN 선언3건·보안 high2는 그대로 실패한다. 지원 공개 SDK 부분 개선과 전체 앱/릴리스 수락을 구분한다.
 7. **Git:** 01단계 [PR18](https://github.com/kasa500000-png/KoreaMap/pull/18), commit4914fbc681fca9fd0cec3b24574b735d836494e7/merge9db22c21f68509aaa1e242bd78e969805121559e. 02통합 브랜치 `fix/stage-02-public-types`, commit조회 `git log -1 --format='%H %s' --grep='^fix: preserve native public GeoJSON declarations$'`.
 8. **다음:** 선언 누락 수정은 검증 후 preview 통합 가능하며 브라우저·성능·Android 독립 빌드 단계를 계속한다. 전체 타입/보안·기기 수락 및 실제 외부 배포 완료가 아니다.
+
+## 우선순위 10단계 — 03 브라우저·반복 생명주기 — 2026-10-21 KST
+
+1. **구현:** 기존 Chromium25회귀를 유지하고 별도 Chromium/Firefox/Linux WebKit4검사씩,3폭·4테마·한글/마커/경로/503복구·20회 반복/정리·실제PNG검사를 추가했다. 세 브라우저의 독립 Ubuntu CI matrix도 구성했다. [실행 기록](research/stage-03-browser-lifecycle.md)을 따른다.
+2. **파일:** Playwright설정·선택형CLI·새E2E/PNGhelper·옵션/CI 정책3회귀·package/tasks 연결·CI·docs-only 공식host검토·단계/진행/비용/로드맵 문서. SDK/예제/lock/Provider는 미변경이다.
+3. **검사:** 격리 실제 기본25/25와 신규3브라우저12/12, strict/관련SDK·Next빌드·ESLint/Prettier·옵션10/PNG4검사 PASS. 루트 새정책3회귀와 전체`pnpm check`도PASS, 복사본Chromium4개는47.8초에재실행PASS. 최종staged/정적 검사는commit전에수행한다. 스킵/재시도로통과시키지않았다.
+4. **실화면:** 각테마 viewport 캡처·독립PNG색검사와Firefox/WebKit390px Outdoor 이미지 직접확인. 처음발견한offscreen 긴캡처누락을실제그림판정과분리했다. ChromeGC주heap20회약1.18MB증가,Worker/Observer종료기준복귀. FF/WK heap/GPU메모리와Safari/iOS는 미검증이다.
+5. **라이선스/보안:** 합성MITfixture·공식Playwrightarchive·서명/SHA검증Debian유저전용libs만사용,원문/폰트/브라우저파일은ignored. root권한/전역환경/PWsource수정없다. 로컬WK의ldconfig기반사전검사는해당실행에서만독립 loader검증으로분리했고실제4검사PASS를요구했다. CI에는그생략값이없다.
+6. **차단:** 장시간/Worker·GPU전체메모리·실기기·브라우저원격CI는별도다. 보안high2·상위선언·33ms프레임목표는유지한다. 무료표준runner만사용하며배포대상선택전외부호스팅은미실행이다.
+7. **Git:** 02단계 [PR19](https://github.com/kasa500000-png/KoreaMap/pull/19), commit2196e7254126178c402c0bdeac7d3d6995983582/merge469bb3c5958b00e639c5d0f0df9c3f4c93d822d2. 03브랜치 `test/stage-03-cross-browser`, commit조회 `git log -1 --format='%H %s' --grep='^test: add cross-browser map lifecycle QA$'`.
+8. **다음:** 세Linux브라우저범위는실검증후반영가능하며고정프레임·Android독립빌드·실자료단계를계속한다. WebKit을Safari실기기지원으로표시하지않는다.

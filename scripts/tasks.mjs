@@ -59,6 +59,7 @@ else if (task === 'check') {
     'test:real-poi',
     'test:real-tiles',
     'test:map-quality',
+    'test:browser-policy',
     'test:native-consumer',
     'changeset:status',
   ])

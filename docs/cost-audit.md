@@ -407,3 +407,11 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 Native 공개 index의 공식 GeoJSON 보존 참조와 @types/geojson7946.0.16 dependency 승격을 개별 검토했다. runtime 실행문은 그대로이며 manifest/lock은 기존 버전의 importer 역할만 바꾼다. 새 Provider·URL·계정·data/font payload가 없다. Native sourceSHA1개만 갱신했다.
 
 실제 소비 verifier에서 직접 GeoJSON 타입 주입을 제거하고 설치된 Native tarball의 전이 의존성으로 해결하도록 했다. SDK 자체의 strict Bundler/NodeNext 선언2개는 통과했지만 전체 RN 선언3건은 기존대로 PARTIAL_PASS/exit1이다. 신규 공식 TypeScript/React Native 근거 host2개는 문서에만 허용하며 코드/runtime의 같은 URL을 거부하는 회귀로 비용 경계를 유지한다. 초기 pack의 미검토host/sourcehash 실패는 근거와 함께 보존하고 루트 개별 검토 후 다시 검사한다. CI·발행 승인 조건·기본 외부 요청은 변경하지 않는다.
+
+## 우선순위 10단계 — 03 브라우저 QA — 2026-10-21 KST
+
+SDK/예제/Provider/lockfile 변경 없이 합성 데이터 browser QA를 추가했다. 로컬 실제 Chromium25와 선택형 Chromium/Firefox/Linux WebKit12가 통과했고 외부 origin/page 오류는0이다. 20회 반복 정리·실제PNG는 확인했으나 전체GPU/worker메모리·장기운영·실기기 결과로 확대하지 않는다.
+
+공식 Playwright payload와 서명/SHA 검증된 최소 Debian 사용자 전용 라이브러리는 ignored 저장소에서만 사용했다. 환경별 실패와 해당 WebKit 실행에서만의 독립 loader 검증/표준 preflight 미사용을 그대로 기록한다. SDK/실행기/CI 기본에는 우회 환경값을 넣지 않았다. 두 공식 문서 host는 docs-only로 검토하고 같은 host의 runtime URL 차단 회귀를 유지한다.
+
+일반 Foundation CI의 세 브라우저 matrix는 표준 Ubuntu·공식 설치와 Xvfb만 사용한다. 공개 repository의 표준 runner 외 유료/GPU runner·새 계정·cache/artifact upload·schedule·배포·지도 endpoint를 추가하지 않는다. 기본 SDK 설치/테스트가 브라우저 다운로드나 OS 의존성을 요구하지 않으며 선택형 QA와 서비스 운영 비용을 분리한다. 원격 CI는 해당 실제 결과를 따르며 미종료를 성공으로 처리하지 않는다.
