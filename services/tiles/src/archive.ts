@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { openSync, readSync, closeSync, lstatSync } from 'node:fs';
-import { inflateSync } from 'node:zlib';
+import { inflateSync, gunzipSync } from 'node:zlib';
+import { validateMvt } from './mvt.js';
 import {
   invariant,
   optionalSourceLayers,
@@ -101,6 +102,8 @@ export interface ArchiveInfo {
   maxzoom: number;
   gzip: boolean;
 }
+export const maximumStoredTileBytes = 8 * 1024 * 1024;
+export const maximumExpandedTileBytes = 8 * 1024 * 1024;
 export function inspectArchive(path: string, schema: TileSchema = 'design-v1'): ArchiveInfo {
   tileSchema(schema);
   invariant(
@@ -177,10 +180,16 @@ export function inspectArchive(path: string, schema: TileSchema = 'design-v1'): 
     const layers = (json.vector_layers ?? []).map((l) => l.id).sort();
     invariant(new Set(layers).size === layers.length, 'UNREVIEWED_TILE_SCHEMA');
     const count = Number(db.prepare('SELECT count(*) AS n FROM tiles').get()?.['n']);
+    // Check SQLite storage classes before length(): TEXT reports characters, not stored bytes.
+    // Both gates return scalar metadata before any tile_data BLOB is materialized in JavaScript.
+    invariant(
+      !db.prepare("SELECT 1 FROM tiles WHERE typeof(tile_data) <> 'blob' LIMIT 1").get(),
+      'INVALID_TILE_PAYLOAD',
+    );
     const largest = Number(
       db.prepare('SELECT max(length(tile_data)) AS n FROM tiles').get()?.['n'],
     );
-    invariant(largest > 0 && largest <= 8 * 1024 * 1024, 'OVERSIZE_TILE');
+    invariant(largest > 0 && largest <= maximumStoredTileBytes, 'OVERSIZE_TILE');
     const sample = db.prepare('SELECT tile_data FROM tiles LIMIT 1').get()?.['tile_data'];
     invariant(
       count > 0 &&
@@ -246,12 +255,35 @@ export function inspectArchive(path: string, schema: TileSchema = 'design-v1'): 
         'ARCHIVE_ZOOM_COVERAGE_MISMATCH',
       );
     }
+    let gzip: boolean | undefined;
+    const declared = new Set(layers);
+    // Iterate one bounded BLOB at a time; checksum/SQLite validity alone cannot validate compressed MVT.
+    for (const row of db.prepare('SELECT tile_data FROM tiles').iterate()) {
+      const data = row['tile_data'];
+      invariant(data instanceof Uint8Array && data.length > 0, 'INVALID_TILE_PAYLOAD');
+      const compressed = data[0] === 31 && data[1] === 139;
+      invariant(gzip === undefined || gzip === compressed, 'MIXED_TILE_COMPRESSION');
+      gzip = compressed;
+      let expanded: Uint8Array = data;
+      if (compressed) {
+        try {
+          expanded = gunzipSync(data, { maxOutputLength: maximumExpandedTileBytes });
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException)?.code === 'ERR_BUFFER_TOO_LARGE')
+            throw new Error('OVERSIZE_EXPANDED_TILE', { cause: error });
+          throw new Error('INVALID_TILE_GZIP', { cause: error });
+        }
+      }
+      invariant(expanded.length > 0, 'EMPTY_MVT_TILE');
+      invariant(expanded.length <= maximumExpandedTileBytes, 'OVERSIZE_EXPANDED_TILE');
+      validateMvt(expanded, declared);
+    }
     return {
       tileCount: count,
       layers,
       minzoom,
       maxzoom,
-      gzip: sample[0] === 31 && sample[1] === 139,
+      gzip: gzip === true,
     };
   } finally {
     db.close();

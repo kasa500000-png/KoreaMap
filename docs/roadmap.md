@@ -167,3 +167,6 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 
 
 10단계 07: [한국어 검색·라우팅 품질 평가](research/stage-07-service-quality.md). 허가된 실제 정답·관측자료가 없어 검색·경로 정확도 수락은 NOT_RUN이다.
+
+
+10단계 08: [타일 CRC·MVT 무결성](research/stage-08-tile-integrity.md). 해안선은 공식메타데이터 후보만 조사했으며A수집승인/통합하지 않았다. 전국8GiBgate·기존성공세대보존은 유지한다.

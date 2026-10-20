@@ -435,3 +435,10 @@ private ETL CLI가 data/raw 밖으로 이어지는 symlink/junction·일반파�
 ## 우선순위 10단계 — 07 한국어 검색·라우팅 품질 평가
 
 최소100고유한국어질의와30경로의 독립정답·출처·권리·기간을 검사하는 offline 평가 도구다. 합성결과는 NON_ACCEPTANCE/releaseAcceptance:false다. Node14개 PASS, 자료없는 실제실행 NOT_RUN/exit2. 한국어질의 희석과 syntheticID 보고서 유출 회귀를 포함한다. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-07-service-quality.md)를따른다.
+
+
+## 우선순위 10단계 — 08 타일 CRC·MVT 무결성
+
+모든archive행의 bounded gzip CRC/끝·MVT protobuf/geometry를 검증한다.4096fragment 상한과BOM이름보존으로 우회/과다할당을 거부한다. javac의 암묵적상위소스 컴파일도 제거한다. tile39회귀 PASS; 실제기존9archive/2348tiles 모두PASS·archive/PBF SHA불변. Java v1 40/v2 85·codec78tile267feature PASS, 새compile의 MBTiles byte동일. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-08-tile-integrity.md)를따른다.
+
+처음통합검사에서미검토공식docsURL2건으로감사가실패했다. JDK21 javac옵션과NaturalEarth약관host를문서전용으로개별검토하고같은host의runtime URL거부회귀를확장했다. 이는신규지도원본A등록이나수집허용이아니다. 기존실패로그를보존하고수정후전체검사를재실행한다.

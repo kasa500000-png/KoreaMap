@@ -61,6 +61,7 @@ DOCUMENTATION_HOSTS = {
     "www.typescriptlang.org", "reactnative.dev",  # Reviewed official type-reference/strict API docs only; never runtime providers.
     "playwright.dev", "deb.debian.org",  # Reviewed browser/verified OS dependency docs only; no SDK endpoint.
     "osmdata.openstreetmap.de",  # Reviewed OSM-derived land polygon/license docs only; no runtime provider.
+    "docs.oracle.com", "www.naturalearthdata.com",  # Reviewed javac options and future public-domain data terms only; not providers.
     "docs.npmjs.com", "pypi.org", "www.localdata.go.kr", "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
     "www.w3.org", "www.topografix.com",  # Geolocation / GPX specifications, docs only.
     "www.postgresql.org",  # Reviewed SQL documentation, not a runtime endpoint.

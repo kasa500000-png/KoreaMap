@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DatabaseSync } from 'node:sqlite';
+import { gzipSync } from 'node:zlib';
 import {
   mkdtempSync,
   mkdirSync,
@@ -15,7 +16,11 @@ import {
 } from 'node:fs';
 import { resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { inspectArchive } from '../services/tiles/dist/archive.js';
+import {
+  inspectArchive,
+  maximumStoredTileBytes,
+  maximumExpandedTileBytes,
+} from '../services/tiles/dist/archive.js';
 import {
   contained,
   planetiler,
@@ -33,6 +38,7 @@ import {
   executeTileTool,
 } from '../services/tiles/dist/pipeline.js';
 import { startTileServer } from '../services/tiles/dist/server.js';
+import { authoredMvt, mvtScalar, mvtBytes, mvtPacked } from './tiles-fixture.mjs';
 
 async function fixture() {
   const store = mkdtempSync(resolve(tmpdir(), 'kmk-tiles-security-'));
@@ -51,7 +57,7 @@ async function fixture() {
     json: JSON.stringify({ vector_layers: [{ id: 'road' }] }),
   }))
     put.run(name, value);
-  db.prepare('INSERT INTO tiles VALUES(0,0,0,?)').run(Buffer.from('authored test tile'));
+  db.prepare('INSERT INTO tiles VALUES(0,0,0,?)').run(authoredMvt('authored test tile'));
   db.close();
   const manifest = {
     schemaVersion: 1,
@@ -391,4 +397,194 @@ test('a timed-out tile child process is terminated and reports cancellation', as
     /TILE_BUILD_CANCELLED/,
   );
   assert(globalThis.performance.now() - started < 3000);
+});
+
+function payloadArchive(payloads) {
+  const root = mkdtempSync(resolve(tmpdir(), 'kmk-authored-mvt-'));
+  const archive = resolve(root, 'authored.mbtiles');
+  const db = new DatabaseSync(archive);
+  db.exec(
+    'CREATE TABLE metadata(name TEXT,value TEXT); CREATE TABLE tiles(zoom_level INTEGER,tile_column INTEGER,tile_row INTEGER,tile_data BLOB)',
+  );
+  const insert = db.prepare('INSERT INTO metadata VALUES(?,?)');
+  for (const [key, value] of Object.entries({
+    minzoom: '0',
+    maxzoom: '14',
+    json: JSON.stringify({ vector_layers: [{ id: 'road' }] }),
+  }))
+    insert.run(key, value);
+  for (let i = 0; i < payloads.length; i++)
+    db.prepare('INSERT INTO tiles VALUES(1,?,0,?)').run(i, payloads[i]);
+  db.close();
+  return { archive, cleanup: () => rmSync(root, { recursive: true, force: true }) };
+}
+function customFeature({
+  shape = [9, 0, 0, 10, 32, 32],
+  type = mvtScalar(3, 2),
+  tags = [0, 0],
+  value = mvtBytes(1, Buffer.from('road')),
+  geometry = mvtPacked(4, shape),
+} = {}) {
+  return mvtBytes(
+    3,
+    Buffer.concat([
+      mvtBytes(1, Buffer.from('road')),
+      mvtBytes(2, Buffer.concat([mvtPacked(2, tags), type, geometry])),
+      mvtBytes(3, Buffer.from('kind')),
+      mvtBytes(4, value),
+      mvtScalar(5, 4096),
+      mvtScalar(15, 2),
+    ]),
+  );
+}
+test('stored raw/gzip byte size and SQLite BLOB type are checked before decoding any row', () => {
+  for (const gzip of [false, true]) {
+    const payload = Buffer.alloc(maximumStoredTileBytes + 1);
+    if (gzip) {
+      payload[0] = 31;
+      payload[1] = 139;
+    }
+    // The first row is malformed; a stored-size error proves all-row preflight runs before decode.
+    const f = payloadArchive([Buffer.from([0]), payload]);
+    try {
+      assert.throws(() => inspectArchive(f.archive), /OVERSIZE_TILE/);
+    } finally {
+      f.cleanup();
+    }
+  }
+  for (const payload of [null, 42, '가'.repeat(3 * 1024 * 1024)]) {
+    // The UTF-8 TEXT case is 9MiB in bytes but SQLite length(TEXT) counts only 3Mi characters.
+    const f = payloadArchive([Buffer.from([0]), payload]);
+    try {
+      assert.throws(() => inspectArchive(f.archive), /INVALID_TILE_PAYLOAD/);
+    } finally {
+      f.cleanup();
+    }
+  }
+});
+test('every tile gzip member is checked for CRC, truncation and bounded expanded size', () => {
+  const valid = gzipSync(authoredMvt());
+  const crc = Buffer.from(valid);
+  crc[crc.length - 8] ^= 255;
+  for (const [payload, code] of [
+    [crc, /INVALID_TILE_GZIP/],
+    [valid.subarray(0, valid.length - 1), /INVALID_TILE_GZIP/],
+    [Buffer.from([31, 139]), /INVALID_TILE_GZIP/],
+    [gzipSync(Buffer.alloc(maximumExpandedTileBytes + 1)), /OVERSIZE_EXPANDED_TILE/],
+    [gzipSync(Buffer.alloc(0)), /EMPTY_MVT_TILE/],
+  ]) {
+    const f = payloadArchive([valid, payload]);
+    try {
+      assert.throws(() => inspectArchive(f.archive), code);
+    } finally {
+      f.cleanup();
+    }
+  }
+});
+test('all rows must use consistent compression and actual MVT rather than plausible gzip magic', () => {
+  for (const [payloads, code] of [
+    [[gzipSync(authoredMvt('first')), authoredMvt('second')], /MIXED_TILE_COMPRESSION/],
+    [[gzipSync(Buffer.from('authored non-MVT bytes'))], /MVT/],
+    [[authoredMvt('good'), mvtScalar(3, 1)], /INVALID_MVT_WIRE/],
+  ]) {
+    const f = payloadArchive(payloads);
+    try {
+      assert.throws(() => inspectArchive(f.archive), code);
+    } finally {
+      f.cleanup();
+    }
+  }
+});
+test('MVT field wire types, lengths, UTF-8, tags and geometry commands are validated', () => {
+  for (const [payload, code] of [
+    [Buffer.from([26, 127]), /TRUNCATED_MVT/],
+    [Buffer.from([0]), /INVALID_MVT_FIELD/],
+    [Buffer.from([27]), /INVALID_MVT_WIRE/],
+    [Buffer.from([128, 128, 128, 128, 128, 0]), /INVALID_MVT_VARINT/],
+    [
+      Buffer.concat([mvtScalar(10, 0).subarray(0, 1), Buffer.alloc(10, 255), Buffer.from([1])]),
+      /INVALID_MVT_VARINT/,
+    ],
+    [
+      mvtBytes(3, Buffer.concat([mvtBytes(1, Buffer.from([255])), mvtScalar(15, 2)])),
+      /INVALID_MVT_UTF8/,
+    ],
+    [
+      mvtBytes(3, Buffer.concat([mvtBytes(1, Buffer.from('\uFEFFroad')), mvtScalar(15, 2)])),
+      /UNDECLARED_MVT_LAYER/,
+    ],
+    [customFeature({ type: mvtBytes(3, Buffer.from([2])) }), /INVALID_MVT_WIRE/],
+    [customFeature({ type: mvtScalar(3, 4) }), /INVALID_MVT_GEOMETRY_TYPE/],
+    [customFeature({ tags: [0] }), /INVALID_MVT_TAGS/],
+    [customFeature({ tags: [1, 0] }), /INVALID_MVT_TAG_INDEX/],
+    [customFeature({ shape: [9, 0, 0, 10, 32] }), /TRUNCATED_MVT_GEOMETRY/],
+    [customFeature({ shape: [11, 0, 0] }), /INVALID_MVT_GEOMETRY/],
+    [customFeature({ shape: [1, 0, 0] }), /INVALID_MVT_GEOMETRY/],
+    [
+      customFeature({ type: mvtScalar(3, 3), shape: [9, 0, 0, 18, 32, 0, 0, 32] }),
+      /INVALID_MVT_GEOMETRY/,
+    ],
+    [customFeature({ value: mvtScalar(7, 2) }), /INVALID_MVT_VALUE/],
+  ]) {
+    const f = payloadArchive([payload]);
+    try {
+      assert.throws(() => inspectArchive(f.archive), code);
+    } finally {
+      f.cleanup();
+    }
+  }
+});
+test('packed geometry fragments are bounded before retaining repeated empty or tiny messages', () => {
+  const first = mvtPacked(4, [9, 0, 0, 10, 32, 32]);
+  const atLimit = payloadArchive([
+    customFeature({
+      geometry: Buffer.concat([first, ...Array(4095).fill(mvtBytes(4, Buffer.alloc(0)))]),
+    }),
+  ]);
+  try {
+    assert.equal(inspectArchive(atLimit.archive).tileCount, 1);
+  } finally {
+    atLimit.cleanup();
+  }
+  for (const fragment of [Buffer.alloc(0), Buffer.from([0])]) {
+    const f = payloadArchive([
+      customFeature({ geometry: Buffer.concat(Array(4097).fill(mvtBytes(4, fragment))) }),
+    ]);
+    try {
+      assert.throws(() => inspectArchive(f.archive), /OVERSIZE_MVT_GEOMETRY_PARTS/);
+    } finally {
+      f.cleanup();
+    }
+  }
+});
+test('a rehashed CRC-corrupt archive cannot be activated and preserves the successful generation', async () => {
+  const f = await fixture();
+  try {
+    await activateGeneration(f.store, 'seoul', f.generation);
+    const next = `${Date.now()}-f1234567`,
+      directory = resolve(f.store, 'seoul/generations', next);
+    mkdirSync(directory, { recursive: true });
+    const archive = resolve(directory, 'base.mbtiles');
+    copyFileSync(f.archive, archive);
+    const bytes = gzipSync(authoredMvt('fault candidate'));
+    bytes[bytes.length - 8] ^= 255;
+    const db = new DatabaseSync(archive);
+    db.prepare('UPDATE tiles SET tile_data=?').run(bytes);
+    db.close();
+    const manifest = {
+      ...f.manifest,
+      generation: next,
+      archive: {
+        ...f.manifest.archive,
+        gzip: true,
+        sha256: await sha256(archive),
+        bytes: readFileSync(archive).length,
+      },
+    };
+    writeFileSync(resolve(directory, 'manifest.json'), JSON.stringify(manifest));
+    await assert.rejects(activateGeneration(f.store, 'seoul', next), /INVALID_TILE_GZIP/);
+    assert.equal(activeGeneration(f.store, 'seoul'), f.generation);
+  } finally {
+    f.cleanup();
+  }
 });

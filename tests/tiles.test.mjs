@@ -15,8 +15,10 @@ import {
 } from '../services/tiles/dist/pipeline.js';
 import { startTileServer } from '../services/tiles/dist/server.js';
 import { contained, planetiler, regions, sha256, shaText } from '../services/tiles/dist/config.js';
+import { authoredMvt } from './tiles-fixture.mjs';
 
-const ownTile = gzipSync(Buffer.from('original-authored-http-test-bytes'));
+const ownRawTile = authoredMvt('original-authored-http-test-bytes');
+const ownTile = gzipSync(ownRawTile);
 function authoredPbfHeader(timestamp, compressed = false) {
   const integer = (input) => {
     const out = [];
@@ -298,7 +300,7 @@ test('real SQLite XYZ service handles styles, gzip tiles, missing coverage, orig
     const tile = await globalThis.fetch(service.origin + '/tiles/0/0/0.pbf');
     assert.equal(tile.status, 200);
     assert.equal(tile.headers.get('content-encoding'), 'gzip');
-    assert.equal(await tile.text(), 'original-authored-http-test-bytes');
+    assert.deepEqual(Buffer.from(await tile.arrayBuffer()), ownRawTile);
     assert.equal((await globalThis.fetch(service.origin + '/tiles/14/0/0.pbf')).status, 204);
     assert.equal((await globalThis.fetch(service.origin + '/tiles/0/0/9.pbf')).status, 400);
     assert.equal(

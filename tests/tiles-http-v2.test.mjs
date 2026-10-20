@@ -19,6 +19,7 @@ import { ByteCache, chooseEncoding } from '../services/tiles/dist/http-assets.js
 import { inspectArchive } from '../services/tiles/dist/archive.js';
 import { activateGeneration } from '../services/tiles/dist/pipeline.js';
 import { planetiler, regions, sha256, shaText } from '../services/tiles/dist/config.js';
+import { authoredMvt } from './tiles-fixture.mjs';
 
 let sequence = 0;
 function storage() {
@@ -50,7 +51,8 @@ async function generation(store, text, schema = 'design-v1', region = 'seoul') {
     json: JSON.stringify({ vector_layers: names.map((id) => ({ id, fields })) }),
   }))
     put.run(key, value);
-  const bytes = gzipSync(Buffer.from(text));
+  const raw = authoredMvt(text, schema);
+  const bytes = gzipSync(raw);
   db.prepare('INSERT INTO tiles VALUES(0,0,0,?)').run(bytes);
   if (maxzoom === 16) db.prepare('INSERT INTO tiles VALUES(16,0,65535,?)').run(bytes);
   db.close();
@@ -100,7 +102,7 @@ async function generation(store, text, schema = 'design-v1', region = 'seoul') {
       : {}),
   };
   writeFileSync(resolve(directory, 'manifest.json'), JSON.stringify(manifest));
-  return { id, directory, path, manifest, bytes };
+  return { id, directory, path, manifest, bytes, raw };
 }
 function glyphPack(store) {
   const directory = resolve(store, 'authored-glyph-http');
@@ -239,23 +241,17 @@ test('current and previous datasets stay distinct across rollback; unknown IDs n
         gunzipSync(value.bytes).toString(),
       );
     assert.equal((await http(service.origin, `/datasets/${c.id}/tiles/0/0/0.pbf`)).status, 404);
-    assert.equal(
-      (await http(service.origin, '/tiles/0/0/0.pbf')).bytes.toString(),
-      'generation B only',
-    );
+    assert.deepEqual((await http(service.origin, '/tiles/0/0/0.pbf')).bytes, b.raw);
     await service.close();
     assert.equal(service.diagnostics().archives, 0);
     assert(service.diagnostics().closed);
     await service.close();
     await activateGeneration(store, 'seoul', a.id);
     service = await startTileServer({ store, region: 'seoul' });
-    assert.equal(
-      (await http(service.origin, '/tiles/0/0/0.pbf')).bytes.toString(),
-      'generation A only',
-    );
-    assert.equal(
-      (await http(service.origin, `/datasets/${b.id}/tiles/0/0/0.pbf`)).bytes.toString(),
-      'generation B only',
+    assert.deepEqual((await http(service.origin, '/tiles/0/0/0.pbf')).bytes, a.raw);
+    assert.deepEqual(
+      (await http(service.origin, `/datasets/${b.id}/tiles/0/0/0.pbf`)).bytes,
+      b.raw,
     );
   } finally {
     await service?.close();
@@ -395,9 +391,9 @@ test('context is explicitly selected, bounded and uses its own immutable dataset
         value.tiles?.[0].includes(`/datasets/${context.id}/tiles/`),
       ),
     );
-    assert.equal(
-      (await http(service.origin, `/datasets/${context.id}/tiles/0/0/0.pbf`)).bytes.toString(),
-      'context data',
+    assert.deepEqual(
+      (await http(service.origin, `/datasets/${context.id}/tiles/0/0/0.pbf`)).bytes,
+      context.raw,
     );
   } finally {
     await service?.close();
@@ -515,9 +511,9 @@ test('an invalid retained previous generation is unavailable and cannot return t
     assert.equal(service.diagnostics().archives, 1);
     assert.equal(service.diagnostics().previousAvailable, false);
     assert.equal((await http(service.origin, `/datasets/${a.id}/tiles/0/0/0.pbf`)).status, 404);
-    assert.equal(
-      (await http(service.origin, `/datasets/${b.id}/tiles/0/0/0.pbf`)).bytes.toString(),
-      'current immutable bytes',
+    assert.deepEqual(
+      (await http(service.origin, `/datasets/${b.id}/tiles/0/0/0.pbf`)).bytes,
+      b.raw,
     );
   } finally {
     await service?.close();
