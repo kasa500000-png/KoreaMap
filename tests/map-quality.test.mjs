@@ -21,6 +21,240 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { gzipSync } from 'node:zlib';
+import { runInNewContext } from 'node:vm';
+import { collectFrameRendererMetadata } from '../scripts/frame-renderer-metadata.mjs';
+
+function rendererFixture({
+  attributes = {},
+  extension = true,
+  renderer = 'ANGLE SwiftShader',
+} = {}) {
+  const calls = [];
+  const actual = {
+    alpha: true,
+    antialias: false,
+    depth: true,
+    desynchronized: false,
+    failIfMajorPerformanceCaveat: false,
+    powerPreference: 'high-performance',
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: false,
+    stencil: true,
+    xrCompatible: false,
+    ...attributes,
+  };
+  const gl = {
+    RENDERER: 1,
+    VENDOR: 2,
+    VERSION: 3,
+    SHADING_LANGUAGE_VERSION: 4,
+    getContextAttributes: () => actual,
+    isContextLost: () => false,
+    getExtension(name) {
+      calls.push(['extension', name]);
+      return extension ? { UNMASKED_RENDERER_WEBGL: 5, UNMASKED_VENDOR_WEBGL: 6 } : null;
+    },
+    getParameter(key) {
+      calls.push(['parameter', key]);
+      return {
+        1: 'WebKit WebGL',
+        2: 'WebKit',
+        3: 'WebGL 2.0 (synthetic)',
+        4: 'WebGL GLSL ES 3.00 (synthetic)',
+        5: renderer,
+        6: 'Synthetic vendor',
+      }[key];
+    },
+  };
+  const canvas = {
+    width: 390,
+    height: 800,
+    getContext(type, ...options) {
+      calls.push(['context', type, options]);
+      return gl;
+    },
+  };
+  const environment = {
+    userAgent: 'Synthetic Chromium QA',
+    devicePixelRatio: 1,
+    viewportWidth: 390,
+    viewportHeight: 800,
+    platform: 'Synthetic platform',
+    hardwareConcurrency: 8,
+    deviceMemory: 4,
+  };
+  return { canvas, gl, actual, calls, environment };
+}
+
+test('renderer evidence reads actual attributes without applying defaults or changing the existing context', () => {
+  const fixture = rendererFixture({
+    attributes: {
+      desynchronized: true,
+      preserveDrawingBuffer: true,
+      antialias: true,
+      alpha: false,
+      powerPreference: 'low-power',
+    },
+  });
+  const before = globalThis.structuredClone(fixture.actual);
+  const result = collectFrameRendererMetadata(fixture.canvas, fixture.environment);
+  assert.equal(result.webgl.status, 'AVAILABLE');
+  assert.equal(result.webgl.contextType, 'webgl2');
+  assert.equal(result.webgl.attributes.status, 'AVAILABLE');
+  assert.deepEqual(result.webgl.attributes.values, before);
+  assert.deepEqual(fixture.actual, before);
+  assert.deepEqual(
+    fixture.calls.filter(([name]) => name === 'context'),
+    [['context', 'webgl2', []]],
+  );
+  assert.equal(result.webglRenderer, 'ANGLE SwiftShader');
+  assert.equal(result.webgl.renderer.masked.value, 'WebKit WebGL');
+  assert.equal(result.webgl.vendor.unmasked.value, 'Synthetic vendor');
+  assert.equal(result.softwareRendering.status, 'DETECTED');
+  assert.deepEqual(result.softwareRendering.evidence, ['swiftshader']);
+  assert.equal(result.browser, fixture.environment.userAgent);
+  assert.equal(result.canvasWidth, 390);
+  assert.equal(result.canvasHeight, 800);
+  assert.equal(result.devicePixelRatio, 1);
+  assert.deepEqual(result.viewport, { width: 390, height: 800 });
+  assert.deepEqual(result.device, {
+    platform: 'Synthetic platform',
+    hardwareConcurrency: 8,
+    memoryGiB: 4,
+  });
+});
+
+test('absent contexts and failed context reads remain unavailable rather than reporting default attributes or hardware', () => {
+  for (const canvas of [
+    undefined,
+    { width: 0, height: 0 },
+    { getContext: () => null },
+    {
+      getContext: () => {
+        throw Error('Synthetic blocked context');
+      },
+    },
+  ]) {
+    const result = collectFrameRendererMetadata(canvas);
+    assert.equal(result.webgl.status, 'NOT_AVAILABLE');
+    assert.equal(result.webgl.contextType, null);
+    assert.equal(result.webgl.attributes.status, 'NOT_AVAILABLE');
+    assert(Object.values(result.webgl.attributes.values).every((value) => value === null));
+    assert.equal(result.softwareRendering.status, 'NOT_AVAILABLE');
+    assert.equal(result.webglRenderer, 'UNAVAILABLE');
+    assert.equal(result.devicePixelRatio, null);
+    assert.deepEqual(result.viewport, { width: null, height: null });
+  }
+  const blocked = collectFrameRendererMetadata({
+    getContext: () => {
+      throw Error('Do not echo');
+    },
+  });
+  assert.equal(blocked.webgl.reason, 'READ_FAILED');
+  assert(!JSON.stringify(blocked).includes('Do not echo'));
+});
+
+test('missing debug extension keeps masked identity separate and cannot establish hardware acceleration', () => {
+  const fixture = rendererFixture({ extension: false });
+  const result = collectFrameRendererMetadata(fixture.canvas, fixture.environment);
+  assert.equal(result.webgl.debugRendererInfo.status, 'NOT_AVAILABLE');
+  assert.equal(result.webgl.renderer.unmasked.status, 'NOT_AVAILABLE');
+  assert.equal(result.webgl.vendor.unmasked.status, 'NOT_AVAILABLE');
+  assert.equal(result.webglRenderer, 'WebKit WebGL');
+  assert.equal(result.softwareRendering.status, 'UNCONFIRMED');
+  assert.equal(result.softwareRendering.source, 'masked-renderer');
+  assert(!fixture.calls.some(([name, key]) => name === 'parameter' && ![1, 2, 3, 4].includes(key)));
+  const namedGpu = rendererFixture({ renderer: 'ANGLE Synthetic GPU' });
+  assert.equal(
+    collectFrameRendererMetadata(namedGpu.canvas).softwareRendering.status,
+    'UNCONFIRMED',
+  );
+});
+
+test('partially supported attributes, failed extension/parameter reads and context loss are reported independently', () => {
+  const fixture = rendererFixture({
+    attributes: { desynchronized: undefined, xrCompatible: 'false' },
+  });
+  fixture.gl.getExtension = () => {
+    throw Error('Synthetic extension denial');
+  };
+  fixture.gl.getParameter = () => {
+    throw Error('Synthetic parameter denial');
+  };
+  let result = collectFrameRendererMetadata(fixture.canvas);
+  assert.equal(result.webgl.attributes.status, 'PARTIAL');
+  assert.deepEqual(result.webgl.attributes.unavailable, ['desynchronized', 'xrCompatible']);
+  assert.equal(result.webgl.attributes.values.desynchronized, null);
+  assert.equal(result.webgl.attributes.values.preserveDrawingBuffer, false);
+  assert.equal(result.webgl.debugRendererInfo.reason, 'READ_FAILED');
+  assert.equal(result.webgl.renderer.masked.reason, 'READ_FAILED');
+  assert.equal(result.softwareRendering.status, 'NOT_AVAILABLE');
+  fixture.gl.getContextAttributes = () => {
+    throw Error('Synthetic attributes denial');
+  };
+  result = collectFrameRendererMetadata(fixture.canvas);
+  assert.equal(result.webgl.attributes.status, 'NOT_AVAILABLE');
+  assert.equal(result.webgl.attributes.reason, 'READ_FAILED');
+  fixture.gl.getContextAttributes = () => fixture.actual;
+  fixture.gl.isContextLost = () => true;
+  result = collectFrameRendererMetadata(fixture.canvas);
+  assert.equal(result.webgl.status, 'NOT_AVAILABLE');
+  assert.equal(result.webgl.reason, 'CONTEXT_LOST');
+  assert.equal(result.webgl.attributes.reason, 'CONTEXT_LOST');
+  assert(Object.values(result.webgl.attributes.values).every((value) => value === null));
+  assert.equal(result.webgl.renderer.masked.reason, 'CONTEXT_LOST');
+});
+
+test('renderer helper stays self-contained when serialized into the production QA consumer', () => {
+  const fixture = rendererFixture();
+  const browserFunction = runInNewContext(`(${collectFrameRendererMetadata.toString()})`);
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(browserFunction(fixture.canvas, fixture.environment))),
+    collectFrameRendererMetadata(fixture.canvas, fixture.environment),
+  );
+});
+
+test('software, unconfirmed and unavailable renderer metadata cannot relax the fixed frame acceptance gate', () => {
+  const fixture = rendererFixture();
+  const noExtension = rendererFixture({ extension: false });
+  const metadata = [
+    collectFrameRendererMetadata(fixture.canvas),
+    collectFrameRendererMetadata(noExtension.canvas),
+    collectFrameRendererMetadata(undefined),
+  ];
+  for (const renderer of metadata) {
+    const trials = Array.from({ length: 5 }, () => ({
+      deltas: Array(6).fill(100),
+      sourceCount: 1000,
+      before: { renderedCount: 1000, allMarkersInBounds: true },
+      after: { renderedCount: 1000, allMarkersInBounds: true },
+      completed: true,
+      elapsedMs: 1000,
+      renderer,
+    }));
+    const result = evaluateMarkerFrameSeries(trials);
+    assert.equal(result.status, 'FAIL');
+    assert.equal(result.targetMs, 33);
+    assert.equal(result.requiredSamples, 30);
+    assert.equal(result.samples, 30);
+    assert.equal(result.frameP95Ms, 100);
+  }
+});
+
+test('actual renderer metadata is collected after the timed loop and optional profiler stop, before map destruction', () => {
+  const source = readFileSync(new URL('../scripts/verify-map-frames.mjs', import.meta.url), 'utf8');
+  const loop = source.indexOf('for (let index = 0; index < trialCount; index++)');
+  const stop = source.indexOf(
+    'if (profiler) Object.assign(report.profiling, await profiler.stop())',
+  );
+  const collect = source.indexOf(
+    'await page.evaluate(() => globalThis.frameProbe.rendererMetadata())',
+  );
+  const destroy = source.indexOf('map.destroy()');
+  assert(loop >= 0 && stop > loop && collect > stop && destroy > collect);
+  assert.equal(source.split('globalThis.frameProbe.rendererMetadata()').length - 1, 1);
+  assert.match(source, /capturePhase: 'AFTER_TIMED_TRIALS_AND_PROFILE_STOP'/);
+});
 
 test('quality matrix includes all 240 fixed region/theme/zoom/viewport combinations', () => {
   const cases = mapQualityCases();
