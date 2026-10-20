@@ -68,3 +68,5 @@ All five SDK packages and Web/Android/iOS remain the final target; Web Alpha is 
 ## Map quality work
 
 Optional shared camera/selection interactions and detailed `design-v2` cartography preserve the existing APIs and default provider policy. See the [quality plan](docs/map-quality.md) and [validation report](docs/research/map-quality-validation.md) for actual regional evidence and remaining release gates. Physical Android/iOS validation, approved coastlines and nationwide detail remain separate acceptance work.
+
+Ten-stage preview integration: [results, PRs and remaining gates](docs/research/ten-stage-execution.md). [Fixture-only static export](docs/research/stage-10-web-deployment.md) is locally verified; external hosting and npm publication remain incomplete.
