@@ -268,17 +268,18 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
         geometry: { type: 'Point', coordinates: [...m.coordinate] },
       })),
     });
-    selector.replaceChildren();
+    const choices = document.createDocumentFragment();
     const placeholder = document.createElement('option');
     placeholder.value = '';
     placeholder.textContent = `장소 선택 (${markers.length})`;
-    selector.append(placeholder);
+    choices.append(placeholder);
     for (const marker of markers) {
       const option = document.createElement('option');
       option.value = marker.id;
       option.textContent = marker.label;
-      selector.append(option);
+      choices.append(option);
     }
+    selector.replaceChildren(choices);
     renderSelection();
   }
   function renderOverlay(id: string, data: MapFeatureCollection) {
@@ -693,6 +694,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
         { padding, duration: 0, bearing: 0, pitch: 0 },
       );
     },
+    () => status,
   );
   return handle;
 }

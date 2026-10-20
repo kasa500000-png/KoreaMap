@@ -630,3 +630,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** node-forge1.4.0/braces3.0.3에 공식 패치 없음. 최신 지원 RN/MapLibre 경로에도 전체 선언 오류가 남는다. CI 실패를 우회한 main 병합이나 단계 전체 완료를 하지 않는다.
 7. **Git:** `fix/security-and-public-types`, 기반 `3cb1a37d9b2bebcd66586c614f681ded7aaeb116`. 단계 커밋: `git log -1 --format='%H %s' --grep='^fix: fail closed on public declaration verification$'`. 사용자가 두 단계의 commit/PR/main merge를 승인했다. 최초 PR은 main에 없는 기존 SDK 기반도 포함하며, 실제 PR/CI/병합 상태는 최종 사용자 보고로 연결한다.
 8. **다음:** 독립적인 성능 개선은 가능하다. 보안·전체 타입은 BLOCKED이며 병합·발행 수락으로 처리하지 않는다. npm 발행/Release/운영 배포 승인은 없다.
+
+## 후속 2단계 — 지도 조작 비용 감소·프로파일 — 2026-10-20 KST
+
+1. **구현:** Web 명령 status의 전체 마커 query 제거, selector fragment 배치, WeakMap 마커 ID 인덱스, 예제 좌표의 idle 갱신, 수락과 분리된 opt-in CPU/trace 수집을 추가했다. 도로/건물·마커 수·위계·기본 protocol/33ms 기준은 유지했다.
+2. **파일:** Web runtime3개·예제2개·개별 출처 SHA5개, 관련 unit/E2E·프레임 verifier/QA 회귀·Web patch Changeset·가이드·[최종 성능 기록](research/map-performance-validation.md)·로드맵·비용/진행 기록.
+3. **검사:** `pnpm check`(Vitest181/18파일·release12·타일34·QA12·Native consumer6 등), Web25 E2E·5pack·clean byte 동일 재빌드·격리 Web 지원 경로 PASS. 실제100명령에서 query/source write/selector mutation0·camera100·표시 마커1000 유지. 독립 Web 전체 판정은 NodeNext TS2834/exit1로 PARTIAL_PASS다. Native offline 설치·앱타입/plugin/양OS JS export도 재검증PASS이나 RN상위3건으로 PARTIAL_PASS/exit1이다.
+4. **실화면/성능:** Chromium390/768/1440·터치 모의·4테마·선택/복구/정리 통과,390px 지도/테마 이미지 직접 확인. 실제 서울1,000마커 고정5회/54표본p95116.7ms로33ms목표 **FAIL**(수정 전도116.7ms). 실제profile12.48MB 수집은 NON_ACCEPTANCE/exit2이며 기본report byte동일 보존. GPU/readback 병목이 남는다. 이번 코드의 실제240화면·30cold/warm·Native 기기는 미재실행/미검증이다.
+5. **라이선스/보안:** 자체MIT 수정만 반영, SDK 의존성/lock·기본 provider·키·제작자endpoint·제3자payload 추가 없음. 프로파일·실지도/font·이미지는 ignored. 최종 staged16원천/348파일·diff 검사 PASS, 작업 트리/index·로컬29커밋/820blob·실제5tarball의 정적 findings0이다. 보안 high2·상위 RN/NodeNext 선언 차단은 유지한다.
+6. **차단:** frame 목표·실제GPU/Android·Mac/iOS, 상위 공식 보안/타입 수정, 해안선/전국·장기 부하/OS 네트워크 검증은 남는다. 기능 회귀 성공을 전체 성능·출시 성공으로 처리하지 않는다.
+7. **Git:** 1단계 `39d77444154b3dfedf7971316df10a004526d30e`와 macOS 회귀 `0390182482a1c2b2da26eea353971ae603080e7b`를 [PR15](https://github.com/kasa500000-png/KoreaMap/pull/15)에 반영했다. CI21 Windows/macOS 성공, audit/Linux 공개타입 실패. 2단계 브랜치 `perf/map-interactions`; 커밋 조회 `git log -1 --format='%H %s' --grep='^perf: avoid redundant work during map interactions$'`. 별도 stacked PR의 실제번호·SHA·CI는 최종 보고한다. main·기본브랜치·배포/Release/npm은 변경하지 않는다.
+8. **다음:** 후속 개선은 가능하지만 두 단계 전체 수락·main 병합은 BLOCKED다. 사용자의 단계별 병합 승인은 기록했으며 실패 검사를 억제하지 않는다. 기존14개 stacked PR은 자동 정리하지 않았다.

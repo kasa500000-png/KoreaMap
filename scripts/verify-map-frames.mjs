@@ -3,16 +3,21 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
+  closeSync,
   mkdirSync,
   mkdtempSync,
+  openSync,
   readFileSync,
+  readdirSync,
   realpathSync,
   rmSync,
   statSync,
   writeFileSync,
+  writeSync,
 } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, isAbsolute, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { clearTimeout, setTimeout } from 'node:timers';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { qualityTargets, percentile } from './map-quality-cases.mjs';
 import { startQualityConsumer } from './quality-consumer.mjs';
@@ -30,13 +35,200 @@ export function parseMapFrameOptions(args) {
   const values = new Map();
   for (const arg of args) {
     if (arg === '--operator-opt-in') continue;
+    if (arg === '--profile') {
+      assert(!values.has(arg), 'Duplicate --profile flag');
+      values.set(arg, true);
+      continue;
+    }
     const match = /^--(store|glyphs)=(.+)$/.exec(arg);
     assert(match && !values.has(match[1]), 'Unique explicit --store and --glyphs required');
     values.set(match[1], match[2]);
   }
   for (const key of ['store', 'glyphs'])
     assert(isAbsolute(values.get(key) ?? ''), 'Absolute operator paths required');
-  return { store: values.get('store'), glyphs: values.get('glyphs') };
+  return {
+    store: values.get('store'),
+    glyphs: values.get('glyphs'),
+    ...(values.has('--profile') ? { profile: true } : {}),
+  };
+}
+export function frameReportPolicy(profile = false) {
+  assert(typeof profile === 'boolean', 'Boolean profile option required');
+  return profile
+    ? { file: 'frames-profile-report.json', acceptanceEligible: false, status: 'NON_ACCEPTANCE' }
+    : { file: 'frames-report.json', acceptanceEligible: true };
+}
+const maxProfileBytes = 64 * 1024 ** 2;
+const profileCommandTimeoutMs = 30000;
+function profileDeadline(promise) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(
+        () => reject(new Error('PROFILE_COMMAND_TIMEOUT')),
+        profileCommandTimeoutMs,
+      );
+    }),
+  ]).finally(() => clearTimeout(timer));
+}
+
+/** Diagnostic-only CDP capture; the supplied directory must be new and empty. */
+export async function startFrameProfile(session, directory, { maxBytes = maxProfileBytes } = {}) {
+  assert(
+    Number.isSafeInteger(maxBytes) && maxBytes > 0 && maxBytes <= maxProfileBytes,
+    'Invalid profile size bound',
+  );
+  assert(
+    statSync(directory).isDirectory() && readdirSync(directory).length === 0,
+    'Empty owned profile directory required',
+  );
+  let cpuEnabled = false,
+    cpuRunning = false,
+    traceRunning = false,
+    closed = false;
+  let completeListener, traceHandle;
+  const command = (method, params) => profileDeadline(session.send(method, params));
+  async function endTrace() {
+    const complete = new Promise((resolve) => {
+      completeListener = resolve;
+      session.once('Tracing.tracingComplete', completeListener);
+    });
+    try {
+      await command('Tracing.end');
+      const event = await profileDeadline(complete);
+      traceRunning = false;
+      traceHandle = event.stream;
+      assert(
+        typeof traceHandle === 'string' && traceHandle.length > 0 && !event.dataLossOccurred,
+        'PROFILE_TRACE_INCOMPLETE',
+      );
+      return traceHandle;
+    } finally {
+      session.off('Tracing.tracingComplete', completeListener);
+      completeListener = undefined;
+    }
+  }
+  async function cleanup(removeFiles) {
+    if (closed) return;
+    closed = true;
+    try {
+      if (traceRunning) {
+        try {
+          await endTrace();
+        } catch {
+          /* Browser teardown may already have stopped tracing. */
+        }
+      }
+      if (traceHandle) {
+        try {
+          await command('IO.close', { handle: traceHandle });
+        } catch {
+          /* Continue releasing the CDP session. */
+        }
+      }
+      if (cpuRunning) {
+        try {
+          await command('Profiler.stop');
+        } catch {
+          /* Continue cleanup after a failed capture. */
+        }
+      }
+      if (cpuEnabled) {
+        try {
+          await command('Profiler.disable');
+        } catch {
+          /* Detach also releases profiler state. */
+        }
+      }
+    } finally {
+      try {
+        await profileDeadline(session.detach());
+      } catch {
+        /* Closed browser sessions are already detached. */
+      }
+      if (removeFiles) rmSync(directory, { recursive: true, force: true });
+    }
+  }
+  try {
+    await command('Profiler.enable');
+    cpuEnabled = true;
+    await command('Profiler.setSamplingInterval', { interval: 1000 });
+    await command('Profiler.start');
+    cpuRunning = true;
+    await command('Tracing.start', {
+      categories:
+        'toplevel,devtools.timeline,v8.execute,blink.user_timing,cc,gpu,disabled-by-default-devtools.timeline',
+      transferMode: 'ReturnAsStream',
+    });
+    traceRunning = true;
+  } catch (error) {
+    await cleanup(true);
+    throw error;
+  }
+  return {
+    async stop() {
+      assert(!closed, 'Profiler already closed');
+      try {
+        const { profile } = await command('Profiler.stop');
+        cpuRunning = false;
+        assert(
+          profile &&
+            Array.isArray(profile.nodes) &&
+            Array.isArray(profile.samples) &&
+            profile.samples.length > 0,
+          'PROFILE_CPU_INCOMPLETE',
+        );
+        const cpu = JSON.stringify(profile);
+        const cpuBytes = Buffer.byteLength(cpu);
+        assert(cpuBytes <= maxBytes, 'PROFILE_SIZE_LIMIT');
+        writeFileSync(resolve(directory, 'cpu.cpuprofile'), cpu, { flag: 'wx', mode: 0o600 });
+        const handle = await endTrace();
+        const digest = createHash('sha256');
+        let bytes = 0;
+        let reads = 0;
+        const fd = openSync(resolve(directory, 'trace.json'), 'wx', 0o600);
+        try {
+          for (;;) {
+            assert(++reads <= 4096, 'PROFILE_STREAM_LIMIT');
+            const part = await command('IO.read', {
+              handle,
+              size: Math.min(1024 ** 2, maxBytes - cpuBytes - bytes + 1),
+            });
+            const chunk = Buffer.from(part.data, part.base64Encoded ? 'base64' : 'utf8');
+            assert(cpuBytes + bytes + chunk.length <= maxBytes, 'PROFILE_SIZE_LIMIT');
+            assert(chunk.length > 0 || part.eof, 'PROFILE_STREAM_NO_PROGRESS');
+            let offset = 0;
+            while (offset < chunk.length) {
+              const written = writeSync(fd, chunk, offset, chunk.length - offset);
+              assert(written > 0, 'PROFILE_WRITE_FAILED');
+              offset += written;
+            }
+            digest.update(chunk);
+            bytes += chunk.length;
+            if (part.eof) break;
+          }
+        } finally {
+          closeSync(fd);
+        }
+        assert(bytes > 0, 'PROFILE_TRACE_EMPTY');
+        await command('IO.close', { handle });
+        traceHandle = undefined;
+        const files = [
+          { file: 'cpu.cpuprofile', bytes: cpuBytes, sha256: sha(cpu) },
+          { file: 'trace.json', bytes, sha256: digest.digest('hex') },
+        ];
+        await cleanup(false);
+        return { status: 'CAPTURED', maxBytes, totalBytes: cpuBytes + bytes, files };
+      } catch (error) {
+        await cleanup(true);
+        throw error;
+      }
+    },
+    async abort() {
+      await cleanup(true);
+    },
+  };
 }
 function jsonFile(path) {
   assert(
@@ -118,6 +310,7 @@ probe.ready=true;
 }
 
 export async function verifyMapFrames(options) {
+  const policy = frameReportPolicy(options.profile ?? false);
   const { startTileServer } = await import('../services/tiles/dist/server.js');
   const { sourceEligibility } = await import('../services/tiles/dist/config.js');
   const { chromium, expect } = await import('@playwright/test');
@@ -169,8 +362,21 @@ export async function verifyMapFrames(options) {
       'Marker source count and actual rendered unique IDs plus geometric coverage verified at both ends of each fixed-zoom/bearing/pitch affine pan; per-frame feature queries are omitted to limit instrumentation overhead',
       'RAF intervals include browser scheduling and software rendering; p95 goal remains 33ms and sample minimum remains 30',
     ],
+    ...(!policy.acceptanceEligible
+      ? {
+          status: policy.status,
+          acceptanceEligible: false,
+          profiling: {
+            status: 'NOT_STARTED',
+            mode: 'cpu-and-chrome-trace',
+            samplingIntervalUs: 1000,
+            maxArtifactBytes: maxProfileBytes,
+            qualifiesAsBenchmark: false,
+          },
+        }
+      : {}),
   };
-  let consumer, tiles, browser, context, page;
+  let consumer, tiles, browser, context, page, profiler;
   let disposing = false;
   try {
     const require = createRequire(import.meta.url);
@@ -293,6 +499,18 @@ export async function verifyMapFrames(options) {
         report.initialScene.labels > 0,
       'Actual balanced Seoul scene must render',
     );
+    if (!policy.acceptanceEligible) {
+      const directory = mkdtempSync(resolve(output, 'frame-profile-'));
+      try {
+        const session = await context.newCDPSession(page);
+        profiler = await startFrameProfile(session, directory);
+      } catch (error) {
+        rmSync(directory, { recursive: true, force: true });
+        throw error;
+      }
+      report.profiling.status = 'RECORDING';
+      report.profiling.directory = relative(output, directory).split('\\').join('/');
+    }
     for (let index = 0; index < trialCount; index++) {
       const sample = await page.evaluate((index) => globalThis.frameProbe.trial(index), index);
       report.trials.push(sample);
@@ -302,6 +520,7 @@ export async function verifyMapFrames(options) {
       );
       await page.waitForFunction(() => globalThis.frameProbe.idle, {}, { timeout: 30000 });
     }
+    if (profiler) Object.assign(report.profiling, await profiler.stop());
     report.result = evaluateMarkerFrameSeries(report.trials);
     report.mapErrors = await page.evaluate(() => globalThis.frameProbe.errors);
     assert.equal(report.network.unexpected, 0, 'Unexpected browser origin');
@@ -318,32 +537,50 @@ export async function verifyMapFrames(options) {
     assert.equal(report.cleanup.status, 'destroyed');
     assert.equal(report.cleanup.listeners, 0);
     assert.equal(report.cleanup.observing, false);
-    report.status = report.result.status;
+    report.status = policy.status ?? report.result.status;
     return report;
   } catch (error) {
-    report.status = 'FAIL';
+    report.status = policy.status ?? 'FAIL';
+    if (report.profiling && report.profiling.status !== 'CAPTURED')
+      report.profiling.status = 'FAILED';
     report.failure = /^[A-Z_]+$/.test(error?.code ?? '') ? error.code : 'VERIFICATION_FAILED';
     throw error;
   } finally {
     disposing = true;
-    await context?.close();
-    await browser?.close();
-    await tiles?.close();
-    await consumer?.close();
-    rmSync(temporary, { recursive: true, force: true });
-    writeFileSync(resolve(output, 'frames-report.json'), `${JSON.stringify(report, null, 2)}\n`);
+    for (const [name, close] of [
+      ['profiler', () => profiler?.abort()],
+      ['context', () => context?.close()],
+      ['browser', () => browser?.close()],
+      ['tiles', () => tiles?.close()],
+      ['consumer', () => consumer?.close()],
+    ]) {
+      try {
+        await close();
+      } catch {
+        (report.cleanupFailures ??= []).push(name);
+        report.status = policy.status ?? 'FAIL';
+        report.failure = 'CLEANUP_FAILED';
+      }
+    }
+    try {
+      rmSync(temporary, { recursive: true, force: true });
+    } finally {
+      writeFileSync(resolve(output, policy.file), `${JSON.stringify(report, null, 2)}\n`);
+    }
   }
 }
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   try {
     const report = await verifyMapFrames(parseMapFrameOptions(process.argv.slice(2)));
     console.log(
-      `${report.status}: ${report.result.samples} frame samples; p95 ${report.result.frameP95Ms ?? 'unverified'}ms; fixed goal 33ms`,
+      `${report.status}: ${report.result.samples} frame samples; p95 ${report.result.frameP95Ms ?? 'unverified'}ms; fixed goal 33ms${report.acceptanceEligible === false ? '; profiler overhead, not an acceptance benchmark' : ''}`,
     );
-    if (report.status !== 'PASS') process.exitCode = 1;
+    if (report.failure) process.exitCode = 1;
+    else if (report.acceptanceEligible === false) process.exitCode = 2;
+    else if (report.status !== 'PASS') process.exitCode = 1;
   } catch {
     console.error(
-      'Map frame probe failed; explicit settings are not echoed. See ignored frames-report.json when available.',
+      'Map frame probe failed; explicit settings are not echoed. See the ignored frame report for the selected mode when available.',
     );
     process.exitCode = 1;
   }

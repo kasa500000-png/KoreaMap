@@ -374,3 +374,11 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 [보안·타입 조사](research/security-types-validation.md)에서 공식 registry·advisory·지원 버전을 재확인했다. high2/critical0와 공개 선언 오류는 유지된다. Web/Native 독립 소비 명령이 PARTIAL_PASS를 exit0으로 넘기던 결함을 수정해 실패/미실행에서 발행을 차단한다. 정상 Bundler/core/SSR/browser·Native 앱/plugin/JS 결과와 source commit·진단은 보존한다. 키·제작자 서비스·SDK 의존성·lockfile·기본 provider·CI runner/발행 승인 조건은 바꾸지 않았다. 공식 MapLibre tarball 및 실진단/프로파일은 ignored artifacts에만 있다.
 
 사용자는1·2단계의 공개 commit/PR·main merge를 승인했다. 실패 감사/선언을 억제한 병합이나 npm/Release/운영 배포는 승인 범위로 확대하지 않는다. 이번 독립 Web 브라우저의 외부 요청0은 OS 전체/Native 실행 감사가 아니다. 최종 staged·로컬 이력·실제5tarball 비밀/비용 스캔은 단계 커밋 전에 실행한다.
+
+## 후속 2단계 — 2026-10-20 KST
+
+최종 staged 데이터 검사16원천/348파일과 diff 검사를 통과했다. 작업 트리348파일·index348blob·도달 가능한 로컬29커밋/820blob·실제5tarball의 정적 findings는0(`PASS_STATIC_ONLY`)이다. ignored `artifacts/performance-step2/cost-final.json`에 결과를 보존한다.
+
+[성능 기록](research/map-performance-validation.md)의 Web query/DOM/index·예제 idle 변경은5개 기존 자체MIT runtime 경로만 개별 검토·SHA 갱신했다. 새 dependency/lockfile·제작자endpoint·credential·기본 서비스·외부 Provider·다운로드·CI/과금 설정은 없다. Web25 E2E·격리 tarball 브라우저·실제 서울 unprofiled/profile 검사에서 예상 밖 외부 origin0을 확인했다. profile은 opt-in 운영자 로컬 자료와 동일 loopback 소비자만 사용하고 CPU+trace를64MiB로 제한한다. 수집 report는NON_ACCEPTANCE/exit2, 기본성능 report는FAIL/exit1로 남겨 발행 수락과 혼동하지 않는다.
+
+실지도/OSM·glyph/폰트·브라우저 screenshot·원본 trace는 ignored 저장소에만 있다. 새 Web tarball19,672B와 나머지4개 모두 pack 출처/비밀/비용 검사 및 byte 동일 재현을 확인했다. 독립 Web 전체 검증은 NodeNext 오류로exit1, 전체 의존 audit도high2로차단이다. 원격PR15의 Windows/macOS CI는 성공했고 audit/Linux 공개 타입은 실패하며 억제하지 않았다. 두 단계의 공개 PR 작업만 사용자 승인에 따라 수행하고 main 병합·기본브랜치 설정·npm/Release/운영 배포·유료 인프라는 실행하지 않는다. Static findings0이나 loopback Web 요청0을 Native OS egress/청구 설정/전체 보안 보증으로 확대하지 않는다.

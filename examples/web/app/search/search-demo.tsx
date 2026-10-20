@@ -51,9 +51,8 @@ export function SearchDemo() {
           return;
         }
         handle.current = map;
-        map.api.onEvent((event) => {
-          if (event.type === 'camera') setCamera(event.camera.center.join(', '));
-        });
+        // Display the latest snapshot after movement; camera frames do not rerender search results.
+        map.on('idle', () => setCamera(map.state.getSnapshot().camera.center.join(', ')));
         await map.ready;
         if (!abort.signal.aborted) {
           setReady(true);

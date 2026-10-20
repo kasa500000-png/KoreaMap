@@ -49,12 +49,11 @@ export function MapDemo() {
         map.on('status', setStatus);
         map.on('error', () => setStatus('error'));
         map.on('select', (marker) => setSelected(marker?.label ?? '선택 없음'));
-        map.on('camera', (next) =>
+        map.on('idle', () => {
+          const next = model.getSnapshot().camera;
           setCameraText(
             `${next.center[0].toFixed(5)},${next.center[1].toFixed(5)} / ${next.zoom.toFixed(2)} / ${next.bearing.toFixed(1)}`,
-          ),
-        );
-        map.on('idle', () => {
+          );
           setRendered(map.diagnostics().renderedMarkers);
           if (container.current) container.current.dataset.motion = 'idle';
         });
