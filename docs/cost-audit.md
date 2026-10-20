@@ -425,3 +425,8 @@ QA 보고서의 실제 context 속성 수집은 측정·선택형 profiler 정�
 ## 우선순위 10단계 — 05 Android APK
 
 선택형localtool을명시적으로설정한격리tarball APK빌드만수행했다. offlineGradle335tasks와내장Hermes/ELF/rawZIP검증은PASS_BUILD_ONLY이며전체RN선언/OS네트워크/기기/바이너리고지수락은미완료다. 기본pnpm check에는가짜APK단위회귀만연결하고JDK/SDK/Gradle/EAS/기기/클라우드요구를추가하지않았다. no-shell/PID시작시각확인·출력/시간상한을사용하나PPIDpolling이모든재부모화자손을발견함을보장하지않는다. 실제APK·번들·프로젝트는ignored로보존하고Git/npm에넣지않았다. 외부배포·유료runner·새endpoint·서명키없음.
+
+
+## 우선순위 10단계 — 06 공공 POI 파일 입력 보호
+
+private ETL CLI가 data/raw 밖으로 이어지는 symlink/junction·일반파일 아닌 입력·크기초과를 거부하고 단일 fd로 읽는다. 합성 Vitest188/19·실제 Docker PostGIS19·compiled CLI 링크 거부3개 PASS. 공식8원본 URL은503, 실제CSV 미확보로 실자료통합 NOT_RUN. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-06-poi-ingestion.md)를따른다.

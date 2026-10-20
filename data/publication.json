@@ -214,7 +214,7 @@
       "license": "MIT"
     },
     "services/geo-data/src/cli.ts": {
-      "sha256": "613e8a6af26d602453bdd35e7a576703dd20902f2a81dc4efc32ecf853adaf13",
+      "sha256": "ba980d28c39e7365ba29619c08552b099c9107aefe509b83d5ddb309a0f5f5a7",
       "origin": "project-authored",
       "license": "MIT"
     },
@@ -535,6 +535,11 @@
     },
     "services/tiles/src/http-assets.ts": {
       "sha256": "1768949de7dc66ae05c570eae79ce85c79f02ed4cd6984a9a4f77c9a23f4b24f",
+      "origin": "project-authored",
+      "license": "MIT"
+    },
+    "services/geo-data/src/operator-files.ts": {
+      "sha256": "f794a38c4970288ed0cd1c15645be5c68fbe6361356f0efe6a6903aefa57919e",
       "origin": "project-authored",
       "license": "MIT"
     }

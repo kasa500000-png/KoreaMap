@@ -713,3 +713,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 전체RN/Web선언·high2·성능·앱실행수락이남는다. PPIDpolling은빠른재부모화자손을보장하지않아descendantCoverage UNKNOWN으로기록하며모든자손정리성공을주장하지않는다. 선택형QA의Windows launcher는미지원, SDKWindows지원과별개다.
 7. **Git:** 04 PR21/commitb6bdd4ca88fdbee1d066da357329c4df459a0b9f/merge729bf19bea53adc6aad4810bba8dd77fff5f2a8f. 05브랜치 test/stage-05-android-artifact, commit조회 `git log -1 --format='%H %s' --grep='^test: verify isolated Android APK payloads$'`.
 8. **다음:** 검증된빌드/검사도구를preview소스에반영하고데이터단계를계속한다. Native전체릴리스수락·실제외부배포완료가아니다.
+
+
+## 우선순위 10단계 — 06 공공 POI 파일 입력 보호 — 2026-10-21 KST
+
+1. **구현:** private ETL CLI가 data/raw 밖으로 이어지는 symlink/junction·일반파일 아닌 입력·크기초과를 거부하고 단일 fd로 읽는다. [세부 근거](research/stage-06-poi-ingestion.md).
+2. **파일:** services/geo-data/src/operator-files.ts, services/geo-data/src/cli.ts, tests/unit/operator-files.test.ts, docs/research/stage-06-poi-ingestion.md 및 개별출처원장/명령연결/진행·로드맵·비용문서. SDK와운영자서비스 경계를 유지한다.
+3. **검사:** 합성 Vitest188/19·실제 Docker PostGIS19·compiled CLI 링크 거부3개 PASS. 공식8원본 URL은503, 실제CSV 미확보로 실자료통합 NOT_RUN. 통합 pnpm check PASS(Vitest188), 실제 PostGIS19/19·5pack 동일SHA PASS. staged·정적감사는commit전에확인한다.
+4. **실화면:** 서비스 CLI 변경으로 새 지도 화면 QA는 미실행이며 실제 POI 표시도 미검증이다.
+5. **라이선스/보안:** 자체MIT코드만추가, 원본데이터·glyph·폰트·APK·키·개인정보·제작자endpoint는포함하지않았다. 새의존성·유료runner·외부배포없음. runtimeSHA는해당diff검토후개별검증했다.
+6. **차단:** 원본CSV exact URL·SHA·header·독립 좌표기준점 확보가 필요하다. A등급만으로 원본통합 성공을 주장하지 않는다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
+7. **Git:** 브랜치 `fix/stage-06-operator-files`. commit조회 `git log -1 --format='%H %s' --grep='^fix: constrain operator ETL file inputs$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
+8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.

@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
-import { createReadStream } from 'node:fs';
-import { resolve, relative, isAbsolute } from 'node:path';
 import { KitError } from 'korea-map-core';
+import { readOperatorFile } from './operator-files.js';
 import {
   openDatabase,
   migrate,
@@ -14,27 +13,6 @@ import {
   type CsvImportConfig,
 } from './index.js';
 
-/** Run from the repository root. Configuration/raw files must remain in ignored operator storage. */
-function operatorFile(path: string | undefined): string {
-  if (!path) throw new KitError('INVALID_ARGUMENT', 'OPERATOR_FILE_REQUIRED');
-  const root = resolve('data/raw');
-  const file = resolve(path);
-  const rel = relative(root, file);
-  if (!rel || rel.startsWith('..') || isAbsolute(rel))
-    throw new KitError('INVALID_ARGUMENT', 'USE_IGNORED_OPERATOR_STORAGE');
-  return file;
-}
-async function readBounded(path: string, max: number): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  let size = 0;
-  for await (const chunk of createReadStream(path)) {
-    const bytes = chunk as Buffer;
-    size += bytes.length;
-    if (size > max) throw new KitError('INVALID_ARGUMENT', 'OPERATOR_FILE_TOO_LARGE');
-    chunks.push(bytes);
-  }
-  return Buffer.concat(chunks);
-}
 async function main(): Promise<void> {
   const command = process.argv[2];
   if (!['migrate', 'fixture', 'import', 'download', 'collect', 'serve'].includes(command ?? ''))
@@ -48,7 +26,7 @@ async function main(): Promise<void> {
   if (command === 'import' || command === 'download' || command === 'collect') {
     const catalog: unknown = JSON.parse(await readFile('data/sources.json', 'utf8'));
     const config = JSON.parse(
-      (await readBounded(operatorFile(process.env.KMK_IMPORT_CONFIG), 65536)).toString('utf8'),
+      (await readOperatorFile(process.env.KMK_IMPORT_CONFIG, 65536)).toString('utf8'),
     ) as CsvImportConfig;
     let bytes: Uint8Array;
     if (command === 'download' || command === 'collect') {
@@ -69,7 +47,7 @@ async function main(): Promise<void> {
         return;
       }
     } else {
-      bytes = await readBounded(operatorFile(process.env.KMK_SOURCE_FILE), 10 * 1024 * 1024);
+      bytes = await readOperatorFile(process.env.KMK_SOURCE_FILE, 10 * 1024 * 1024);
       prepared = prepareCsv(catalog, config, bytes);
     }
   }
