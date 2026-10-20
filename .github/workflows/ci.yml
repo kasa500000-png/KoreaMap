@@ -54,11 +54,64 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: sudo apt-get install --no-install-recommends --yes fonts-noto-cjk
       - run: node scripts/check-font.mjs --font /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc --face 1
-      - run: pnpm verify:packages
-      - run: pnpm verify:native-consumer
       - run: pnpm test:web
       - run: pnpm test:geo
       - run: pnpm test:routing
+  web-consumer:
+    name: Web consumer declarations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      EXPO_NO_TELEMETRY: '1'
+      EXPO_OFFLINE: '1'
+      EXPO_NO_DOTENV: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: npm install --global pnpm@12.14.0 --ignore-scripts --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:sdk
+      - run: pnpm pack:check
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: sudo apt-get install --no-install-recommends --yes fonts-noto-cjk
+      - run: node scripts/check-font.mjs --font /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc --face 1
+      - run: pnpm verify:packages
+  native-consumer:
+    name: Native consumer declarations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      EXPO_NO_TELEMETRY: '1'
+      EXPO_OFFLINE: '1'
+      EXPO_NO_DOTENV: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: npm install --global pnpm@12.14.0 --ignore-scripts --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:sdk
+      - run: pnpm pack:check
+      - run: pnpm verify:native-consumer
   windows:
     runs-on: windows-2025
     timeout-minutes: 20

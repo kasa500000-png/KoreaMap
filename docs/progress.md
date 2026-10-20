@@ -654,3 +654,16 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** high2·Web/RN 상위 선언·p95116.7ms>33ms·실제Android/iOS·해안선/전국·POI/릴리스 계정 검증은 남는다. 기본 브랜치 main 변경은 GitHub HTTP403으로 거부돼 기존 `chore/project-policy` 그대로이며 `--branch main`이 필요하다. 독립 소비 결과는 기존 PARTIAL_PASS/exit1이다.
 7. **Git:** PR15 병합 `8d068bf6935b0290001695071db66d3e754c81b3`, PR16 병합 `49e8aac64d7b7f2de3236cfaaff2373da602999e`. 문서 브랜치 `docs/clone-ready-preview`, 커밋 조회 `git log -1 --format='%H %s' --grep='^docs: document clone-ready main preview$'`. 최종 문서 PR/병합 SHA는 완료 보고에서 제공한다.
 8. **다음:** main clone 후 후속 개발 가능. 소스 통합을 전체 기능 수락/릴리스로 보고하지 않는다. npm·tag·GitHub Release·운영 배포·visibility 변경은 하지 않았다.
+
+## 우선순위 10단계 — 01 보안 재검증·CI 격리 — 2026-10-21 KST
+
+사용자의 새 요청은 [10단계 실행](ten-stage-plan.md)의 단계별 commit/PR/main 반영과 지정 대상 배포다. Android 물리 기기·macOS/iOS는 제외하며 기존 실패를 수락으로 바꾸지 않는다.
+
+1. **구현:** Web 선언 실패 때문에 뒤의 Native/Web/DB/라우팅 검사가 미실행되던 CI를 수정했다. Web·Native 소비를 독립 Ubuntu job으로 옮겨 모든 실패를 유지하면서 Linux 기능 회귀를 실행한다. [공식 재조사](research/stage-01-security.md)에서는 안전한 수정 의존성 경로를 찾지 못했다.
+2. **파일:** CI workflow·release 정책 회귀·단계01 검증 문서·10단계 계획과 현재 진행/로드맵/비용 기록이다. SDK runtime·의존성·lock·발행 workflow는 변경하지 않았다.
+3. **검사:** 실제 전체 audit high2/critical0·exit1, why 경로 exit0. release/선언 정책 회귀14개와 전체 `pnpm check`(Vitest181·Next production·Expo 양OS JS·정책/문서 검사) 통과. 최종 staged/정적 검사는 단계 commit 전에 실행하며 보안 실패는 통과로 계산하지 않는다.
+4. **실화면:** CI 전용 변경으로 renderer/UI는 미수정, 이번 단계의 화면 QA는 재실행하지 않았다.
+5. **라이선스/보안:** 자체 MIT 정책/테스트 변경, 새 원본 payload·키·제작자 endpoint·유료 runner·cache/artifact upload 없음. 알려진 node-forge/braces high2 및 Web/RN 선언 오류는 그대로 실패한다.
+6. **차단:** 공식 수정 버전·지원 그래프, 전체 소비 선언 수락과 원격 새 CI의 실제 결과가 남는다. 배포 대상은 사용자 선택 확인 중이며 아직 외부 배포를 실행하지 않았다.
+7. **Git:** `fix/stage-01-security-review`, 기준 `259d75e116a2de456f546c736014d50197774a4d`. 단계 commit은 `git log -1 --format='%H %s' --grep='^ci: isolate consumer declaration gates$'`로 식별한다. 실제 PR/merge SHA는 원격 반영 후 보고한다.
+8. **다음:** CI 격리 개선을 검증해 preview 소스로 반영하고 독립 타입/QA/데이터 단계를 계속한다. 취약점 해소·보안 수락 자체는 BLOCKED다.
