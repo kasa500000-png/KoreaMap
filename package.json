@@ -53,7 +53,7 @@
     "check:licenses": "node scripts/check-licenses.mjs",
     "audit:dependencies": "pnpm audit --audit-level=high",
     "verify:packages": "node scripts/verify-packages.mjs",
-    "test:release": "node --test tests/release.test.mjs tests/declaration-probe.test.mjs",
+    "test:release": "node --test tests/release.test.mjs tests/declaration-probe.test.mjs tests/release-preflight.test.mjs",
     "release:prepare": "node scripts/release.mjs prepare",
     "release:verify": "node scripts/release.mjs verify",
     "tiles": "node --use-env-proxy services/tiles/dist/cli.js",
@@ -75,7 +75,8 @@
     "verify:native-android": "node scripts/verify-native-android.mjs",
     "test:native-android": "node --test tests/native-android.test.mjs",
     "test:service-quality": "node --test tests/service-quality.test.mjs",
-    "verify:service-quality": "node scripts/service-quality.mjs"
+    "verify:service-quality": "node scripts/service-quality.mjs",
+    "release:preflight": "node scripts/release-preflight.mjs"
   },
   "devDependencies": {
     "typescript": "6.0.3",

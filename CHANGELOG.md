@@ -86,3 +86,19 @@ audit in CI and bind release inputs to an approved main-integrated commit. See t
 ### Release preparation
 
 English/Korean entry docs, community policies, source/asset license separation, package metadata, guarded manual publication preparation, tarball integrity manifest and release notes. Known high-severity advisories, strict Web NodeNext incompatibility, native device/iOS gaps, registry permissions and final publication validation remain open. See [release report](docs/releases/v0.1.0.md).
+
+### Additional unpublished work consolidated — 2026-10-21
+
+These three records are included in the first unpublished 0.1.0 baseline, following the existing initial release policy. No published version or tag exists. Future changes after publication use the normal fixed-group Changesets process.
+
+#### fast-web-map-commands
+
+Avoid rendered-marker queries during internal command readiness checks, batch accessible marker selector updates, and reuse marker ID indexes for picking. Camera events, marker content, selection ordering and explicit diagnostics remain unchanged.
+
+#### readable-maps-and-interactions
+
+Add an optional shared interaction controller for completed camera transitions, asymmetric insets, batch markers and portable selection. Preserve the existing controller and default marker behavior. Add opt-in clustering, accessible example controls and a detailed cartography style with an explicitly versioned tile schema. This changeset does not publish packages or certify physical Android/iOS support.
+
+#### native-public-geojson-types
+
+Preserve the public GeoJSON type reference and ship its existing type dependency so strict React-only consumers can resolve Native SDK declarations in Bundler and NodeNext modes. React Native application declaration failures remain release blockers.
