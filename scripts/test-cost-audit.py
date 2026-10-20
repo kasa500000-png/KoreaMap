@@ -68,6 +68,16 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit()
         self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
 
+    def test_official_type_reference_docs_do_not_authorize_runtime_requests(self):
+        for host in ['www.typescriptlang.org', 'reactnative.dev']:
+            self.write('docs/types.md', 'https://' + host + '/docs/\n')
+            self.write('packages/core/src/provider.ts', '')
+            process, _, _ = self.run_audit()
+            self.assertEqual(process.returncode, 0)
+            self.write('packages/core/src/provider.ts', 'const endpoint = "https://' + host + '/docs/";\n')
+            _, _, rules = self.run_audit()
+            self.assertIn('EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW', rules)
+
     def test_operator_download_exception_is_exact_and_private(self):
         url = "https" + "://download.geofabrik.de/asia/south-korea-latest.osm.pbf"
         self.write("services/tiles/src/pipeline.ts", 'const url = "' + url + '";\n')

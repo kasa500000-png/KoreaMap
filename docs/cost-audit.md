@@ -401,3 +401,9 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 일반 Foundation CI에 표준 Ubuntu Web/Native 소비 job을 분리했다. 모든 기존 audit·선언·Web/geo/routing 검사를 유지하고 needs/조건부 skip/continue-on-error를 추가하지 않았다. 표준 runner 실행량은 늘지만 유료 runner·cache·artifact upload·cron·shared service·제작자 키를 추가하지 않는다. SDK/lock/기본Provider·npm 발행 workflow는 그대로다. 초기 install/보안 metadata 조회는 공개 registry이며 유료 지도 호출과 구분한다. 계정 과금 제한과 모든 OS egress를 정적 검사만으로 보장하지 않는다.
 
 단계01의 보안 수락은 BLOCKED다. 단계별 소스 통합 승인을 실패 감사 억제·npm 최초 발행·불명확한 외부 호스팅 활성화로 확대하지 않는다. 배포 대상 선택 전에는 준비와 검증을 진행하고 외부 배포 결과를 만들어내지 않는다. 최종 staged/작업 트리·이력·실제5tarball 정적 감사는 commit 전에 실행한다.
+
+## 우선순위 10단계 — 02 공개 타입 — 2026-10-21 KST
+
+Native 공개 index의 공식 GeoJSON 보존 참조와 @types/geojson7946.0.16 dependency 승격을 개별 검토했다. runtime 실행문은 그대로이며 manifest/lock은 기존 버전의 importer 역할만 바꾼다. 새 Provider·URL·계정·data/font payload가 없다. Native sourceSHA1개만 갱신했다.
+
+실제 소비 verifier에서 직접 GeoJSON 타입 주입을 제거하고 설치된 Native tarball의 전이 의존성으로 해결하도록 했다. SDK 자체의 strict Bundler/NodeNext 선언2개는 통과했지만 전체 RN 선언3건은 기존대로 PARTIAL_PASS/exit1이다. 신규 공식 TypeScript/React Native 근거 host2개는 문서에만 허용하며 코드/runtime의 같은 URL을 거부하는 회귀로 비용 경계를 유지한다. 초기 pack의 미검토host/sourcehash 실패는 근거와 함께 보존하고 루트 개별 검토 후 다시 검사한다. CI·발행 승인 조건·기본 외부 요청은 변경하지 않는다.

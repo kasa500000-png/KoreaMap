@@ -1,3 +1,5 @@
+// Published MapLibre style types use the ambient GeoJSON namespace.
+/// <reference types="geojson" preserve="true" />
 import {
   Map as LibreMapView,
   Camera,

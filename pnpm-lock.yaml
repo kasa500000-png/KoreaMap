@@ -323,6 +323,9 @@ importers:
       '@maplibre/maplibre-gl-style-spec':
         specifier: 26.2.1
         version: 26.2.1
+      '@types/geojson':
+        specifier: 7946.0.16
+        version: 7946.0.16
       korea-map-core:
         specifier: workspace:*
         version: link:../core
@@ -333,9 +336,6 @@ importers:
       '@maplibre/maplibre-react-native':
         specifier: 11.5.0
         version: 11.5.0(@types/geojson@7946.0.16)(@types/react@19.3.0)(expo@58.0.14(@babel/core@7.29.7(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1)(typescript@6.0.3))(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
-      '@types/geojson':
-        specifier: 7946.0.16
-        version: 7946.0.16
       '@types/react':
         specifier: 19.3.0
         version: 19.3.0

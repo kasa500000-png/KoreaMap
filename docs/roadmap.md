@@ -5,6 +5,7 @@
 ## 기반과 현재 작업
 
 - 현재 후속 작업은 사용자 요청에 따라 [우선순위별 10단계](ten-stage-plan.md)로 실행한다. 각 단계의 독립 commit/PR/main 반영과 지정 대상 배포를 준비하며, 실제 Android 기기·macOS/iOS는 제외 범위다. 기존 보안·타입·성능 게이트를 유지하고 완료·부분 성공·외부 차단을 구분한다.
+- 01단계는 [PR18](https://github.com/kasa500000-png/KoreaMap/pull/18)로 CI 소비 게이트를 격리했으며 보안 high2는 미해결이다. 02단계의 [Native 공개 GeoJSON 선언](research/stage-02-public-types.md)은 SDK strict Bundler/NodeNext 검사를 개선하고 전체 RN/Web 상위 선언 실패는 유지한다.
 
 - 2026-10-20 사용자가 다른 컴퓨터에서 clone할 수 있도록 현재 작업의 병합을 명시적으로 요청했다. [PR15](https://github.com/kasa500000-png/KoreaMap/pull/15)는 `8d068bf6935b0290001695071db66d3e754c81b3`, [PR16](https://github.com/kasa500000-png/KoreaMap/pull/16)은 `49e8aac64d7b7f2de3236cfaaff2373da602999e`로 각각 main에 병합했다. 이는 미완료 preview 소스 통합이며 보안·타입·성능·Native 수락 완료가 아니다. 현재 clone 방법과 새 설치 검사는 [clone 검증 기록](research/clone-validation.md)을 따른다.
 - 저장소는 Public이고 SDK 전체 소스는 `main`에 있다. 기본 브랜치 `chore/project-policy`를 main으로 변경하는 요청은 GitHub 권한 부족 HTTP403으로 거부됐다. 따라서 `git clone --branch main https://github.com/kasa500000-png/KoreaMap.git`을 사용한다. 기본 브랜치 변경은 미반영이며 GitHub 관리 설정에서 별도로 처리할 수 있다. npm 발행·GitHub Release·운영 배포는 수행하지 않았다.
