@@ -11,3 +11,4 @@ export * from './track-formats.js';
 export * from './replay.js';
 export * from './routing.js';
 export * from './coordinate-bounds.js';
+export * from './interaction.js';

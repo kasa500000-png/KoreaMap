@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { KitError, defineMapStyle, normalizeError } from 'korea-map-core';
+import { KitError, defineMapStyle, normalizeError, type MapSelection } from 'korea-map-core';
 import { createMap, type MapHandle } from 'korea-map-web';
 import { parseCustomStyle, themeNames, type ThemeName } from 'korea-map-styles';
 
@@ -27,6 +27,7 @@ interface Session {
   styleUrl: URL;
   layers: readonly string[];
   unsubscribe: (() => void)[];
+  cameraText: string;
 }
 interface VisibleFeatures {
   roads: number;
@@ -82,6 +83,12 @@ export function TilesDemo() {
   const [themed, setThemed] = useState(false);
   const [camera, setCamera] = useState('');
   const [features, setFeatures] = useState<VisibleFeatures | null>(null);
+  const [selection, setSelection] = useState<MapSelection | null>(null);
+  const [candidates, setCandidates] = useState<readonly MapSelection[]>([]);
+  const [origin, setOrigin] = useState('');
+  const cardTitle = useRef<HTMLHeadingElement>(null);
+  const pointer = useRef<{ id: number; x: number; y: number } | null>(null);
+  const pickRevision = useRef(0);
 
   function current(session: Session) {
     return mounted.current && active.current === session && !session.controller.signal.aborted;
@@ -101,6 +108,10 @@ export function TilesDemo() {
     setCamera('');
     setFeatures(null);
     setThemed(false);
+    setSelection(null);
+    setCandidates([]);
+    setOrigin('');
+    pickRevision.current++;
   }
   useEffect(() => {
     mounted.current = true;
@@ -113,17 +124,19 @@ export function TilesDemo() {
   function summarize(session: Session) {
     const map = session.map;
     if (!current(session) || !map || map.diagnostics().status !== 'ready') return;
-    const candidates = [
-      'korea-road-major',
-      'korea-road-minor',
-      'korea-building',
-      'korea-label-place',
-      'korea-label-road',
-      'korea-label-poi',
-    ];
-    const layers = candidates.filter((id) => session.layers.includes(id));
+    const layers = session.layers.filter(
+      (id) =>
+        id.startsWith('korea-road-') ||
+        id === 'korea-building' ||
+        id.startsWith('korea-label-') ||
+        id.startsWith('korea-poi-priority-'),
+    );
     const rendered = layers.length ? map.getRenderedFeatures(layers) : [];
-    const labels = rendered.filter((feature) => feature.layerId.startsWith('korea-label-'));
+    const labels = rendered.filter(
+      (feature) =>
+        feature.layerId.startsWith('korea-label-') ||
+        feature.layerId.startsWith('korea-poi-priority-'),
+    );
     const names = labels
       .map(({ properties }) => properties['name:ko'] ?? properties['name'] ?? properties['name:en'])
       .filter((name): name is string => typeof name === 'string' && name.trim().length > 0);
@@ -164,6 +177,7 @@ export function TilesDemo() {
       styleUrl: url,
       layers: [],
       unsubscribe: [],
+      cameraText: '',
     };
     active.current = session;
     setStatus('connecting');
@@ -183,6 +197,13 @@ export function TilesDemo() {
         },
         workerUrl: '/vendor/maplibre/maplibre-gl-worker.mjs',
         useLocalIdeographs: false,
+        clustering: { radius: 48, maxZoom: 13 },
+        interactionPoiLayers: session.layers.filter(
+          (id) =>
+            id === 'korea-label-poi' ||
+            (!id.endsWith('-context') &&
+              (id.startsWith('korea-poi-priority-') || id.startsWith('korea-label-transport-'))),
+        ),
         signal: session.controller.signal,
       });
       if (!current(session)) {
@@ -190,13 +211,30 @@ export function TilesDemo() {
         return;
       }
       session.map = map;
+      if (map.interactions)
+        session.unsubscribe.push(
+          map.interactions.onEvent((event) => {
+            if (!current(session)) return;
+            if (event.type === 'selection')
+              setSelection(event.selection?.kind === 'cluster' ? null : event.selection);
+            if (event.type === 'camera')
+              setOrigin(
+                event.origin === 'gesture'
+                  ? '직접 지도 이동'
+                  : event.origin === 'api'
+                    ? '버튼·장소로 이동'
+                    : '지도 위치 변경',
+              );
+          }),
+        );
       session.unsubscribe.push(
-        map.on('idle', () => summarize(session)),
+        map.on('idle', () => {
+          summarize(session);
+          if (current(session)) setCamera(session.cameraText);
+        }),
         map.on('camera', (value) => {
           if (current(session))
-            setCamera(
-              `${value.center.map((number) => number.toFixed(5)).join(', ')} · z${value.zoom.toFixed(1)}`,
-            );
+            session.cameraText = `${value.center.map((number) => number.toFixed(5)).join(', ')} · z${value.zoom.toFixed(1)}`;
         }),
         map.on('error', (error) => {
           if (!current(session)) return;
@@ -224,11 +262,87 @@ export function TilesDemo() {
     const session = active.current;
     if (!session?.map || !current(session) || status !== 'ready') return;
     try {
-      await session.map.api.setCenter(cities[city].center);
-      await session.map.api.setZoom(14);
+      if (session.map.interactions)
+        await session.map.interactions.transitionCamera({
+          center: cities[city].center,
+          zoom: 14,
+          bearing: 0,
+          pitch: 0,
+        });
+      else {
+        await session.map.api.setCenter(cities[city].center);
+        await session.map.api.setZoom(14);
+      }
       if (current(session)) summarize(session);
     } catch (error) {
-      fail(error, session);
+      if (normalizeError(error).code !== 'ABORTED') fail(error, session);
+    }
+  }
+  async function choose(value: MapSelection) {
+    const session = active.current;
+    if (!session?.map?.interactions || !current(session)) return;
+    try {
+      await session.map.interactions.selectFeature(value);
+      if (!current(session)) return;
+      setCandidates([]);
+      if (value.kind !== 'cluster') {
+        const small = window.matchMedia('(max-width:680px)').matches;
+        await session.map.interactions.transitionCamera(
+          { ...session.map.state.getSnapshot().camera, center: value.coordinate },
+          { insets: small ? { bottom: 240 } : { right: 320 } },
+        );
+        if (current(session)) cardTitle.current?.focus({ preventScroll: true });
+      }
+    } catch (error) {
+      if (normalizeError(error).code !== 'ABORTED') fail(error, session);
+    }
+  }
+  async function pick(x: number, y: number) {
+    const session = active.current,
+      revision = ++pickRevision.current;
+    if (!session?.map?.interactions || !current(session) || status !== 'ready') return;
+    try {
+      const values = await session.map.interactions.pickFeatures({ x, y });
+      if (!current(session) || revision !== pickRevision.current) return;
+      setCandidates(values);
+      if (values.length === 1) await choose(values[0]!);
+      else {
+        await session.map.interactions.selectFeature(null);
+        if (current(session)) setSelection(null);
+      }
+    } catch (error) {
+      if (normalizeError(error).code !== 'ABORTED') fail(error, session);
+    }
+  }
+  async function closeCard() {
+    const session = active.current;
+    if (!session?.map?.interactions || !current(session)) return;
+    try {
+      await session.map.interactions.selectFeature(null);
+      await session.map.interactions.transitionCamera(session.map.state.getSnapshot().camera, {
+        insets: {},
+        durationMs: 0,
+      });
+      if (current(session)) {
+        setSelection(null);
+        setCandidates([]);
+        container.current?.querySelector('canvas')?.focus({ preventScroll: true });
+      }
+    } catch (error) {
+      if (normalizeError(error).code !== 'ABORTED') fail(error, session);
+    }
+  }
+  async function zoom(delta: number) {
+    const session = active.current;
+    if (!session?.map || !current(session)) return;
+    const camera = session.map.state.getSnapshot().camera;
+    try {
+      const value = Math.max(0, Math.min(20, camera.zoom + delta));
+      if (session.map.interactions)
+        await session.map.interactions.transitionCamera({ ...camera, zoom: value });
+      else await session.map.api.setZoom(value);
+    } catch (error) {
+      if (normalizeError(error).code !== 'ABORTED') fail(error, session);
     }
   }
   async function changeTheme(value: ThemeName) {
@@ -258,7 +372,7 @@ export function TilesDemo() {
   }
   const busy = status === 'connecting' || status === 'styling';
   return (
-    <main>
+    <main className="tiles-demo">
       <p className="eyebrow">KOREA MAP KIT</p>
       <h1>내 타일 서버로 한국 지도 연결</h1>
       <p>
@@ -336,6 +450,16 @@ export function TilesDemo() {
         <button type="button" disabled={status !== 'ready'} onClick={() => void move()}>
           지역으로 이동
         </button>
+        <button
+          type="button"
+          disabled={status !== 'ready'}
+          onClick={() => {
+            const rect = container.current?.getBoundingClientRect();
+            if (rect) void pick(rect.width / 2, rect.height / 2);
+          }}
+        >
+          지도 중심 장소 찾기
+        </button>
       </div>
       {themed && (
         <div className="actions" aria-label="지도 테마" style={{ marginBlock: 16 }}>
@@ -352,13 +476,90 @@ export function TilesDemo() {
           ))}
         </div>
       )}
-      <div
-        ref={container}
-        role="region"
-        aria-label="자체 한국 지도"
-        className="map"
-        style={{ height: 540, width: '100%', background: '#e8eee9', borderRadius: 12 }}
-      />
+      <div className="tiles-map-shell">
+        <div
+          ref={container}
+          role="region"
+          aria-label="자체 한국 지도"
+          className="map"
+          onPointerDown={(event) => {
+            pointer.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+          }}
+          onPointerCancel={() => {
+            pointer.current = null;
+          }}
+          onPointerUp={(event) => {
+            const start = pointer.current;
+            pointer.current = null;
+            if (
+              !start ||
+              start.id !== event.pointerId ||
+              Math.hypot(start.x - event.clientX, start.y - event.clientY) > 8
+            )
+              return;
+            if ((event.target as HTMLElement).closest('button,a,select,input')) return;
+            const rect = event.currentTarget.getBoundingClientRect();
+            void pick(event.clientX - rect.left, event.clientY - rect.top);
+          }}
+          style={{ height: 540, width: '100%', background: '#e8eee9', borderRadius: 12 }}
+        />
+        <div className="tiles-zoom" aria-label="지도 확대 축소">
+          <button
+            type="button"
+            aria-label="지도 확대"
+            disabled={status !== 'ready'}
+            onClick={() => void zoom(1)}
+          >
+            ＋
+          </button>
+          <button
+            type="button"
+            aria-label="지도 축소"
+            disabled={status !== 'ready'}
+            onClick={() => void zoom(-1)}
+          >
+            −
+          </button>
+        </div>
+        {(selection || candidates.length > 1) && (
+          <section className="tiles-place-card" aria-label="선택한 장소">
+            {selection ? (
+              <>
+                <h2 ref={cardTitle} tabIndex={-1}>
+                  {selection.label || '이름 없는 장소'}
+                </h2>
+                <p>지도에 표시된 장소 · OSM</p>
+                <button type="button" onClick={() => void closeCard()}>
+                  장소 카드 닫기
+                </button>
+              </>
+            ) : (
+              <>
+                <h2>가까운 장소 선택</h2>
+                <ul>
+                  {candidates.map((value) => (
+                    <li key={value.key}>
+                      <button type="button" onClick={() => void choose(value)}>
+                        {value.label || '이름 없는 장소'}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <button type="button" onClick={() => setCandidates([])}>
+                  선택 취소
+                </button>
+              </>
+            )}
+          </section>
+        )}
+      </div>
+      <p className="tiles-help">
+        지도 위 장소를 눌러 카드를 여세요. 겹친 장소는 목록에서 선택할 수 있습니다. 드래그하면 진행
+        중인 자동 이동이 멈춥니다.
+      </p>
+      <p role="status" aria-live="polite">
+        {selection ? `${selection.label} 선택됨` : origin}
+      </p>
       <p data-testid="tiles-camera">{camera}</p>
       <p data-testid="tiles-rendered">
         {features

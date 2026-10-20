@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { normalizeError, type MapInteractionController } from 'korea-map-core';
 import { AppState, Button, ScrollView, Switch, Text, TextInput, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MapView, type MapController } from 'korea-map-native';
@@ -21,6 +22,11 @@ export function ScenarioScreen({ kind }: { kind: ScenarioKind }) {
   const map = useRef<MapController>(null),
     app = useRef<ScenarioSession | null>(null);
   const live = useRef(true);
+  const interactions = useRef<MapInteractionController | null>(null);
+  const receiveInteractions = useCallback((controller: MapInteractionController | null) => {
+    interactions.current = controller;
+  }, []);
+  const [motionNotice, setMotionNotice] = useState('');
   const [state, setState] = useState<ScenarioSnapshot>(),
     [query, setQuery] = useState(''),
     [gestures, setGestures] = useState(false);
@@ -68,6 +74,8 @@ export function ScenarioScreen({ kind }: { kind: ScenarioKind }) {
           ref={map}
           config={config}
           gesturesEnabled={gestures}
+          markerClustering={{ radius: 48, maxZoom: 13 }}
+          onInteractionsReady={receiveInteractions}
           onEvent={(event) => {
             if (event.type === 'ready' && map.current && !app.current && live.current) {
               app.current = createScenarioSession(
@@ -89,6 +97,28 @@ export function ScenarioScreen({ kind }: { kind: ScenarioKind }) {
           }}
         />
       </View>
+      <Button
+        title="모든 예제 장소 보기"
+        disabled={busy}
+        onPress={() => {
+          const coordinates = places.map((place) => place.coordinate);
+          void interactions.current
+            ?.fitBounds(
+              {
+                west: Math.min(...coordinates.map((point) => point[0])),
+                east: Math.max(...coordinates.map((point) => point[0])),
+                south: Math.min(...coordinates.map((point) => point[1])),
+                north: Math.max(...coordinates.map((point) => point[1])),
+              },
+              { insets: { top: 24, right: 24, bottom: 80, left: 24 } },
+            )
+            .catch((error: unknown) => {
+              if (live.current && normalizeError(error).code !== 'ABORTED')
+                setMotionNotice('지도를 이동하지 못했습니다. 다시 시도해 주세요.');
+            });
+        }}
+      />
+      <Text accessibilityLiveRegion="polite">{motionNotice}</Text>
       <Text>
         {kind === 'walk'
           ? '가상 공원 · 동물병원 · 미용실'

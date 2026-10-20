@@ -61,10 +61,10 @@ def main(root: Path) -> None:
             assert heading in text, f"Missing {heading}: {aid}"
         adrs[aid] = set(re.findall(r"\b[RZ]\d{2}\b", text))
         assert adrs[aid] <= requirements.keys(), f"Unknown ADR requirement: {aid}"
-    assert len(adrs) == 9, "Expected 9 ADRs"
+    assert set(adrs) == {f"ADR-{index:03}" for index in range(1, 11)}, "Expected ADR-001 through ADR-010"
     for rid, (_, _, aid) in requirements.items():
         assert aid in adrs and rid in adrs[aid], f"Missing reverse ADR mapping: {rid} -> {aid}"
-    print("PASS: 9 ADRs; every requirement has a matching ADR reference")
+    print("PASS: 10 ADRs; every requirement has a matching ADR reference")
 
     versions = json.loads((docs / "research/dependency-snapshot.json").read_text())
     names = set()

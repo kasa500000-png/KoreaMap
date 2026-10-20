@@ -355,3 +355,16 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 - 작업 트리/index/도달 가능한 로컬 Git 이력과5개 실제 tarball에 정적 검사, data publication 검사, cost 회귀19개를 실행한다. 발견0은 heuristic 범위다. 최종 staged 검사와 commit binding은 구현 보고 및 최종 커밋 결과를 따른다. 루프백 테스트를 제작자 유료 endpoint 무요청의 모든 OS/모든 실행에 대한 보증으로 확대하지 않는다.
 
 추가 점검: 실제 OSM 스타일의 클릭 가능한 공식 copyright/ODbL 고지를 제공했다. 이 exact 표시 링크는 private config 한 경로에만 정적 검토했으며 자동 fetch가 아니다. 현재 워크스페이스 Android debug APK의 offline compile도 성공했으나 JS 내장·독립tarballAPK/기기/OS egress 검증을 대신하지 않는다. 모바일 경로 QA의 resize 경쟁 조건을 수정하고 전체 경로 bounds와 실제 waypoint3개를 재검증했다.
+## 지도 품질 개선 비용·공개 감사 — 2026-10-20 UTC
+
+브랜치 `feat/map-quality`, 시작점 `964e9674ee626f60942be4d0f4bfe4f1aec9bbc8`. [품질 결과](research/map-quality-validation.md)와 [ADR-010](decisions/010-map-quality-and-interactions.md)을 따른다. 기능 검사 통과와 성능·보안·기기/공개 수락을 구분한다.
+
+- 공통 interaction·4테마 cartography·클러스터·예제 카드/가상화/접근성을 구현했으며 새 외부 의존성·제작자 endpoint·공유 키·DB·telemetry·자동 백엔드가 없다. 기본은 합성 데이터 또는 필수 설정 누락의 안전한 실패다. `/tiles/`는 빈 주소·미동의에서0 요청이며 새 Web 회귀가 이를 재검사한다.
+- v2 타일·context와 glyph 서버는 명시적 운영자 opt-in, loopback, 원장A/기한/원본SHA·시점/컴파일 원문SHA/세대SHA·capability 검증을 유지한다. 지역 상세와 context의 기존 성공본을 보존했다. 신규 coastline 공급원은 공식 HTML만 읽었고 원장 승격·자료 다운로드·auto collection을 하지 않았다. 원본PBF/MBTiles/폰트/OFL glyph/실지도 screenshot은 ignored 저장소에만 있다.
+- generation/style revision/glyph hash URL에만 immutable 캐시를 적용한다. mutable alias·다른 세대에 최신 자료 fallback·범용 proxy·공유 API endpoint는 없다. glyph gzip 캐시는 byte bound와 원본 hash 검사 뒤에만 사용한다. 캐시가 있다는 사실을 무료 공개 호스팅·영구 retention·운영 SLA로 표현하지 않는다.
+- production QA 도구는 public SDK exports를 로컬 bundle로 만들고 환경변수 주입·외부 asset import를 차단한다. loopback 정적 서버와 운영자 타일 서버만 연결한다. 도시 보존 수정 후 최종240화면 검사의 예상 밖 origin/HTTP/page 오류는0이다. 최종30cold/warm p95는2,934/1,493ms로이번호스트 목표를 통과했고, 별도1,000marker의56frame delta p95는116.7ms로목표33ms에 미달했다. matrix의11delta는불충분 표본으로 보존한다. 프로파일 수정 전 cold3,071ms/warm1,570ms·별도47delta p95150ms 실패도 이력으로 남기며 임계값을 낮추지 않았다. 실제 운영자 연결 예제9화면도 browser style12/tile73/glyph333·예상 밖/HTTP/page/console 오류0과 종료 정리를 확인했다. 단일 호스트/loopback 관측을 전체 장치 성능·OS egress 보증으로 확대하지 않는다.
+- `pnpm check`와 Web24 E2E, SDK5 tarball의 데이터/원본/비밀·비용 스캔, byte 동일 재빌드, 격리 Web 설치·SSR·브라우저의 외부 요청0이 통과했다. 격리 Native offline 설치·앱타입·plugin/JS export는 부분 통과지만 상위 RN 선언 전체 검사3건은 실패다. Android workspace debug의 offline compile은 기기 실행·현재JS 내장·Native OS egress를 증명하지 않는다.
+- metadata 라이선스645개와 strict 경계를 확인했다. runtime26개 수정/추가는 팀이 직접 작성한 MIT 코드·합성 fixture·공식 API adapter로 개별 검토한 경로만 출처 SHA를 갱신했다. 기존 미수정 원장과 제3자 payload 금지는 보존했다. 공식 attribution href를 확인하는 QA의 exact URL만 offline assertion으로 검토했고, 새 coastline host는 docs-only 허용이다. 실제 비밀 패턴·runtime endpoint 검사를 완화하지 않았다.
+- `pnpm audit`는 high2/critical0·exit1이며 공개 차단이다. 공식 지원 수정·Native 기기/상위 타입·해안선·전국/장기 성능이 남아 있다. audit ignore/continue-on-error, paid runner/EAS/cloud/remote cache/cron/artifact 업로드/배포/발행·GitHub 원격 쓰기를 추가하지 않았다. SDK 코드 배포와 운영자의 지도·검색·라우팅 서비스 비용은 계속 분리한다.
+
+최종 커밋 전 검사에서 작업 트리342파일·index342blob·도달 가능한 로컬26커밋/739blob과 실제5개 tarball의 정적 findings는0(`PASS_STATIC_ONLY`)이다. staged 데이터 검사16원천/342파일과 diff 검사도 통과했다. 결과는 ignored `artifacts/map-quality-final-cost.json`, 커밋 식별은 [진행 기록](progress.md)의 최신 단계를 따른다. 정적 findings0·브라우저 외부 요청0을 모든 Native OS 트래픽·운영자 청구 설정·상용 서비스 전체 검증으로 확대하지 않는다.

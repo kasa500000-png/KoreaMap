@@ -26,7 +26,11 @@ import {
   sha256,
   shaText,
   sourceEligibility,
+  archiveCapabilities,
+  tileSchema,
   type Region,
+  type TileSchema,
+  type TileCapabilities,
 } from './config.js';
 
 const MAX_SOURCE_BYTES = 512 * 1024 ** 2;
@@ -34,9 +38,7 @@ const MAX_ARCHIVE_BYTES = 16 * 1024 ** 3;
 const SOURCE_URL = 'https://download.geofabrik.de/asia/south-korea-latest.osm.pbf';
 const generationPattern = /^[0-9]{13}-[a-f0-9]{8}$/;
 const checksumPattern = /^[a-f0-9]{64}$/;
-export interface Generation {
-  schemaVersion: 1;
-  schema: 'design-v1';
+interface GenerationBase {
   generation: string;
   region: Region;
   bounds: readonly number[];
@@ -56,6 +58,17 @@ export interface Generation {
     freeDiskBefore: number;
   };
 }
+export type Generation = GenerationBase &
+  (
+    | { schemaVersion: 1; schema: 'design-v1' }
+    | {
+        schemaVersion: 2;
+        schema: 'design-v2';
+        schemaRevision: 1;
+        capabilities: TileCapabilities;
+        sources: GenerationBase['source'][];
+      }
+  );
 export interface BuildOptions {
   root: string;
   store: string;
@@ -70,6 +83,25 @@ export interface BuildOptions {
   heapMiB: number;
   signal?: AbortSignal;
   timeoutMs?: number;
+  schema?: TileSchema;
+}
+/** The explicit national overview does not relax detailed Korea resource gates. */
+export function buildLimits(
+  region: Region,
+  schema: TileSchema,
+  maxzoom: number,
+): { minimumDisk: number } {
+  regionName(region);
+  tileSchema(schema);
+  invariant(
+    Number.isInteger(maxzoom) && maxzoom >= 0 && maxzoom <= (schema === 'design-v2' ? 16 : 14),
+    'ZOOM_LIMIT',
+  );
+  invariant(region !== 'context' || (schema === 'design-v2' && maxzoom <= 9), 'CONTEXT_ZOOM_LIMIT');
+  return {
+    minimumDisk:
+      region === 'korea' ? 8 * 1024 ** 3 : region === 'context' ? 1024 ** 3 : 512 * 1024 ** 2,
+  };
 }
 export function executeTileTool(
   command: string,
@@ -258,11 +290,9 @@ export async function downloadSource(options: {
 export async function buildGeneration(options: BuildOptions): Promise<Generation> {
   invariant(options.operatorOptIn, 'OPERATOR_OPT_IN_REQUIRED');
   regionName(options.region);
+  const schema = tileSchema(options.schema);
+  const limits = buildLimits(options.region, schema, options.maxzoom);
   invariant(checksumPattern.test(options.expectedSha256), 'INPUT_CHECKSUM_REQUIRED');
-  invariant(
-    Number.isInteger(options.maxzoom) && options.maxzoom >= 0 && options.maxzoom <= 14,
-    'ZOOM_LIMIT',
-  );
   invariant(
     Number.isInteger(options.heapMiB) && options.heapMiB >= 512 && options.heapMiB <= 8192,
     'HEAP_LIMIT',
@@ -291,21 +321,26 @@ export async function buildGeneration(options: BuildOptions): Promise<Generation
   mkdirSync(options.store, { recursive: true });
   const disk = statfsSync(options.store),
     freeDisk = disk.bavail * disk.bsize;
-  const minimumDisk = options.region === 'korea' ? 8 * 1024 ** 3 : 512 * 1024 ** 2;
-  invariant(freeDisk >= minimumDisk, 'INSUFFICIENT_TILE_DISK');
+  invariant(freeDisk >= limits.minimumDisk, 'INSUFFICIENT_TILE_DISK');
   invariant(freemem() > (options.heapMiB + 512) * 1024 ** 2, 'INSUFFICIENT_TILE_MEMORY');
   const name = `${Date.now()}-${randomBytes(4).toString('hex')}`;
   const directory = contained(options.store, `${options.region}/generations/${name}`);
   mkdirSync(directory, { recursive: true });
   const classes = contained(directory, 'classes');
   mkdirSync(classes);
-  const profile = resolve(options.root, 'services/tiles/profile/KoreaProfile.java');
+  const mainClass = schema === 'design-v2' ? 'KoreaProfileV2' : 'KoreaProfile';
+  const profile = resolve(options.root, `services/tiles/profile/${mainClass}.java`);
   const start = performance.now(),
     availableMemory = freemem();
   try {
+    // Compile the exact bytes whose hash is recorded, even if checkout files change during a long build.
+    const profileSource = readFileSync(profile);
+    const profileSha256 = shaText(profileSource);
+    const snapshot = contained(directory, `${mainClass}.java`);
+    writeFileSync(snapshot, profileSource, { flag: 'wx', mode: 0o600 });
     await executeTileTool(
       options.javac,
-      ['-proc:none', '-cp', resolve(options.jar), '-d', classes, profile],
+      ['-proc:none', '-cp', resolve(options.jar), '-d', classes, snapshot],
       options.root,
       signal,
     );
@@ -315,7 +350,7 @@ export async function buildGeneration(options: BuildOptions): Promise<Generation
         `-Xmx${options.heapMiB}m`,
         '-cp',
         [classes, resolve(options.jar)].join(delimiter),
-        'KoreaProfile',
+        mainClass,
         `--osm-path=${resolve(options.input)}`,
         `--output=${contained(directory, 'base.mbtiles')}`,
         `--bounds=${regions[options.region].bounds.join(',')}`,
@@ -330,33 +365,42 @@ export async function buildGeneration(options: BuildOptions): Promise<Generation
       signal,
     );
     signal.throwIfAborted();
+    invariant(shaText(readFileSync(profile)) === profileSha256, 'PROFILE_CHANGED_DURING_BUILD');
     const archiveFile = realContained(directory, 'base.mbtiles');
     invariant(
       statSync(archiveFile).size > 0 && statSync(archiveFile).size <= MAX_ARCHIVE_BYTES,
       'INVALID_ARCHIVE_SIZE',
     );
-    const info = inspectArchive(archiveFile);
+    const info = inspectArchive(archiveFile, schema);
     invariant(
       info.maxzoom === options.maxzoom && info.layers.includes('road'),
       'TILE_SMOKE_FAILED',
     );
+    const primarySource: GenerationBase['source'] = {
+      id: 'osm-geofabrik-kr',
+      sha256: options.expectedSha256,
+      dataAsOf,
+      license: 'ODbL-1.0',
+      catalogSha256: source.catalogSha256,
+    };
     const generation: Generation = {
-      schemaVersion: 1,
-      schema: 'design-v1',
+      ...(schema === 'design-v2'
+        ? {
+            schemaVersion: 2 as const,
+            schema,
+            schemaRevision: 1 as const,
+            capabilities: archiveCapabilities(info.layers),
+            sources: [primarySource],
+          }
+        : { schemaVersion: 1 as const, schema }),
       generation: name,
       region: options.region,
       bounds: regions[options.region].bounds,
-      source: {
-        id: 'osm-geofabrik-kr',
-        sha256: options.expectedSha256,
-        dataAsOf,
-        license: 'ODbL-1.0',
-        catalogSha256: source.catalogSha256,
-      },
+      source: primarySource,
       tool: {
         version: planetiler.version,
         sha256: planetiler.sha256,
-        profileSha256: shaText(readFileSync(profile)),
+        profileSha256,
       },
       archive: {
         ...info,
@@ -395,13 +439,43 @@ export async function verifyGeneration(
     readBoundedFile(directory, 'manifest.json', 128 * 1024).toString('utf8'),
   ) as Generation;
   invariant(
-    manifest?.schemaVersion === 1 &&
-      manifest.schema === 'design-v1' &&
+    ((manifest?.schemaVersion === 1 && manifest.schema === 'design-v1') ||
+      (manifest?.schemaVersion === 2 &&
+        manifest.schema === 'design-v2' &&
+        manifest.schemaRevision === 1)) &&
       manifest.region === region &&
       manifest.generation === generation &&
       manifest.archive?.file === 'base.mbtiles',
     'INVALID_GENERATION_MANIFEST',
   );
+  buildLimits(region, manifest.schema, manifest.archive.maxzoom);
+  if (manifest.schema === 'design-v2') {
+    const expected = archiveCapabilities(manifest.archive.layers);
+    invariant(
+      manifest.capabilities &&
+        JSON.stringify(Object.keys(manifest.capabilities).sort()) ===
+          JSON.stringify(Object.keys(expected).sort()) &&
+        Object.entries(expected).every(
+          ([key, value]) => manifest.capabilities[key as keyof TileCapabilities] === value,
+        ) &&
+        manifest.capabilities.landmask === false &&
+        manifest.capabilities.ocean === false,
+      'UNREVIEWED_TILE_CAPABILITIES',
+    );
+    // Additional sources need their own reviewed ingestion before payload is accepted.
+    const sourceKeys = ['id', 'sha256', 'dataAsOf', 'license', 'catalogSha256'] as const;
+    const listedSource = manifest.sources?.[0];
+    invariant(
+      Array.isArray(manifest.sources) &&
+        manifest.sources.length === 1 &&
+        listedSource &&
+        manifest.source &&
+        Object.keys(listedSource).length === sourceKeys.length &&
+        Object.keys(manifest.source).length === sourceKeys.length &&
+        sourceKeys.every((key) => listedSource[key] === manifest.source[key]),
+      'UNREVIEWED_GENERATION_SOURCES',
+    );
+  }
   const dataAsOf = manifest.source?.dataAsOf;
   invariant(
     typeof dataAsOf === 'string' &&
@@ -437,7 +511,7 @@ export async function verifyGeneration(
     (await sha256(archiveFile, MAX_ARCHIVE_BYTES)) === manifest.archive.sha256,
     'ARCHIVE_CHECKSUM_MISMATCH',
   );
-  const info = inspectArchive(archiveFile);
+  const info = inspectArchive(archiveFile, manifest.schema);
   invariant(
     info.tileCount === manifest.archive.tileCount &&
       info.minzoom === manifest.archive.minzoom &&

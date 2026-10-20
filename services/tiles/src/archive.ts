@@ -1,7 +1,14 @@
 import { DatabaseSync } from 'node:sqlite';
-import { openSync, readSync, closeSync } from 'node:fs';
+import { openSync, readSync, closeSync, lstatSync } from 'node:fs';
 import { inflateSync } from 'node:zlib';
-import { invariant } from './config.js';
+import {
+  invariant,
+  optionalSourceLayers,
+  sourceLayers,
+  tileSchema,
+  v2Fields,
+  type TileSchema,
+} from './config.js';
 
 /** Read the standard OSMHeader replication timestamp without loading the complete PBF. */
 function fields(bytes: Uint8Array): Map<number, Array<number | Uint8Array>> {
@@ -94,7 +101,14 @@ export interface ArchiveInfo {
   maxzoom: number;
   gzip: boolean;
 }
-export function inspectArchive(path: string): ArchiveInfo {
+export function inspectArchive(path: string, schema: TileSchema = 'design-v1'): ArchiveInfo {
+  tileSchema(schema);
+  invariant(
+    ['-wal', '-journal', '-shm'].every(
+      (suffix) => !lstatSync(`${path}${suffix}`, { throwIfNoEntry: false }),
+    ),
+    'UNHASHED_ARCHIVE_SIDECAR',
+  );
   const db = new DatabaseSync(path, { readOnly: true, allowExtension: false });
   try {
     db.exec('PRAGMA trusted_schema=OFF');
@@ -156,8 +170,12 @@ export function inspectArchive(path: string): ArchiveInfo {
         .all()
         .map((r) => [String(r['name']), String(r['value'])]),
     );
-    const json = JSON.parse(metadata['json'] ?? '{}') as { vector_layers?: Array<{ id: string }> };
+    const json = JSON.parse(metadata['json'] ?? '{}') as {
+      vector_layers?: Array<{ id: string; fields?: Record<string, unknown> }>;
+    };
+    invariant(Array.isArray(json.vector_layers), 'UNREVIEWED_TILE_SCHEMA');
     const layers = (json.vector_layers ?? []).map((l) => l.id).sort();
+    invariant(new Set(layers).size === layers.length, 'UNREVIEWED_TILE_SCHEMA');
     const count = Number(db.prepare('SELECT count(*) AS n FROM tiles').get()?.['n']);
     const largest = Number(
       db.prepare('SELECT max(length(tile_data)) AS n FROM tiles').get()?.['n'],
@@ -173,23 +191,61 @@ export function inspectArchive(path: string): ArchiveInfo {
       'EMPTY_TILE_ARCHIVE',
     );
     invariant(
-      layers.every((v) =>
-        ['land', 'park', 'water', 'building', 'boundary', 'road', 'trail', 'place', 'poi'].includes(
-          v,
-        ),
+      layers.every(
+        (v) =>
+          Object.hasOwn(sourceLayers, v) ||
+          (schema === 'design-v2' &&
+            optionalSourceLayers.includes(v as (typeof optionalSourceLayers)[number])),
       ),
       'UNREVIEWED_TILE_SCHEMA',
     );
+    if (schema === 'design-v2') {
+      invariant(metadata['version'] === '2.1.0', 'ARCHIVE_SCHEMA_REVISION_MISMATCH');
+      invariant(
+        json.vector_layers.every(
+          (layer) =>
+            layer.fields &&
+            ['kind', 'fid', 'subclass', 'rank', 'minzoom'].every((field) =>
+              Object.hasOwn(layer.fields!, field),
+            ) &&
+            ['kind', 'fid', 'subclass'].every((field) => layer.fields![field] === 'String') &&
+            ['rank', 'minzoom'].every((field) => layer.fields![field] === 'Number') &&
+            Object.keys(layer.fields).every((field) =>
+              v2Fields.includes(field as (typeof v2Fields)[number]),
+            ),
+        ),
+        'UNREVIEWED_TILE_FIELDS',
+      );
+      const invalidCoordinates = db
+        .prepare(
+          `SELECT count(*) AS n FROM tiles WHERE
+        zoom_level IS NULL OR tile_column IS NULL OR tile_row IS NULL OR
+        zoom_level < 0 OR zoom_level > 16 OR zoom_level != CAST(zoom_level AS INTEGER) OR
+        tile_column < 0 OR tile_column >= (1 << zoom_level) OR tile_column != CAST(tile_column AS INTEGER) OR
+        tile_row < 0 OR tile_row >= (1 << zoom_level) OR tile_row != CAST(tile_row AS INTEGER)`,
+        )
+        .get();
+      invariant(Number(invalidCoordinates?.['n']) === 0, 'INVALID_TILE_COORDINATE');
+    }
     const minzoom = Number(metadata['minzoom']),
       maxzoom = Number(metadata['maxzoom']);
     invariant(
       Number.isInteger(minzoom) &&
         Number.isInteger(maxzoom) &&
         minzoom >= 0 &&
-        maxzoom <= 14 &&
+        maxzoom <= (schema === 'design-v2' ? 16 : 14) &&
         minzoom <= maxzoom,
       'INVALID_ARCHIVE_ZOOM',
     );
+    if (schema === 'design-v2') {
+      const actualZoom = db
+        .prepare('SELECT min(zoom_level) AS lo,max(zoom_level) AS hi FROM tiles')
+        .get();
+      invariant(
+        Number(actualZoom?.['lo']) >= minzoom && Number(actualZoom?.['hi']) <= maxzoom,
+        'ARCHIVE_ZOOM_COVERAGE_MISMATCH',
+      );
+    }
     return {
       tileCount: count,
       layers,
@@ -201,11 +257,12 @@ export function inspectArchive(path: string): ArchiveInfo {
     db.close();
   }
 }
-export function tileRow(zoom: number, y: number): number {
+export function tileRow(zoom: number, y: number, maxzoom = 14): number {
   invariant(
     Number.isInteger(zoom) &&
       zoom >= 0 &&
-      zoom <= 14 &&
+      (maxzoom === 14 || maxzoom === 16) &&
+      zoom <= maxzoom &&
       Number.isInteger(y) &&
       y >= 0 &&
       y < 2 ** zoom,

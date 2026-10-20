@@ -34,7 +34,7 @@ const deltas = (values) => {
   });
 };
 export const tileFixtureBounds = [126.99, 37.49, 127.04, 37.54];
-export function tileFixturePbf() {
+export function tileFixturePbf(v2 = false) {
   const strings = [''];
   const index = (value) => {
     if (!strings.includes(value)) strings.push(value);
@@ -120,6 +120,55 @@ export function tileFixturePbf() {
     'name:en': 'Authored City English',
   });
   node(127.012, 37.522, { amenity: 'parking', 'name:ko': '합성주차장' });
+  if (v2) {
+    // All four labels deliberately share one low-zoom grid cell. IDs put the small city first.
+    node(127.010001, 37.520001, { place: 'province', 'name:ko': '합성도' });
+    node(127.010002, 37.520002, { place: 'city', 'name:ko': '합성소도시', population: '10000' });
+    node(127.010003, 37.520003, { place: 'city', 'name:ko': '합성큰도시', population: '2000000' });
+    node(127.010004, 37.520004, {
+      place: 'city',
+      'name:ko': '합성수도',
+      capital: 'yes',
+      population: '10000000',
+    });
+    way(
+      [
+        [127, 37.518],
+        [127.02, 37.518],
+      ],
+      {
+        highway: 'motorway',
+        bridge: 'yes',
+        layer: '1',
+        ref: '7',
+        'name:ko': '합성고속도로',
+      },
+    );
+    way(
+      [
+        [127, 37.519],
+        [127.02, 37.519],
+      ],
+      {
+        railway: 'rail',
+        tunnel: 'yes',
+        layer: '-1',
+        'name:ko': '합성철도',
+      },
+    );
+    way(
+      [
+        [127.025, 37.5],
+        [127.025, 37.52],
+      ],
+      { waterway: 'river', 'name:ko': '합성하천' },
+    );
+    node(127.025, 37.525, { railway: 'station', 'name:ko': '합성역' });
+    // Deliberately clustered competitors exercise ranking/grid suppression through z16.
+    node(127.025001, 37.525001, { railway: 'station', 'name:ko': '합성역후보' });
+    node(127.012001, 37.522001, { amenity: 'parking', 'name:ko': '합성주차후보' });
+    node(127.013, 37.523, { amenity: 'parking' });
+  }
   const relation = bytes(
     4,
     concat(
@@ -131,7 +180,13 @@ export function tileFixturePbf() {
     ),
   );
   return concat(
-    block('OSMHeader', bytes(4, Buffer.from('OsmSchema-V0.6'))),
+    block(
+      'OSMHeader',
+      concat(
+        bytes(4, Buffer.from('OsmSchema-V0.6')),
+        scalar(32, Math.floor(Date.parse('2026-10-18T00:00:00Z') / 1000)),
+      ),
+    ),
     block(
       'OSMData',
       concat(

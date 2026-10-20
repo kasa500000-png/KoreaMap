@@ -55,6 +55,16 @@ export function renderedSummary(text) {
     ? { roads: Number(match[1]), buildings: Number(match[2]), labels: Number(match[3]) }
     : null;
 }
+export function localResourceKind(pathname) {
+  if (pathname.startsWith('/styles/')) return 'styles';
+  if (
+    pathname.startsWith('/tiles/') ||
+    /^\/datasets\/[0-9]{13}-[a-f0-9]{8}\/tiles\//.test(pathname)
+  )
+    return 'tiles';
+  if (pathname.startsWith('/glyphs/')) return 'glyphs';
+  return null;
+}
 const redact = (value) => String(value).replace(/https?:\/\/[^\s"'<>]+/g, '[URL]');
 
 async function verify(options) {
@@ -154,13 +164,7 @@ async function verify(options) {
       let disposing = false;
       const resourceKind = (url) => {
         if (url.origin !== server.origin) return null;
-        return url.pathname.startsWith('/styles/')
-          ? 'styles'
-          : url.pathname.startsWith('/tiles/')
-            ? 'tiles'
-            : url.pathname.startsWith('/glyphs/')
-              ? 'glyphs'
-              : null;
+        return localResourceKind(url.pathname);
       };
       context.on('request', (request) => {
         const kind = resourceKind(new URL(request.url()));

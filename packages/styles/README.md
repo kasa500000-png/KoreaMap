@@ -50,3 +50,25 @@ Typography is explicit:
 Repository QA: `node scripts/check-font.mjs --font /path/to/reviewed/font.ttc --face 1`. It checks the corpus plus all 11,172 modern Hangul syllables without downloading a font. Face 1 is the tested Noto CJK KR collection face; inspect other files before choosing their index. Web Chromium rendering is verified separately. Android/iOS physical rendering is **unverified** until an explicit glyph provider and device/simulator are available.
 
 Noto CJK is OFL-1.1: preserve its copyright/license when redistributing fonts or derived glyph packs, review reserved-name conditions for modifications, and do not relicense them MIT. This SDK distributes no Noto font/glyph payload. The full license, platform matrix and four screenshots are in the repository design-system documentation.
+
+## 선택형 상세 지도 스타일
+
+`createThemeStyle`은 기존 출력과 기본값을 유지합니다. 도로·장소 위계와 POI 밀도 조절은 새 `createCartographyStyle`로 선택합니다. `schema: 'design-v2'`, `density: 'balanced' | 'sparse' | 'dense'`를 지정할 수 있습니다. 네 테마와 기존 색상·폭 오버라이드를 사용하며 `name:ko → name → name:en` 순서로 표시합니다.
+
+`designV1`/`designV2`는 필드·레이어 계약을 공개합니다. 실제 v2 타일은 선택형 운영자 profile로 생성해야 합니다. rail/waterway/transport/landmask/ocean capability를 원본 확인 없이 켜지 마세요. context source는 z0–9, detail source는 z10 이상을 담당합니다. 육지 마스크 없는 바다·해안선은 구현됐다고 표현하지 않습니다. 폰트·glyph·타일 endpoint는 운영자가 설정합니다.
+
+```ts
+import { createCartographyStyle } from 'korea-map-styles';
+
+const synthetic = createCartographyStyle({
+  theme: 'standard',
+  target: 'web',
+  schema: 'design-v2',
+  density: 'balanced',
+  data: { mode: 'fixture', capabilities: { rail: true, waterway: true, transport: true } },
+  typography: { mode: 'none' },
+  icons: false,
+});
+```
+
+합성 예시는 실제 한국 지도가 아닙니다. 한국어 라벨은 운영자가 허가된 glyph를 연결해야 합니다. [품질 기준](../../docs/map-quality.md)과 [검증 기록](../../docs/research/map-quality-validation.md)을 참고하세요.

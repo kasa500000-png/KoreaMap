@@ -46,12 +46,17 @@ try {
     jar,
     '-d',
     classes,
-    ...['KoreaProfile', 'KoreaProfileTest', 'KoreaArchiveTest'].map((name) =>
-      resolve(profile, `${name}.java`),
-    ),
+    ...[
+      'KoreaProfile',
+      'KoreaProfileV2',
+      'KoreaProfileTest',
+      'KoreaProfileV2Test',
+      'KoreaArchiveTest',
+    ].map((name) => resolve(profile, `${name}.java`)),
   ]);
   const classpath = [classes, jar].join(delimiter);
   const unit = run(values.java, ['-cp', classpath, 'KoreaProfileTest']);
+  const unitV2 = run(values.java, ['-cp', classpath, 'KoreaProfileV2Test']);
   const input = resolve(temp, 'fixture.osm.pbf');
   const output = resolve(temp, 'fixture.mbtiles');
   const fixture = tileFixturePbf();
@@ -72,14 +77,39 @@ try {
     '--color=false',
   ]);
   const archive = run(values.java, ['-cp', classpath, 'KoreaArchiveTest', output]);
+  const fixtureV2 = tileFixturePbf(true);
+  const inputV2 = resolve(temp, 'fixture-v2.osm.pbf');
+  const outputV2 = resolve(temp, 'fixture-v2.mbtiles');
+  writeFileSync(inputV2, fixtureV2);
+  run(values.java, [
+    '-Xmx512m',
+    '-cp',
+    classpath,
+    'KoreaProfileV2',
+    `--osm-path=${inputV2}`,
+    `--output=${outputV2}`,
+    `--tmpdir=${resolve(temp, 'work-v2')}`,
+    `--bounds=${tileFixtureBounds.join(',')}`,
+    '--maxzoom=16',
+    '--threads=1',
+    '--download=false',
+    '--debug-url=http://localhost/',
+    '--color=false',
+  ]);
+  const archiveV2 = run(values.java, ['-cp', classpath, 'KoreaArchiveTest', outputV2, 'design-v2']);
+  const { inspectArchive } = await import('../dist/archive.js');
+  assert.equal(inspectArchive(outputV2, 'design-v2').maxzoom, 16);
+  assert.throws(() => inspectArchive(outputV2), /SCHEMA|ZOOM/);
   const summary = [
     unit.split('\n').find((line) => line.startsWith('PASS KoreaProfile:')),
     archive.trim(),
+    unitV2.split('\n').find((line) => line.startsWith('PASS KoreaProfileV2:')),
+    archiveV2.trim(),
   ];
   assert(summary.every(Boolean), 'Actual test summaries required');
   writeFileSync(
     resolve(artifacts, 'profile-validation.json'),
-    `${JSON.stringify({ profileSchema: 'design-v1', planetiler: '0.10.2', binarySha256: digest, fixtureSha256: createHash('sha256').update(fixture).digest('hex'), fixtureBytes: fixture.length, results: summary, scope: 'Original synthetic OSM-format input passed through the actual pinned Planetiler binary; not real Korea rendering or Native QA.' }, null, 2)}\n`,
+    `${JSON.stringify({ profileSchemas: ['design-v1', 'design-v2'], planetiler: '0.10.2', binarySha256: digest, fixtureSha256: createHash('sha256').update(fixture).digest('hex'), fixtureBytes: fixture.length, fixtureV2Sha256: createHash('sha256').update(fixtureV2).digest('hex'), fixtureV2Bytes: fixtureV2.length, results: summary, scope: 'Original synthetic OSM-format input passed through the actual pinned Planetiler binary and normalized MBTiles/schema inspection; not real Korea rendering or Native QA.' }, null, 2)}\n`,
   );
   for (const line of summary) console.log(line);
 } finally {

@@ -45,3 +45,7 @@ SDK 소스 배포는 MIT 무료 오픈소스입니다. 지도 데이터·타일�
 [실행 계획](docs/execution-plan.md)의 범위에서 서울·울산·부산·제주 실제 OSM 타일·한글 glyph·Chromium 9화면, 세대 rollback과 실제 Valhalla 4경로의 서울 지도 표시를 검증했습니다. 명령·범위는 [타일 가이드](docs/tiles.md)를 따릅니다. 실제 공공 POI 적재는 원본 파일 미확보로 차단됐습니다. 독립 Native 설치·plugin·JS export는 통과했으나 상위 RN 선언 전체 검사가 실패해 `PARTIAL_PASS`입니다. Web·Android·iOS와 5개 패키지 목표를 유지하며 Web Alpha는 중간 검증 단계입니다. 높은 심각도 개발 의존성 취약점 2건, 실제 npm 발행 권한/설치, Android 실기기, iOS, Native PMTiles·한글 glyph 검증이 남아 있습니다. [최종 후보 보고서](docs/releases/v0.1.0.md)의 통과 항목만 완료로 취급합니다.
 
 [기여 방법](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md) · [보안 신고](SECURITY.md) · [변경 이력](CHANGELOG.md) · [MIT](LICENSE)
+
+## 지도 가독성과 조작 개선
+
+기존 API를 유지하는 선택형 공통 카메라·선택 확장, 상세 `design-v2` 타일 형식과 4종 cartography 테마를 추가합니다. [품질 계획과 실행](docs/map-quality.md), [실제 검증 범위](docs/research/map-quality-validation.md)를 확인하세요. 실제 Android/iOS·전국 정확도·상용 지도 동등성은 별도 수락 항목입니다.

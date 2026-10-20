@@ -584,3 +584,38 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **잔여:** 보안 수정 그래프, 실제 공공 CSV HTTP503 해결 후 ETL/DB/검색/지도, Android ARM64·macOS/iOS Development Build/기기·XYZ/glyph/PMTiles·GPS/권한·메모리/OS egress·binary notice, Web NodeNext와 RN 상위 선언, 전국 자원 확보(현 여유4.7GiB<8GiB)·장기 운영 검증. 원격 main/default에는 아직 SDK가 없으며 이번 커밋의 원격CI/통합과 npm 권한·발행·registry 설치는 별도 남았다.
 7. **Git:** `feat/korean-map-completion`, 기반 `76b379b9dd2abbb6393e90f789a78ac2fd352762`. 구현 커밋 조회: `git log -1 --format='%H %s' --grep='^feat: add verified operator tiles and completion gates$'`. 기능/패키지 검증 후 로컬 커밋하며 원격 push/PR·main merge·배포·발행·Release는 하지 않는다. [커넥터 통합 예행](research/integration-rehearsal.md)은 14개 기존 PR 및 기준 tree 범위이고 새 커밋 원격 CI 성공을 의미하지 않는다.
 8. **다음:** 차단과 추가 플랫폼·실원본 검증은 진행 가능하다. 공개 발행 판정은 **BLOCKED**이며 전체 계획 완료로 처리하지 않는다. 별도 외부 작업 승인은 정확한 검증 커밋과 남은 게이트를 검토한 뒤 적용한다.
+## 지도 가독성·공통 조작 품질 구현 — 2026-10-20 UTC
+
+### 1. 구현 완료 기능
+
+기존 API/design-v1을 보존하면서 상세 design-v2/cartography4테마/밀도·도로·지명·POI 위계, 선택형 공통 interaction과 Web/Native adapter를 추가했다. 실제 완료/취소/여백·일괄 마커·클러스터·최대8개 후보·접근성 카드/가상화·예제 조작을 구현했다. 버전에 결합한 타일/style/glyph URL, ETag/304/HEAD/gzip/byte 제한 캐시와 명시 context를 추가했다. SDK/backend/앱 저장 정책 경계를 유지한다. 전체 품질·출시 완료 판정은 아니다.
+
+실지도 검수에서 확인한 저확대 도시 누락도 고쳤다. 수도/행정수도/검증 가능한 인구 hint로 rank를 나누고 z0–9 도시 후보를 보존한다. z10–16 장소 제한과 POI/transport 밀도 제한은 유지했다. 원본에 없는 새 사실·데이터를 만들지 않았다.
+
+### 2. 생성/수정 파일
+
+`packages/core/src/interaction.ts`, Web/Native adapter·선택 helper, styles의 cartography/schema/합성 fixture, 타일 profile/config/archive/pipeline/HTTP 자산 서버, Web/Expo 소비 예제와 단위/타입/브라우저/실제 codec 회귀를 수정·추가했다. `scripts/map-quality-cases.mjs`, production 소비자와 matrix/frame QA 도구, [품질 계획](map-quality.md), [결과](research/map-quality-validation.md), [ADR-010](decisions/010-map-quality-and-interactions.md), API 선언 문서·가이드·README·로드맵·출처 원장·minor Changeset을 갱신했다. 폰트·실지도·원천 payload는 Git/npm에 추가하지 않았다.
+
+### 3. 실행한 테스트와 결과
+
+`pnpm check`(strict/경계/라이선스/출처/ESLint/Prettier/API 문서/Next·Expo JS/회귀), Vitest177개/17파일, Web E2E24개, 타일Node34개, 고정 QA/production 소비자8개 통과. 선택형 실제 Planetiler 검사는 v1 40개/19타일87피처, 최종v2 85개/78타일267피처다. actual4지역+context 생성·verify·활성화와 이전 포인터 보존을 확인했다. SDK5 pack·원본/비용 스캔·clean byte 동일 재빌드와 격리 Web 설치/타입/SSR/브라우저도 통과했다. Native 격리 설치·앱타입/plugin/JS export는 부분 통과이며 상위 RN 선언3건·Web NodeNext 선언은 실패 상태를 유지한다.
+
+### 4. 실화면 QA 결과
+
+도시 누락을 수정한 최종 세대로 Chromium154/software WebGL에서4지역×4테마×5zoom×3폭240개 실제 화면을 다시 검사했다. 렌더링·출처/한국어·z6 도시 symbol을 확인했고 예상 밖 origin/HTTP/page 오류는0이다. 수동 검수는4테마 서울z14와저확대서울·제주 등 표본이며 수정 후 서울 도시명 표시도 확인했다. 최종30cold/warm의 p95는2,934/1,493ms로이번호스트 목표3,000/1,500ms를 통과했다. 별도5회 frame56개 p95는116.7ms로목표33ms에 미달했다. 짧은 matrix frame11개는 표본 부족이며 전체 성능 수락은 미완료다. 실제 운영자 연결 예제9화면도 통과했고 browser style12/tile73/glyph333·예상 밖/HTTP/page/console 오류0·종료 정리를 확인했다. 최신 수치·실행 범위와 수정 전 실패 이력은 [품질 기록](research/map-quality-validation.md)을 따른다. Android offline debug compile44.30초는통과했으나 연결실기기0/iOS없음으로 실제기기·터치/접근성·회전/복귀·glyph·메모리·OS egress는미검증이다.
+
+### 5. 라이선스 및 보안 문제
+
+추가 코드는 원본MIT이며 OSM ODbL/폰트OFL과 분리한다. 새 의존성·키·제작자 provider·공개 데이터 payload가 없다. 최종 staged 데이터 검사16원천/342파일 통과, 작업 트리342·index342·로컬26커밋/739blob·실제5tarball의 비밀/비용 정적 감사는 findings0(`PASS_STATIC_ONLY`)다. heuristic의 한계와 Native OS 요청 미검증을 유지한다. 의존성 audit high2/critical0는 공개 차단이며 우회하지 않는다.
+
+### 6. 남은 작업 또는 차단 요인
+
+실제 GPU/Android·Mac/iOS, 승인 landmask/해안선과 충분한 전국 상세 생성 자원, frame 성능 목표와 장치별 로딩 여유·후속 주소/검색·경로/현장 정확도·운영 retention/부하가 남아 있다. 작은 detail bbox의 경계 절단과 Outdoor 도심 보행로 과밀 등 수동 검수 잔여도 기록했다. 미실행과 실패를 통과로 바꾸지 않는다.
+
+### 7. Git 브랜치와 커밋 해시
+
+브랜치 `feat/map-quality`, 시작점 `964e9674ee626f60942be4d0f4bfe4f1aec9bbc8`. 기능검사 통과본의 단계 커밋은 `git log -1 --format='%H %s' --grep='^feat: improve cartography and shared map interactions$'`로 식별한다. 실제 SHA는 커밋 직후 보고한다. main 병합/원격 공개 업로드/Release/npm 발행/운영 배포는 수행하지 않았다.
+
+### 8. 다음 단계 진행 가능 여부
+
+검증된 SDK 기능과 운영 도구를 바탕으로 후속 작업은 가능하다. 성능·보안/선언·실기기·해안선/전국 수락이 남아 있어 전체 Q0–Q5 완료 또는 공개 릴리스 가능으로 표시할 수 없다. 사용자가 추후 장비/저장 자원을 확보한다는 선호를 유지하며 승인 없는 유료 인프라를 만들지 않는다.

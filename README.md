@@ -59,3 +59,7 @@ pnpm release:prepare
 ```
 
 All five SDK packages and Web/Android/iOS remain the final target; Web Alpha is an intermediate gate. Actual OSM tiles for Seoul/Ulsan/Busan/Jeju, Korean glyphs, nine Chromium views, generation rollback and four real Valhalla routes rendered on the Seoul map passed their scoped checks; see the [tile guide](docs/tiles.md). Real public POI ingestion is blocked by unavailable source files. Isolated Native installation/plugin/JS exports passed, while full upstream React Native declaration checks failed, leaving Native consumer QA at `PARTIAL_PASS`. Standard Linux/Windows/macOS CI is configured. Android physical devices, iOS, native PMTiles and native Korean glyph rendering remain unverified. Two high-severity development dependency advisories remain release blockers; see [candidate report](docs/releases/v0.1.0.md). No registry publication, tag, GitHub Release, deployment or visibility change is authorized by these commands.
+
+## Map quality work
+
+Optional shared camera/selection interactions and detailed `design-v2` cartography preserve the existing APIs and default provider policy. See the [quality plan](docs/map-quality.md) and [validation report](docs/research/map-quality-validation.md) for actual regional evidence and remaining release gates. Physical Android/iOS validation, approved coastlines and nationwide detail remain separate acceptance work.

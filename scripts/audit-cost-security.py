@@ -35,6 +35,7 @@ LOCKFILES = {"package-lock.json", "pnpm-lock.yaml", "yarn.lock"}
 PUBLIC_REPO = "https://github.com/kasa500000-png/KoreaMap"
 # Reviewed literal used only to validate local research metadata, not a request.
 OFFLINE_REFERENCE_URLS = {
+    "scripts/verify-map-quality.mjs": {"https://www.openstreetmap.org/copyright"},  # Assertion of displayed attribution href only; not fetched.
     "scripts/check-design.py": {"https://registry.npmjs.org/"},
     "scripts/audit-cost-security.py": {"https://registry.npmjs.org/", PUBLIC_REPO},
 }
@@ -57,6 +58,7 @@ OFFLINE_REFERENCE_URLS["scripts/audit-cost-security.py"].update(
     url for values in PUBLIC_ATTRIBUTION_LINKS.values() for url in values
 )
 DOCUMENTATION_HOSTS = {
+    "osmdata.openstreetmap.de",  # Reviewed OSM-derived land polygon/license docs only; no runtime provider.
     "docs.npmjs.com", "pypi.org", "www.localdata.go.kr", "developer.android.com",  # Reviewed official SDK install docs; not a runtime provider.
     "www.w3.org", "www.topografix.com",  # Geolocation / GPX specifications, docs only.
     "www.postgresql.org",  # Reviewed SQL documentation, not a runtime endpoint.

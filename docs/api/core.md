@@ -464,6 +464,144 @@ export declare function createMapController(port: MapPort, scheduler: Scheduler)
 export declare function boundsFromCoordinates(points: readonly Coordinate[]): MapBounds;
 ```
 
+## EdgeInsets
+
+```ts
+/** CSS pixels on Web and logical points on Native. */
+export interface EdgeInsets {
+    readonly top: number;
+    readonly right: number;
+    readonly bottom: number;
+    readonly left: number;
+}
+```
+
+## ScreenPoint
+
+```ts
+export interface ScreenPoint {
+    readonly x: number;
+    readonly y: number;
+}
+```
+
+## CameraTransitionOptions
+
+```ts
+export interface CameraTransitionOptions extends OperationOptions {
+    /** 0..10000ms; default 300. Zero applies without animation. */
+    readonly durationMs?: number;
+    /** Each edge is 0..1000 CSS pixels or native logical points; missing edges are zero. */
+    readonly insets?: Partial<EdgeInsets>;
+    /** Forces duration zero while retaining the requested insets. */
+    readonly reducedMotion?: boolean;
+}
+```
+
+## InteractionFitBoundsOptions
+
+```ts
+export interface InteractionFitBoundsOptions {
+    readonly durationMs?: number;
+    readonly insets?: Partial<EdgeInsets>;
+    readonly reducedMotion?: boolean;
+}
+```
+
+## NormalizedCameraTransition
+
+```ts
+/** The controller supplies complete, validated values. Reduced motion forces duration zero. */
+export interface NormalizedCameraTransition {
+    readonly durationMs: number;
+    readonly insets: EdgeInsets;
+    readonly reducedMotion: boolean;
+}
+```
+
+## MapSelection
+
+```ts
+/** Detached selection data; engine properties, DOM and native events are never exposed. */
+export interface MapSelection {
+    readonly key: string;
+    readonly id: string;
+    readonly kind: 'marker' | 'poi' | 'cluster';
+    readonly coordinate: MapCamera['center'];
+    readonly label: string;
+    readonly sourceId?: string;
+    readonly layerId?: string;
+    readonly priority?: number;
+    readonly distancePixels?: number;
+    readonly clusterId?: string | number;
+    readonly count?: number;
+}
+```
+
+## MapInteractionEvent
+
+```ts
+export type MapInteractionEvent = {
+    readonly type: 'camera';
+    readonly camera: MapCamera;
+    readonly origin: 'gesture' | 'api' | 'unknown';
+} | {
+    readonly type: 'selection';
+    readonly selection: MapSelection | null;
+} | {
+    readonly type: 'gesture';
+} | {
+    readonly type: 'destroyed';
+};
+```
+
+## MapInteractionController
+
+```ts
+/** Optional extension. Existing MapController commands and timing contracts remain unchanged. */
+export interface MapInteractionController {
+    transitionCamera(camera: MapCamera, options?: CameraTransitionOptions): Promise<void>;
+    fitBounds(bounds: MapBounds, fit?: InteractionFitBoundsOptions, options?: OperationOptions): Promise<void>;
+    setMarkers(markers: readonly MapMarker[], options?: OperationOptions): Promise<void>;
+    /** At most eight unique keys, ordered by priority, pixel distance, then key. */
+    pickFeatures(point: ScreenPoint, options?: OperationOptions): Promise<readonly MapSelection[]>;
+    selectFeature(selection: MapSelection | null, options?: OperationOptions): Promise<void>;
+    onEvent(listener: (event: MapInteractionEvent) => void): () => void;
+    destroy(): void;
+}
+```
+
+## MapInteractionPort
+
+```ts
+/**
+ * Port camera promises settle on actual movement completion; duration zero applies immediately.
+ * Stop the current movement in place when context.signal aborts. Never restore an old camera.
+ * Emit only portable events. Destroy releases this extension, leaving the base map intact.
+ */
+export interface MapInteractionPort {
+    transitionCamera(camera: MapCamera, transition: NormalizedCameraTransition, context: OperationContext): void | Promise<void>;
+    fitBounds(bounds: MapBounds, transition: NormalizedCameraTransition, context: OperationContext): void | Promise<void>;
+    setMarkers(markers: readonly MapMarker[], context: OperationContext): void | Promise<void>;
+    pickFeatures(point: ScreenPoint, context: OperationContext): readonly MapSelection[] | Promise<readonly MapSelection[]>;
+    selectFeature(selection: MapSelection | null, context: OperationContext): void | Promise<void>;
+    subscribe(listener: (event: MapInteractionEvent) => void): () => void;
+    destroy(): void;
+}
+```
+
+## createMapInteractionController
+
+```ts
+/**
+ * Pure orchestration; timers, rendering and resource requests belong to injected ports.
+ * A new camera/fit/selection operation supersedes the previous movement. Gesture, caller
+ * cancellation, movement timeout and destruction signal the adapter and reject ABORTED.
+ * Movement stops in place; no rollback command is sent. Non-movement timeouts remain TIMEOUT.
+ */
+export declare function createMapInteractionController(port: MapInteractionPort, scheduler: Scheduler): MapInteractionController;
+```
+
 ## LocationObserver
 
 ```ts

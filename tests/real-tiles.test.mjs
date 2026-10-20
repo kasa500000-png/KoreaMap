@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import test from 'node:test';
-import { parseRealTileOptions, renderedSummary } from '../scripts/verify-real-tiles.mjs';
+import {
+  parseRealTileOptions,
+  renderedSummary,
+  localResourceKind,
+} from '../scripts/verify-real-tiles.mjs';
 import { parseRealRoutingMapOptions } from '../scripts/verify-real-routing-map.mjs';
 
 const flags = () => [
@@ -11,6 +15,17 @@ const flags = () => [
   '--web-origin=http://127.0.0.1:4173',
   '--port=8787',
 ];
+test('request audit counts both legacy and immutable generation tile URLs', () => {
+  assert.equal(localResourceKind('/tiles/14/13970/6346.pbf'), 'tiles');
+  assert.equal(
+    localResourceKind('/datasets/1792488349559-c91461a3/tiles/14/13970/6346.pbf'),
+    'tiles',
+  );
+  assert.equal(localResourceKind('/datasets/unreviewed/tiles/14/1/1.pbf'), null);
+  assert.equal(localResourceKind('/styles/standard.json'), 'styles');
+  assert.equal(localResourceKind('/glyphs/pack/KoreaNoto/0-255.pbf'), 'glyphs');
+  assert.equal(localResourceKind('/unrelated/tiles/foo'), null);
+});
 test('real tile QA requires explicit opt-in, absolute local inputs and exact loopback origin', () => {
   assert.equal(parseRealTileOptions(flags()).port, 8787);
   assert.throws(() => parseRealTileOptions(flags().slice(1)), /opt-in/);

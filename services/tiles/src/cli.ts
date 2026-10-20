@@ -6,7 +6,7 @@ import {
   downloadSource,
   downloadTool,
 } from './pipeline.js';
-import { invariant, readBoundedFile, regionName, sourceEligibility } from './config.js';
+import { invariant, readBoundedFile, regionName, sourceEligibility, tileSchema } from './config.js';
 import { startTileServer } from './server.js';
 
 const [command, ...args] = process.argv.slice(2);
@@ -48,6 +48,8 @@ try {
       JSON.stringify({ sha256: source.sha256, dataAsOf: source.dataAsOf, verified: true }),
     );
   } else if (command === 'build') {
+    const schema = tileSchema(flag('--schema'));
+    const region = regionName(required('--region'));
     const java = flag('--java') ?? 'java';
     const javac =
       flag('--javac') ??
@@ -57,14 +59,17 @@ try {
     const generation = await buildGeneration({
       root,
       store,
-      region: regionName(required('--region')),
+      region,
+      schema,
       input: required('--input'),
       expectedSha256: required('--sha256'),
       operatorOptIn: optIn,
       jar: resolve(flag('--jar') ?? `${store}/tools/planetiler-0.10.2.jar`),
       java,
       javac,
-      maxzoom: Number(flag('--maxzoom') ?? 14),
+      maxzoom: Number(
+        flag('--maxzoom') ?? (region === 'context' ? 9 : schema === 'design-v2' ? 16 : 14),
+      ),
       heapMiB: Number(flag('--heap-mib') ?? 4096),
       timeoutMs: Number(flag('--timeout-ms') ?? 300000),
       signal: controller.signal,
@@ -93,12 +98,31 @@ try {
     const port = Number(flag('--port') ?? 8787);
     invariant(Number.isInteger(port) && port > 1024 && port <= 65535, 'INVALID_PORT');
     const cors = flag('--cors-origin');
+    const quality = flag('--quality');
+    invariant(
+      quality === undefined || ['legacy', 'balanced', 'sparse', 'dense'].includes(quality),
+      'INVALID_CARTOGRAPHY_QUALITY',
+    );
+    invariant(
+      !flag('--context-generation') || args.includes('--context'),
+      'EXPLICIT_CONTEXT_REQUIRED',
+    );
     const service = await startTileServer({
       store,
       region,
       port,
       ...(glyphs ? { glyphs: resolve(glyphs) } : {}),
       ...(cors ? { allowedOrigins: [cors] } : {}),
+      ...(quality ? { quality: quality as 'legacy' | 'balanced' | 'sparse' | 'dense' } : {}),
+      ...(args.includes('--context')
+        ? {
+            context: {
+              ...(flag('--context-generation')
+                ? { generation: flag('--context-generation')! }
+                : {}),
+            },
+          }
+        : {}),
     });
     console.log(
       JSON.stringify({

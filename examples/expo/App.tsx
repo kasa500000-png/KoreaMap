@@ -1,17 +1,28 @@
 import { View, Text, StyleSheet, Button, ScrollView, Switch } from 'react-native';
-import { useRef, useState } from 'react';
-import { defineMapStyle, normalizeError, type MapController } from 'korea-map-core';
-import { createThemeStyle, designAttribution, themeNames, type ThemeName } from 'korea-map-styles';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  defineMapStyle,
+  normalizeError,
+  type MapController,
+  type MapInteractionController,
+} from 'korea-map-core';
+import {
+  createCartographyStyle,
+  designAttribution,
+  themeNames,
+  type ThemeName,
+} from 'korea-map-styles';
 import { GpsDemo } from './gps-demo';
 import { ScenarioScreen } from './scenario-screen';
 import { MapView } from 'korea-map-native';
 
 function themeStyle(theme: ThemeName) {
-  const document = createThemeStyle({
+  const document = createCartographyStyle({
     theme,
     target: 'native',
-    data: { mode: 'fixture' },
+    data: { mode: 'fixture', capabilities: { rail: true, waterway: true, transport: true } },
     typography: { mode: 'none' },
+    icons: false,
   });
   // An app-owned custom layer. Supply all custom layers again when changing styles.
   document.layers.push({
@@ -29,10 +40,41 @@ const config = {
 function ApiDemo() {
   const map = useRef<MapController>(null);
   const initialized = useRef(false);
+  const interactions = useRef<MapInteractionController | null>(null);
+  const offInteractions = useRef<(() => void) | null>(null);
   const [status, setStatus] = useState('지도 준비 중');
   const [ready, setReady] = useState(false);
   const [theme, setTheme] = useState<ThemeName>('standard');
   const [gestures, setGestures] = useState(true);
+  const [motionStatus, setMotionStatus] = useState('');
+  const receiveInteractions = useCallback((controller: MapInteractionController | null) => {
+    offInteractions.current?.();
+    offInteractions.current = null;
+    interactions.current = controller;
+    if (controller)
+      offInteractions.current = controller.onEvent((event) => {
+        if (event.type === 'selection')
+          setMotionStatus(event.selection ? `${event.selection.label} 선택됨` : '선택 해제');
+        if (event.type === 'gesture') setMotionStatus('직접 지도 조작 · 자동 이동 중단');
+      });
+  }, []);
+  useEffect(
+    () => () => {
+      offInteractions.current?.();
+      interactions.current = null;
+    },
+    [],
+  );
+  async function interact(run: (controller: MapInteractionController) => Promise<unknown>) {
+    if (!interactions.current) return;
+    try {
+      await run(interactions.current);
+      setStatus('완료');
+    } catch (error) {
+      const code = normalizeError(error).code;
+      setStatus(code === 'ABORTED' ? '이동 중단' : code);
+    }
+  }
   async function action(run: (api: MapController) => Promise<unknown>) {
     if (!map.current) return;
     try {
@@ -117,6 +159,8 @@ function ApiDemo() {
           ref={map}
           config={config}
           gesturesEnabled={gestures}
+          markerClustering={{ radius: 48, maxZoom: 13 }}
+          onInteractionsReady={receiveInteractions}
           onEvent={(event) => {
             if (event.type === 'ready') {
               setReady(true);
@@ -133,6 +177,36 @@ function ApiDemo() {
         />
       </View>
       <View style={styles.row}>
+        <Button
+          title="부드러운 이동"
+          disabled={!ready}
+          onPress={() =>
+            void interact((api) =>
+              api.transitionCamera(
+                { center: [126.978, 37.5665], zoom: 15, bearing: 0, pitch: 0 },
+                { insets: { bottom: 100 } },
+              ),
+            )
+          }
+        />
+        <Button
+          title="1000개 합성 마커"
+          disabled={!ready}
+          onPress={() =>
+            void interact((api) =>
+              api.setMarkers(
+                Array.from({ length: 1000 }, (_, index) => ({
+                  id: `synthetic-${index}`,
+                  label: `합성 장소 ${index + 1}`,
+                  coordinate: [
+                    126.978 + ((index % 40) - 20) * 0.0001,
+                    37.5665 + (Math.floor(index / 40) - 12) * 0.0001,
+                  ],
+                })),
+              ),
+            )
+          }
+        />
         <Button
           title="확대"
           disabled={!ready}
@@ -162,6 +236,9 @@ function ApiDemo() {
           }
         />
       </View>
+      <Text accessibilityLiveRegion="polite" style={styles.caption}>
+        {motionStatus}
+      </Text>
       <Text style={styles.caption}>
         마커 또는 아래 장소 버튼으로 카드를 엽니다. 테마 전환 후 마커·경로가 유지되어야 합니다. 화면
         회전, 홈 이동 후 복귀, 예제 전환으로 지도 해제를 확인하세요.

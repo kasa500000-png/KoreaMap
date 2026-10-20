@@ -96,3 +96,19 @@ export {
 export { createPoiIcon, poiKinds, type PoiKind, type RgbaIcon } from './icons.js';
 export { createDesignFixture, designAttribution, designLabelCorpus } from './design-fixture.js';
 export { inspectFontCoverage } from './font-coverage.js';
+export {
+  designV1,
+  designV2,
+  cartographyOptionalKinds,
+  type CartographyOptionalKind,
+  type CartographyKind,
+  type CartographySchema,
+  type CartographyDensity,
+  type CartographyCapabilities,
+} from './cartography-schema.js';
+export {
+  createCartographyStyle,
+  type CartographyStyleOptions,
+  type CartographySource,
+} from './cartography.js';
+export { createCartographyFixture } from './cartography-fixture.js';

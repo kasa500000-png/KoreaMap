@@ -1,6 +1,17 @@
 # Native SDK 검증 기록
 
-확인일: 2026-10-19. 브랜치 `feat/native-sdk`. 이전 GPS/공통 API 기록에 추가되는 단계다.
+## 최신 품질 구현 검증 — 2026-10-20 UTC
+
+브랜치 `feat/map-quality`의 선택형 `onInteractionsReady`·공통 이동/취소/여백·일괄 마커·클러스터·안전한 선택 DTO·최대8개 후보·가상화/접근성 UI를 검증했다. 기존 ref API와 provider/권한·데이터 경계를 보존했고 패키지/엔진 버전은 아래와 같다. 전체 근거와 잔여 게이트는 [지도 품질 검증](map-quality-validation.md)을 따른다.
+
+- Native 목표 회귀34개, strict·실제 MapLibre binding, 전체 Vitest177개/17파일과 `pnpm check` 통과. mock/타입 검사를 native 화면·OS 이벤트 수락으로 대체하지 않는다.
+- 독립 core/native/styles tarball offline 설치·strict 앱/API·config plugin·Android/iOS JS export 통과. `skipLibCheck:false`의 상위 RN 선언 TS2411/TS2344/TS2416 실패로 전체 판정은 `PARTIAL_PASS`다.
+- 현재 workspace Android x86_64 debug를 offline 컴파일했다. 08:54:01.028–08:54:45.328 UTC, 44.30초, APK83,382,862B, SHA256 `20ee651881e586d156c24f006bf07c4b72fd335eb872489a27b9184f6c6af876`. ignored `artifacts/native-interaction/probe.json`에 결과를 보존했다. Development Build 컴파일은 현재 JS 내장·독립 tarball APK 설치·기기 실행 증거가 아니다.
+- 연결 Android 실제 기기0, macOS/Xcode/iOS 환경 없음. 테마/한글 glyph·PMTiles·실제 터치/스크롤·회전/복귀·위치 권한·메모리·OS egress는 이번 변경에서 미검증이다. Web240화면/로딩 통과와 software GPU frame 실패를 Native 결과로 확대하지 않는다. Expo Go·EAS·유료 빌드·배포는 사용하지 않았다.
+
+## 이전 Native SDK 구현 기록
+
+확인일: 2026-10-19. 브랜치 `feat/native-sdk`. 아래는 이전 GPS/공통 API 기록에 추가됐던 당시 결과다.
 
 ## 범위와 근거
 

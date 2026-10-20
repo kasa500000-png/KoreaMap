@@ -50,3 +50,11 @@ The shared async API is available as `handle.api` after `await handle.ready`. It
 watch APIs. It never prompts on import/construction; call `setConsent(true)` only after the user
 agrees. Visibility loss stops collection without automatic resume. Use core track/GPX/GeoJSON/replay
 functions and the repository's `docs/gps-tracks.md`. No persistence or remote upload is included.
+
+## 선택형 카메라·선택 확장
+
+`createMap`이 반환하는 `handle.interactions`는 공통 `MapInteractionController`입니다. 이전/custom handle에서는 없을 수 있으므로 확인합니다. `transitionCamera`와 비대칭 `fitBounds`는 실제 이동 완료를 기다리고, 제스처·새 이동·취소 시 현 위치에서 멈춥니다. 기존 API의 즉시 이동 동작은 유지합니다. OS reduced motion을 반영합니다.
+
+클러스터링은 `clustering: {radius:48,maxZoom:13}`을 명시할 때 켭니다. `setMarkers`로 일괄 교체하고 `pickFeatures({x,y})`/`selectFeature`로 최대 8개의 분리된 선택 결과를 다룹니다. basemap 선택은 `interactionPoiLayers`(최대 8개)를 명시해야 합니다. v1의 `korea-label-poi`와 v2의 `korea-poi-priority-1`~`4`는 서로 다른 레이어입니다. 카드 UI·선택 목록·저장 정책은 소비 앱에 둡니다.
+
+[공통 계약](../../docs/public-api.md), [Next 소비 예제](../../examples/web/app/tiles/tiles-demo.tsx), [품질 검증 범위](../../docs/research/map-quality-validation.md)를 참고하세요.

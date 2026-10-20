@@ -233,3 +233,8 @@ CI는 lint/types/build/contract, 패키지 exports, `npm pack --dry-run`, 소비
 ## 공통 Public API 구현 연결
 
 [Public API](public-api.md)와 [생성 선언 문서](api/core.md)가 0.x 구현 계약이다. core의 `MapController` → `MapPort` 경계를 두고 Web의 `MapHandle.api`, React Native의 `MapView` ref를 연결했다. 공유 데이터·검증·취소/기한 처리는 ES2022-only core에 있고, 타이머/엔진 수명·화면·resource policy는 어댑터에 있다. `SearchProvider` 등 여섯 provider 인터페이스는 opt-in 계약이며 기본 서비스가 아니다. Native는 운영자 inline style/direct XYZ·glyph·sprite와 입력 origin gate를 제공하며 remote style/TileJSON·임의 redirect 통제는 지원 범위와 실제 네트워크 결과를 별도 확인한다. 설계상 목표와 플랫폼별 실제 검증 범위는 기능 동등성 표를 따른다.
+## 지도 품질 확장
+
+[ADR-010](decisions/010-map-quality-and-interactions.md)에 따라 기존 `MapController`와 `design-v1`을 유지하고 선택형 `MapInteractionController`·`createCartographyStyle`·`design-v2`를 추가한다. core는 portable 취소/선택/카메라 계약과 검증만 소유한다. Web/Native adapter가 실제 완료와 화면 픽셀·logical point 변환을 처리하고, 소비 앱이 카드 공간·일정/산책 저장 정책을 결정한다.
+
+운영자 타일 파이프라인은 원본·profile snapshot hash에 결합한 immutable generation을 만들고 검증 후 명시 활성화한다. 지역 detail z10–16과 선택 context z0–9를 분리한다. style revision·glyph manifest hash·generation URL이 각각 cache identity이며 현재 도구는 startup current/previous와 지정 glyph pack 범위만 제공한다. 새로운 기본 backend나 공유 키는 없다. 실제 육지 마스크·전국 상세·OS 기기 검증은 [품질 결과](research/map-quality-validation.md)의 별도 게이트다.

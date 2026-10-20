@@ -39,6 +39,36 @@
 
 Web의 기존 `addLayer`로 넣은 임의 레이어는 style 교체 시 제거된다. 유지할 JSON 레이어는 새 style.document.layers에 포함한다. 등록 이미지와 공통 overlay는 Web에서 복원한다. Native overlay는 선언형 children으로 유지하며 실제 style 교체 후 렌더링은 기기 QA가 필요하다. Native ref.destroy는 SDK 내부 지도 뷰를 제거한다; 다시 시작하려면 부모에서 MapView를 remount한다.
 
+## 선택형 공통 조작 확장
+
+`MapInteractionController`는 기존 `MapController`와 별개다. Web factory는 `handle.interactions`로 제공하고 사용자 정의·이전 handle에서는 선택형이므로 존재 여부를 확인한다. Native는 `MapView onInteractionsReady`로 전달하며 해제 시 null을 받는다. 기존 ref는 그대로 `MapController`다.
+
+| API | 계약 |
+| --- | --- |
+| transitionCamera(camera, options) | 실제 이동 완료까지 대기. 기본 300ms, 0~10,000ms. `insets`는 top/right/bottom/left 각각 0~1,000 CSS px/Native logical points |
+| fitBounds(bounds, fit, options) | 비대칭 insets, durationMs, reducedMotion. 기존 `MapController.fitBounds` uniform padding 계약은 보존 |
+| setMarkers(markers, options) | 기존 마커 집합을 한 번에 교체. 입력 검증·복사는 core에서 수행 |
+| pickFeatures({x,y}, options) | 화면 좌표 주변의 허용된 장소/마커/클러스터. Web 22 CSS px, Android 24/iOS 22 logical points. stable key로 중복 제거·정렬 후 최대 8개 |
+| selectFeature(selection, options) | 선택 표시 또는 클러스터 확대. 카드·목록·저장은 앱 책임. null로 해제 |
+| onEvent / destroy | portable camera(origin api/gesture/unknown), selection, gesture, destroyed. 확장 destroy는 확장 리소스만 해제; 전체 지도 종료는 기존 destroy |
+
+새 카메라 이동·직접 제스처·호출자 취소·시간 초과·종료는 진행 중 이동을 현 위치에서 멈추고 `ABORTED`로 끝낸다. 오래된 완료 이벤트가 새 작업을 완료시키지 않아야 한다. 이동 외 작업의 timeout은 기존 `TIMEOUT`을 사용한다. reducedMotion=true 또는 어댑터의 OS 설정은 즉시 이동한다. 설정·이벤트는 분리된 스냅샷이며 raw MapLibre/DOM/Native feature 객체를 core 밖으로 전달하지 않는다.
+
+클러스터링은 기본 비활성이다. Web `createMap({ clustering: {radius:48,maxZoom:13}, interactionPoiLayers:['korea-label-poi'], ... })`, Native `markerClustering={{radius:48,maxZoom:13}} interactionPoiLayers={['korea-label-poi']}`로 명시한다. POI 레이어 allowlist의 기본값은 빈 목록이다. Web px와 Native logical points를 물리 픽셀과 혼동하지 않는다.
+
+```ts
+import type { MapInteractionController } from 'korea-map-core';
+
+async function focusPlace(controller: MapInteractionController) {
+  await controller.transitionCamera(
+    { center: [126.978, 37.5665], zoom: 15, bearing: 0, pitch: 0 },
+    { durationMs: 300, insets: { bottom: 220 } },
+  );
+}
+```
+
+Web 실제 완료/취소/selection/cluster는 브라우저 E2E로, Native bridge는 단위/타입과 Development Build 컴파일로 구분해 검증한다. 물리 기기·iOS·OS 접근성 수락 결과는 [품질 기록](research/map-quality-validation.md)을 따른다.
+
 ## 오류, 취소, 제한 시간
 
 `KitError`의 code는 INVALID_ARGUMENT / UNSUPPORTED / UNAVAILABLE / ABORTED / TIMEOUT / PERMISSION_DENIED / NETWORK_ERROR / NOT_FOUND다. detail은 기계적으로 구분 가능한 안전한 식별자다. `normalizeError()`는 알려지지 않은 예외를 `UNAVAILABLE/OPERATION_FAILED`로 변환해 원본 응답·URL·토큰을 복사하지 않는다. 운영자가 직접 만든 KitError.detail에는 비밀을 넣지 않아야 한다.

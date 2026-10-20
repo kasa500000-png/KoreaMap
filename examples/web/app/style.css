@@ -71,6 +71,81 @@ footer {
   flex-wrap: wrap;
   gap: 8px;
 }
+.tiles-map-shell {
+  position: relative;
+}
+.tiles-demo .actions button,
+.tiles-demo select {
+  min-height: 48px;
+}
+.tiles-map-shell .kmk-place-selector {
+  top: 130px;
+}
+.tiles-map-shell .kmk-place-selector:not(:has(option:nth-child(2))) {
+  display: none;
+}
+.tiles-zoom {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  display: grid;
+  gap: 6px;
+  z-index: 2;
+}
+.tiles-zoom button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 24px;
+  box-shadow: 0 1px 5px #18362b33;
+}
+.tiles-place-card {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 3;
+  width: min(288px, calc(100% - 88px));
+  max-height: 380px;
+  overflow: auto;
+  padding: 16px;
+  background: white;
+  border: 1px solid #b6c7be;
+  border-radius: 12px;
+  color: #18362b;
+  box-shadow: 0 4px 16px #18362b26;
+}
+.tiles-place-card h2 {
+  font-size: 19px;
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+.tiles-place-card p {
+  font-size: 13px;
+  margin: 8px 0;
+}
+.tiles-place-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tiles-place-card button {
+  min-height: 48px;
+  width: 100%;
+  margin-top: 6px;
+}
+.tiles-help {
+  font-size: 14px;
+  color: #345342;
+}
+@media (max-width: 680px) {
+  .tiles-place-card {
+    top: auto;
+    bottom: 56px;
+    right: 12px;
+    width: calc(100% - 24px);
+    max-height: 190px;
+  }
+}
 .actions button {
   padding: 8px 10px;
   font-size: 14px;

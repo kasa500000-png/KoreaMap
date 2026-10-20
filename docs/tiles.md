@@ -182,3 +182,28 @@ pnpm verify:real-routing-map --store=/workspace/Koreamap/artifacts/tiles --glyph
 이 verifier는 임시 소비 Web 서버와 서울 tile 서버를 loopback의 빈 포트에 직접 실행·정리한다. 앞 절의 4173 정적 서버는 필요하지 않으며 원본·graph 다운로드나 라우팅 엔진 시작을 자동 수행하지 않는다. 보고서와 두 캡처·geometry는 ignored `artifacts/tiles/qa/routing-map/`에만 남긴다. 이번 소비는 workspace의 공개 dist export를 사용했으며 독립 npm 설치 증거는 아니다. 결과는 공개 도로 표본의 단일 Chromium 실행이고 실제 기기·현장 통행·전국 정확도·실시간 교통·보행 안전을 검증한 것이 아니다. 실제 공공 POI 적재는 원본 CSV 미확보로 계속 미검증이다.
 
 성공·실패를 확인한 소스와 기기/바이너리 증거는 최종 [진행 기록](progress.md)에 연결한다. 새 기기·OS·입력의 재현성·SLA·장시간 메모리·전국 누락·실시간 교통·보행 안전을 이 결과로 보장하지 않는다. 기본 SDK/공개 fixture는 계속 제작자 자산 서버 요청 없이 실행한다.
+## 선택형 상세 형식과 저확대 context
+
+기존 `build`의 기본 `design-v1`과 z14 상한은 유지한다. `--schema design-v2`를 지정하면 별도 `KoreaProfileV2`를 사용한다. v2는 `schemaRevision:1`, profile metadata `2.1.0`, z16 상세 타일과 문자열 `fid`/도로 subclass/교량/터널/rank/minzoom/교통·수로·철도를 제공한다. SDK 패키지 버전과 타일 형식 버전은 별개다. 정확한 컴파일 원문 snapshot과 SHA를 세대에 보존하며 작업 중 profile 변경은 실패시킨다.
+
+```sh
+pnpm tiles build --operator-opt-in --schema design-v2 --region seoul --store /operator/tiles --jar /operator/tools/planetiler-0.10.2.jar --input /operator/south-korea.osm.pbf --sha256 REPLACE_WITH_VERIFIED_SHA256 --maxzoom 16
+pnpm tiles build --operator-opt-in --schema design-v2 --region context --store /operator/tiles --jar /operator/tools/planetiler-0.10.2.jar --input /operator/south-korea.osm.pbf --sha256 REPLACE_WITH_VERIFIED_SHA256 --maxzoom 9
+```
+
+각 생성 후 출력 generation을 검사하고 기존 `activate --operator-opt-in --region ... --generation ... --store ...` 절차로 명시 활성화한다. `context`는 전국 저확대 전용으로 최대 z9/최소 디스크 1GiB를 요구한다. 지역별 상세는 z16, 전국 상세 `korea`는 기존 최소 8GiB 디스크 게이트를 유지한다. 최소 게이트를 충족해도 전국 생성·운영 성공이나 실제 메모리 용량이 보장되지 않는다. 원본·archive·glyph·실지도 이미지는 Git/npm에 넣지 않는다.
+
+```sh
+pnpm tiles serve --region seoul --store /operator/tiles --glyphs /operator/glyphs --context --quality balanced --port 8787
+```
+
+`--context`가 없으면 자동 연결하지 않는다. `--context-generation`은 `--context`와 함께 특정 검증 세대를 선택한다. v2의 기본 스타일은 balanced cartography이며 sparse/dense도 선택할 수 있다. v1 기본은 기존 legacy factory다. `createCartographyStyle`은 context z0–9와 detail z10 이상을 나누며 실제 capability만 켠다. 승인된 landmask가 없는 현재 형식은 바다·해안선을 생성하지 않는다.
+
+## 자산 캐시와 보관 범위
+
+- `/datasets/{generation}/tiles/{z}/{x}/{y}.pbf`, `/styles/{revision}/{theme}.json`, `/glyphs/{manifestSha}/{fontstack}/{range}.pbf`는 실제 내용·스키마·스타일·glyph에 결합한 경로다. 내용이 같은 지정 세대에만 1년 immutable 캐시를 제공한다. 다른 세대 요청에 현재 자료를 대신 반환하지 않는다.
+- 기존 `/tiles/...`, `/styles/{theme}.json`, `/glyphs/{fontstack}/{range}.pbf`는 no-cache ETag alias로 유지한다. GET/HEAD/304와 gzip 협상, glyph gzip 바이트 제한 LRU를 사용한다. archive/manifest sidecar·변조와 glyph hash 불일치는 캐시 응답 전에도 거부한다.
+- 서버 시작 시 current/검증 가능한 previous 최대 2개 archive와 명시 context 최대 1개만 열고 종료 때 모두 닫는다. 실행 중 pointer를 바꿔도 해당 서버의 startup snapshot은 바뀌지 않는다. 새 전환은 검증 후 서버를 재시작한다.
+- 현재 glyph pack은 지정한 1개만 제공한다. 오래된 style/glyph URL을 서버 교체 뒤 무기한 보관하는 운영 호스팅이 아니다. 공개 CDN·장기 retention·인증·부하/SLA는 운영자가 별도 구성·비용 관리한다.
+
+실제 비교와 성능 명령은 [품질 계획](map-quality.md), 통과·차단 결과는 [검증 기록](research/map-quality-validation.md)을 따른다.

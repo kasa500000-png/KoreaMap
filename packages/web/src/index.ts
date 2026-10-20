@@ -10,6 +10,7 @@ import {
   type LngLat,
   type MapMarker,
   type MapFeatureCollection,
+  type MapInteractionController,
 } from 'korea-map-core';
 import { createFixtureStyle, parseCustomStyle } from 'korea-map-styles';
 import type {
@@ -22,6 +23,12 @@ import type {
 import { createMapState, type MapState } from './state.js';
 import { validateGeoJSON } from './geojson.js';
 import {
+  createWebInteractions,
+  validateInteractionOptions,
+  clusterLayerId,
+  type WebInteractionOptions,
+} from './interaction.js';
+import {
   validateWebConfig,
   resourceUrl,
   escapeAttribution,
@@ -30,6 +37,16 @@ import {
 export { createMapState, type MapState, type MapSnapshot } from './state.js';
 export type { WebMapConfig } from './provider.js';
 export type { CameraState, MapMarker, MapFeatureCollection } from 'korea-map-core';
+export type {
+  MapInteractionController,
+  MapInteractionEvent,
+  MapSelection,
+  CameraTransitionOptions,
+  InteractionFitBoundsOptions,
+  EdgeInsets,
+  ScreenPoint,
+} from 'korea-map-core';
+export type { MarkerClusteringOptions, WebInteractionOptions } from './interaction.js';
 export type MapStatus = 'loading' | 'ready' | 'error' | 'destroyed';
 export interface MapEvents {
   status: MapStatus;
@@ -39,7 +56,7 @@ export interface MapEvents {
   idle: undefined;
   error: { code: 'MAP_LOAD_FAILED' | 'MAP_RESOURCE_FAILED'; fatal: boolean };
 }
-export interface CreateMapOptions {
+export interface CreateMapOptions extends WebInteractionOptions {
   container: HTMLElement;
   config: WebMapConfig;
   workerUrl: string;
@@ -52,6 +69,8 @@ export interface CreateMapOptions {
 }
 export interface MapHandle {
   readonly api: MapController;
+  /** Optional on older/custom handles; createMap always supplies the extension. */
+  readonly interactions?: MapInteractionController;
   readonly state: MapState;
   readonly ready: Promise<void>;
   on<K extends keyof MapEvents>(event: K, callback: (value: MapEvents[K]) => void): () => void;
@@ -85,10 +104,12 @@ let activeWorker = '';
 const markerSource = 'kmk-markers';
 const markerLayer = 'kmk-marker-points';
 const selectedLayer = 'kmk-marker-selected';
+const selectedSource = 'kmk-marker-selection';
 /** Importable on the server. Construction and the renderer import occur only in a browser. */
 export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
   const origin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin;
   const config = validateWebConfig(options.config, origin);
+  const interactionOptions = validateInteractionOptions(options);
   if (options.useLocalIdeographs !== undefined && typeof options.useLocalIdeographs !== 'boolean')
     throw new KitError('INVALID_ARGUMENT', 'INVALID_IDEOGRAPH_MODE');
   if (typeof window === 'undefined') throw new KitError('UNAVAILABLE', 'CLIENT_ONLY');
@@ -144,6 +165,17 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
   let status: MapStatus = 'loading';
   let disposed = false;
   let syncingCamera = false;
+  const interactions = createWebInteractions({
+    map: requireMap(),
+    requireMap() {
+      const map = requireMap();
+      if (status !== 'ready') throw new KitError('UNAVAILABLE', 'MAP_NOT_READY');
+      return map;
+    },
+    state,
+    poiLayers: interactionOptions.poiLayers,
+    reducedMotion: () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+  });
   let popup: LibrePopup | undefined;
   let popupClose: (() => void) | undefined;
   let frame = 0;
@@ -192,7 +224,18 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     if (status !== 'ready' || !engine) return;
     const snapshot = state.getSnapshot();
     const marker = snapshot.markers.find((m) => m.id === snapshot.selectedId);
-    engine.setFilter(selectedLayer, ['==', ['get', 'id'], marker?.id ?? '']);
+    (engine.getSource(selectedSource) as GeoJSONSource).setData({
+      type: 'FeatureCollection',
+      features: marker
+        ? [
+            {
+              type: 'Feature',
+              properties: { id: marker.id },
+              geometry: { type: 'Point', coordinates: [...marker.coordinate] },
+            },
+          ]
+        : [],
+    });
     selector.value = marker?.id ?? '';
     closePopup();
     if (marker) {
@@ -271,6 +314,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
   }
   function cleanup(finalStatus: 'error' | 'destroyed') {
     if (disposed) return;
+    interactions?.controller.destroy();
     disposed = true;
     status = finalStatus;
     clearTimeout(timer);
@@ -347,11 +391,20 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
       engine.addSource(markerSource, {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
+        ...(interactionOptions.clustering
+          ? {
+              cluster: true,
+              clusterRadius: interactionOptions.clustering.radius,
+              clusterMaxZoom: interactionOptions.clustering.maxZoom,
+              maxzoom: 22,
+            }
+          : {}),
       });
       engine.addLayer({
         id: markerLayer,
         source: markerSource,
         type: 'circle',
+        filter: ['!', ['has', 'point_count']],
         paint: {
           'circle-color': '#0369a1',
           'circle-radius': 5,
@@ -359,14 +412,31 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
           'circle-stroke-color': '#ffffff',
         },
       });
+      if (interactionOptions.clustering)
+        engine.addLayer({
+          id: clusterLayerId,
+          source: markerSource,
+          type: 'circle',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': '#0e7490',
+            'circle-radius': ['step', ['get', 'point_count'], 15, 100, 20, 1000, 26],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff',
+          },
+        });
+      engine.addSource(selectedSource, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      });
       engine.addLayer({
         id: selectedLayer,
-        source: markerSource,
+        source: selectedSource,
         type: 'circle',
-        filter: ['==', ['get', 'id'], ''],
         paint: { 'circle-color': '#e11d48', 'circle-radius': 9 },
       });
       status = 'ready';
+      interactions?.styleLoaded();
       clearTimeout(timer);
       renderMarkers();
       for (const [id, data] of overlays) renderOverlay(id, data);
@@ -483,6 +553,9 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     get api() {
       return shared.api!;
     },
+    get interactions() {
+      return interactions!.controller;
+    },
     state,
     ready,
     on: (event, callback) => {
@@ -581,7 +654,7 @@ export async function createMap(options: CreateMapOptions): Promise<MapHandle> {
     diagnostics() {
       return {
         status,
-        listeners: listeners.length,
+        listeners: listeners.length + (interactions?.listenerCount() ?? 0),
         observing: !!observer,
         renderedMarkers:
           engine && status === 'ready'

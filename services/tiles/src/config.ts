@@ -24,11 +24,52 @@ export const sourceLayers = Object.fromEntries(
     k,
   ]),
 );
+export type TileSchema = 'design-v1' | 'design-v2';
+export const optionalSourceLayers = ['rail', 'waterway', 'transport', 'landmask'] as const;
+export interface TileCapabilities {
+  rail: boolean;
+  waterway: boolean;
+  transport: boolean;
+  landmask: boolean;
+  ocean: boolean;
+}
+export const v2Fields = [
+  'kind',
+  'class',
+  'poi',
+  'name:ko',
+  'name',
+  'name:en',
+  'fid',
+  'subclass',
+  'rank',
+  'minzoom',
+  'bridge',
+  'tunnel',
+  'layer',
+  'ref',
+  'admin_level',
+  'poiCategory',
+] as const;
+export function tileSchema(value: unknown = 'design-v1'): TileSchema {
+  invariant(value === 'design-v1' || value === 'design-v2', 'UNREVIEWED_TILE_SCHEMA');
+  return value;
+}
+export function archiveCapabilities(layers: readonly string[]): TileCapabilities {
+  return {
+    rail: layers.includes('rail'),
+    waterway: layers.includes('waterway'),
+    transport: layers.includes('transport'),
+    landmask: layers.includes('landmask'),
+    ocean: false,
+  };
+}
 export const regions = {
   seoul: { bounds: [126.94, 37.53, 127.03, 37.61], center: [126.978, 37.5665], zoom: 13 },
   ulsan: { bounds: [129.27, 35.51, 129.36, 35.59], center: [129.3114, 35.5384], zoom: 13 },
   busan: { bounds: [129, 35.07, 129.1, 35.17], center: [129.0756, 35.1302], zoom: 13 },
   jeju: { bounds: [126.48, 33.46, 126.57, 33.53], center: [126.5312, 33.4996], zoom: 13 },
+  context: { bounds: [124.5, 33, 132, 39.5], center: [127.5, 36], zoom: 7 },
   korea: { bounds: [124.5, 33, 132, 39.5], center: [127.5, 36], zoom: 7 },
 } as const;
 export type Region = keyof typeof regions;

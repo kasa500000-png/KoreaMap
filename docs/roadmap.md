@@ -4,6 +4,8 @@
 
 ## 기반과 현재 작업
 
+- 지도 가독성과 조작 경험을 `feat/map-quality`에서 구현했다. [Q0–Q5 품질 계획](map-quality.md)과 [ADR-010](decisions/010-map-quality-and-interactions.md)은 기존 M1–M7을 대체하지 않는 구체 실행 범위다. `design-v1`·기존 API를 보존하고 새 `design-v2`/cartography/interaction을 선택형으로 추가했다. [최종 검증](research/map-quality-validation.md)은 도시 보존 수정 후240화면·단일 호스트 로딩 목표 통과, 1,000마커 frame 목표 실패를 구분한다. Q4 성능 수락과 실제 기기·육지 마스크·전국 생성·보안 게이트는 남는다.
+
 - 최초 정책만 main에 반영됐고, 이후 구현은 단계별 브랜치와 stacked Draft PR에 있다. 릴리스 후보 시작점은 `76b379b9dd2abbb6393e90f789a78ac2fd352762`다.
 - 마지막 GitHub 확인 시 저장소는 Public, 기본 브랜치는 `chore/project-policy`, Draft PR은 14개이며 후보 브랜치는 로컬 상태다. 기본 브랜치 조회가 전체 SDK의 설치 진입점을 제공하지 않는다. main 통합·공개 업로드·기본 브랜치 정렬은 검증된 구체적 대상에 대한 승인 이후다.
 - 사용자가 승인한 남은 작업 구현은 `feat/korean-map-completion`에서 진행한다. Web/Android/iOS와 SDK 5종 목표를 유지하며 Web Alpha는 중간 검증 단계다.

@@ -51,3 +51,11 @@ Full setup, source schema, Korean glyphs, PMTiles fallback and validation limita
 including `native-sdk.md` and `research/native-consumer-validation.md`, follows the integrated
 default branch. Before integration, use those paths in the reviewed candidate source checkout.
 Third-party fonts/data keep their own licenses and are not included in this package.
+
+## 선택형 공통 조작 확장
+
+기존 `MapController` ref를 유지하며 `onInteractionsReady={(controller) => ...}`로 별도 `MapInteractionController`를 받습니다. unmount 시 null이 전달됩니다. `transitionCamera`, 비대칭 `fitBounds`, 일괄 `setMarkers`, `pickFeatures`, `selectFeature`를 제공합니다. 카메라 Promise는 region 완료와 목표 검증 후 끝나며 취소는 현 위치에서 멈춥니다. OS reduced motion을 따릅니다.
+
+`markerClustering={{radius:48,maxZoom:13}}`은 선택형이며 기본 비활성입니다. `interactionPoiLayers`는 명시적 basemap 선택 allowlist(최대 8개, 기본 빈 목록)입니다. Web CSS px와 Native logical points를 구분합니다. 선택 반경은 Android 24/iOS 22 logical points입니다. 마커 접근성 목록은 가상화하며 선택 카드와 강조는 클러스터에서 분리합니다.
+
+이 설명은 구현 계약입니다. Android/iOS 터치·접근성·화면 회전·복귀·메모리·glyph의 실제 기기 통과를 의미하지 않습니다. [공통 API](../../docs/public-api.md), [Expo 예제](../../examples/expo/App.tsx), [Native 결과](../../docs/research/native-sdk-validation.md), [품질 결과](../../docs/research/map-quality-validation.md)를 확인하세요.
