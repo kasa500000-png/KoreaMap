@@ -415,3 +415,8 @@ SDK/예제/Provider/lockfile 변경 없이 합성 데이터 browser QA를 추가
 공식 Playwright payload와 서명/SHA 검증된 최소 Debian 사용자 전용 라이브러리는 ignored 저장소에서만 사용했다. 환경별 실패와 해당 WebKit 실행에서만의 독립 loader 검증/표준 preflight 미사용을 그대로 기록한다. SDK/실행기/CI 기본에는 우회 환경값을 넣지 않았다. 두 공식 문서 host는 docs-only로 검토하고 같은 host의 runtime URL 차단 회귀를 유지한다.
 
 일반 Foundation CI의 세 브라우저 matrix는 표준 Ubuntu·공식 설치와 Xvfb만 사용한다. 공개 repository의 표준 runner 외 유료/GPU runner·새 계정·cache/artifact upload·schedule·배포·지도 endpoint를 추가하지 않는다. 기본 SDK 설치/테스트가 브라우저 다운로드나 OS 의존성을 요구하지 않으며 선택형 QA와 서비스 운영 비용을 분리한다. 원격 CI는 해당 실제 결과를 따르며 미종료를 성공으로 처리하지 않는다.
+
+
+## 우선순위 10단계 — 04 프레임 증거
+
+QA 보고서의 실제 context 속성 수집은 측정·선택형 profiler 정지 뒤 한 번만 수행한다. 기본 SDK 실행과 네트워크·비용 경로를 변경하지 않는다. 환경값은 ignored 로컬 보고서만 기록하고 외부 전송하지 않는다. 소프트웨어 GPU 단일 비교가33ms 목표를 통과하지 못했으므로 임시 SDK 설정을 제거했다. 실제 지도/glyph/PNG는 Git/npm에서 제외하며 프로파일링/하드웨어 미확인을 성능 수락으로 바꾸지 않는다.

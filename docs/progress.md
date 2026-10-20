@@ -689,3 +689,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 장시간/Worker·GPU전체메모리·실기기·브라우저원격CI는별도다. 보안high2·상위선언·33ms프레임목표는유지한다. 무료표준runner만사용하며배포대상선택전외부호스팅은미실행이다.
 7. **Git:** 02단계 [PR19](https://github.com/kasa500000-png/KoreaMap/pull/19), commit2196e7254126178c402c0bdeac7d3d6995983582/merge469bb3c5958b00e639c5d0f0df9c3f4c93d822d2. 03브랜치 `test/stage-03-cross-browser`, commit조회 `git log -1 --format='%H %s' --grep='^test: add cross-browser map lifecycle QA$'`.
 8. **다음:** 세Linux브라우저범위는실검증후반영가능하며고정프레임·Android독립빌드·실자료단계를계속한다. WebKit을Safari실기기지원으로표시하지않는다.
+
+
+## 우선순위 10단계 — 04 프레임 실행 환경 증거 — 2026-10-21 KST
+
+1. **구현:** 고정 프레임 측정 뒤 실제 WebGL 속성·브라우저 버전·소프트웨어 renderer 근거를 기록한다. 설정 추정이나 성능 기준 완화 없이 [진단](research/stage-04-rendering.md)을 보강했다.
+2. **파일:** renderer metadata helper·프레임 verifier·관련 회귀·단계/진행/로드맵/비용 문서. SDK runtime·공급자·의존성은 불변이다.
+3. **검사:** 관련19개 회귀 PASS. 전체 pnpm check PASS, 새 helper 실제 지도 실행58간격/p95 116.6ms FAIL/exit1. 5회 실제1000마커·이동완료 및종료정리를 확인했다. A/B 임시 설정은 원복했다.
+4. **실화면:** 동일 실제 서울 지도·glyph·1000마커·5회 이동의 직렬 A/B에서 PNG SHA·카메라·피처 수 일치. p95 116.7/100ms 모두33ms FAIL이며 단일 비교를 개선 확정으로 사용하지 않는다.
+5. **라이선스/보안:** MIT QA 코드만 추가, 실제 OSM/glyph/캡처/환경 보고서는 ignored에만 보관한다. 외부 전송·유료 인프라·키·새 endpoint 없음.
+6. **차단:** 33ms 목표·하드웨어 GPU·장기 메모리는 미충족/미검증이다. 보안 high2·상위 선언·기기 수락 및 배포 대상도 별도다.
+7. **Git:** 03단계 PR20/commit05da9d8808ffefef842208ba5102d6261c859cb4/merge5f5c58ff7dcd92957500f87a62929c97276f42cc. 04브랜치 perf/stage-04-map-rendering, commit조회 `git log -1 --format='%H %s' --grep='^test: record actual frame rendering context$'`.
+8. **다음:** 진단 코드 검증 후 preview 소스 통합과 Android/데이터 단계를 계속한다. 성능 수락 완료가 아니다.

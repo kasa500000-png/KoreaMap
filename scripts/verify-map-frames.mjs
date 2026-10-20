@@ -21,6 +21,7 @@ import { clearTimeout, setTimeout } from 'node:timers';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { qualityTargets, percentile } from './map-quality-cases.mjs';
 import { startQualityConsumer } from './quality-consumer.mjs';
+import { collectFrameRendererMetadata } from './frame-renderer-metadata.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -305,6 +306,8 @@ probe.trial=async(index)=>{
  return {index,durationMs:1000,elapsedMs,deltas,sourceCount:state.getSnapshot().markers.length,before,after:await observation(),completed:current.center.every((value,i)=>Math.abs(value-target[i])<0.000001)&&Math.abs(current.zoom-14)<0.0001};
 };
 probe.summary=()=>{const ids=input.layers.filter(id=>id.startsWith('korea-road-')||id==='korea-building'||id.startsWith('korea-label-')||id.startsWith('korea-poi-priority-')),features=map.getRenderedFeatures(ids);return {roads:features.filter(f=>f.layerId.startsWith('korea-road-')).length,buildings:features.filter(f=>f.layerId==='korea-building').length,labels:features.filter(f=>f.layerId.startsWith('korea-label-')||f.layerId.startsWith('korea-poi-priority-')).length}};
+const collectRendererMetadata=${collectFrameRendererMetadata.toString()};
+probe.rendererMetadata=()=>collectRendererMetadata(document.querySelector('canvas'),{userAgent:navigator.userAgent,devicePixelRatio:globalThis.devicePixelRatio,viewportWidth:globalThis.innerWidth,viewportHeight:globalThis.innerHeight,platform:navigator.platform,hardwareConcurrency:navigator.hardwareConcurrency,deviceMemory:navigator.deviceMemory});
 probe.ready=true;
 </script></html>`;
 }
@@ -329,6 +332,7 @@ export async function verifyMapFrames(options) {
     sourceDirty: git('status', '--porcelain').length > 0,
     verifierSha256: sha(readFileSync(fileURLToPath(import.meta.url))),
     consumerSha256: sha(readFileSync(resolve(root, 'scripts/quality-consumer.mjs'))),
+    rendererMetadataSha256: sha(readFileSync(resolve(root, 'scripts/frame-renderer-metadata.mjs'))),
     glyph: {
       manifestSha256: glyph.sha256,
       fontstack: glyph.value.fontstack,
@@ -478,20 +482,6 @@ export async function verifyMapFrames(options) {
         timeout: 30000,
       })
       .toBe(1000);
-    report.renderer = await page.evaluate(() => {
-      const canvas = globalThis.document.querySelector('canvas'),
-        gl = canvas.getContext('webgl2'),
-        extension = gl?.getExtension('WEBGL_debug_renderer_info');
-      return {
-        browser: globalThis.navigator.userAgent,
-        webglRenderer: gl
-          ? String(gl.getParameter(extension ? extension.UNMASKED_RENDERER_WEBGL : gl.RENDERER))
-          : 'UNAVAILABLE',
-        canvasWidth: canvas.width,
-        canvasHeight: canvas.height,
-        devicePixelRatio: globalThis.devicePixelRatio,
-      };
-    });
     report.initialScene = await page.evaluate(() => globalThis.frameProbe.summary());
     assert(
       report.initialScene.roads > 0 &&
@@ -521,6 +511,11 @@ export async function verifyMapFrames(options) {
       await page.waitForFunction(() => globalThis.frameProbe.idle, {}, { timeout: 30000 });
     }
     if (profiler) Object.assign(report.profiling, await profiler.stop());
+    report.renderer = {
+      ...(await page.evaluate(() => globalThis.frameProbe.rendererMetadata())),
+      capturePhase: 'AFTER_TIMED_TRIALS_AND_PROFILE_STOP',
+      browserVersion: browser.version(),
+    };
     report.result = evaluateMarkerFrameSeries(report.trials);
     report.mapErrors = await page.evaluate(() => globalThis.frameProbe.errors);
     assert.equal(report.network.unexpected, 0, 'Unexpected browser origin');
