@@ -393,3 +393,11 @@ frozen/offline·hook 차단 설치를 검증한다. 실제 설치 버전을 기�
 - 기본 브랜치 변경 도구가 커넥터에 없어 gh API로 main 설정을 시도했지만 HTTP403(Resource not accessible by integration)으로 거부됐다. 권한 우회는 하지 않았고 기본 브랜치는 여전히 `chore/project-policy`다. 명시적 `git clone --branch main`을 안내한다. 이는 과금·발행 설정 변경을 요구하지 않는다.
 
 최종 문서 커밋 전 작업 트리349파일/index349blob/도달 가능한 로컬32커밋838blob·실제5tarball 정적 스캔은 `PASS_STATIC_ONLY`/findings0이다. 새 main CI `49e8aac`는 Windows/macOS 성공, audit high2 및 Linux 상위 NodeNext TS2834 실패로 종료됐으며 억제하지 않았다. 문서 변경 이후 CI 결과는 별도 실행에서 판단한다.
+
+## 우선순위 10단계 — 01 보안·CI — 2026-10-21 KST
+
+[10단계 실행](ten-stage-plan.md)은 사용자의 단계별 commit/PR/main 반영과 지정 대상 배포 요청에 따른다. 이번 단계는 공식 registry/advisory의 읽기 전용 재확인 및 실제 pnpm audit/why와 CI 격리 수정이다. 재조사시각은22:13 UTC/07:13 KST, high2/critical0·exit1이며 안전한 공식 수정 경로를 확인하지 못했다. 원문·실행 메타데이터는 ignored `artifacts/ten-stages/stage01`에만 보관한다.
+
+일반 Foundation CI에 표준 Ubuntu Web/Native 소비 job을 분리했다. 모든 기존 audit·선언·Web/geo/routing 검사를 유지하고 needs/조건부 skip/continue-on-error를 추가하지 않았다. 표준 runner 실행량은 늘지만 유료 runner·cache·artifact upload·cron·shared service·제작자 키를 추가하지 않는다. SDK/lock/기본Provider·npm 발행 workflow는 그대로다. 초기 install/보안 metadata 조회는 공개 registry이며 유료 지도 호출과 구분한다. 계정 과금 제한과 모든 OS egress를 정적 검사만으로 보장하지 않는다.
+
+단계01의 보안 수락은 BLOCKED다. 단계별 소스 통합 승인을 실패 감사 억제·npm 최초 발행·불명확한 외부 호스팅 활성화로 확대하지 않는다. 배포 대상 선택 전에는 준비와 검증을 진행하고 외부 배포 결과를 만들어내지 않는다. 최종 staged/작업 트리·이력·실제5tarball 정적 감사는 commit 전에 실행한다.

@@ -92,6 +92,73 @@ test('dependency audit runs independently of functional CI and fails closed', ()
     /needs:|continue-on-error:|\|\|\s*true|--prod\b|--ignore-registry-errors/,
   );
 });
+
+function ciJobs(workflow) {
+  const source = workflow.split('\njobs:\n')[1];
+  assert(source, 'CI jobs are required');
+  const headings = [...source.matchAll(/^ {2}([a-z][a-z0-9-]*):\n/gm)];
+  return new Map(
+    headings.map((heading, index) => [
+      heading[1],
+      source.slice(heading.index, headings[index + 1]?.index),
+    ]),
+  );
+}
+function assertSeparatedConsumerGates(workflow) {
+  const jobs = ciJobs(workflow);
+  const linux = jobs.get('linux');
+  assert(linux, 'Linux functional job is required');
+  assert.doesNotMatch(linux, /pnpm verify:(?:packages|native-consumer)/);
+  for (const command of ['pnpm test:web', 'pnpm test:geo', 'pnpm test:routing'])
+    assert(linux.includes(`- run: ${command}\n`), `Functional QA missing: ${command}`);
+  for (const [id, command] of [
+    ['web-consumer', 'pnpm verify:packages'],
+    ['native-consumer', 'pnpm verify:native-consumer'],
+  ]) {
+    const job = jobs.get(id);
+    assert(job, `Independent ${id} gate required`);
+    assert.match(job, /runs-on: ubuntu-24\.04\n/);
+    assert.match(job, /timeout-minutes: 20\n/);
+    for (const step of [
+      'pnpm install --frozen-lockfile',
+      'pnpm build:sdk',
+      'pnpm pack:check',
+      command,
+    ])
+      assert(job.includes(`- run: ${step}\n`), `Self-contained ${id} step missing: ${step}`);
+    assert(job.indexOf('pnpm build:sdk') < job.indexOf('pnpm pack:check'));
+    assert(job.indexOf('pnpm pack:check') < job.indexOf(command));
+    assert.equal(workflow.split(`- run: ${command}\n`).length - 1, 1);
+  }
+  for (const id of ['linux', 'web-consumer', 'native-consumer'])
+    assert.doesNotMatch(
+      jobs.get(id),
+      /^\s*(?:needs|if|continue-on-error):|\|\|\s*true|--prod\b|--ignore-registry-errors/m,
+      `${id} must run independently and preserve failure`,
+    );
+}
+test('both consumer declaration gates run independently without blocking Linux Web/database/routing QA', () => {
+  assertSeparatedConsumerGates(readFileSync('.github/workflows/ci.yml', 'utf8'));
+});
+test('CI isolation policy rejects skipped, hidden, incomplete and re-serialized consumer gates', () => {
+  const workflow = readFileSync('.github/workflows/ci.yml', 'utf8');
+  const native = ciJobs(workflow).get('native-consumer');
+  for (const mutation of [
+    workflow.replace('  web-consumer:\n', '  web-consumer:\n    needs: [linux]\n'),
+    workflow.replace(
+      '  native-consumer:\n',
+      "  native-consumer:\n    if: github.ref == 'refs/heads/main'\n",
+    ),
+    workflow.replace(
+      '- run: pnpm verify:native-consumer\n',
+      '- run: pnpm verify:native-consumer || true\n',
+    ),
+    workflow.replace(native, native.replace('      - run: pnpm pack:check\n', '')),
+    workflow.replace('      - run: pnpm test:routing\n', ''),
+    workflow.replace('  linux:\n', '  linux:\n    needs: [web-consumer, native-consumer]\n'),
+  ])
+    assert.throws(() => assertSeparatedConsumerGates(mutation));
+});
 test('documented shared API sample matches the strict compiled type fixture', () => {
   const docs = readFileSync('docs/web-guide.md', 'utf8').split('```ts\n')[1].split('```')[0];
   assert.equal(docs.trim(), readFileSync('tests/release-guide.types.ts', 'utf8').trim());
