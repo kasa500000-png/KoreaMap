@@ -60,6 +60,7 @@ else if (task === 'check') {
     'test:real-tiles',
     'test:map-quality',
     'test:browser-policy',
+    'test:web-deploy',
     'test:service-quality',
     'test:native-consumer',
     'test:native-android',

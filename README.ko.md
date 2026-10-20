@@ -50,3 +50,5 @@ SDK 소스 배포는 MIT 무료 오픈소스입니다. 지도 데이터·타일�
 ## 지도 가독성과 조작 개선
 
 기존 API를 유지하는 선택형 공통 카메라·선택 확장, 상세 `design-v2` 타일 형식과 4종 cartography 테마를 추가합니다. [품질 계획과 실행](docs/map-quality.md), [실제 검증 범위](docs/research/map-quality-validation.md)를 확인하세요. 실제 Android/iOS·전국 정확도·상용 지도 동등성은 별도 수락 항목입니다.
+
+10단계 preview 반영과 [PR·검증·남은 차단](docs/research/ten-stage-execution.md)을 확인하세요. [합성 정적 데모 준비](docs/research/stage-10-web-deployment.md)는 로컬 검증이며 외부 호스팅 배포·npm 발행은 미완료입니다.

@@ -76,7 +76,10 @@
     "test:native-android": "node --test tests/native-android.test.mjs",
     "test:service-quality": "node --test tests/service-quality.test.mjs",
     "verify:service-quality": "node scripts/service-quality.mjs",
-    "release:preflight": "node scripts/release-preflight.mjs"
+    "release:preflight": "node scripts/release-preflight.mjs",
+    "test:web-deploy": "node --test tests/web-deploy.test.mjs",
+    "prepare:web-deploy": "node scripts/prepare-web-deploy.mjs prepare",
+    "verify:web-deploy": "node scripts/prepare-web-deploy.mjs verify"
   },
   "devDependencies": {
     "typescript": "6.0.3",

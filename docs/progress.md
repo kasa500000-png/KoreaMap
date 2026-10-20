@@ -761,3 +761,15 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** 최초미발행0.1.0에3개Changeset본문을CHANGELOG로보존/소비했다. high2·Web/RN선언·npm발행주체·GitHub기본브랜치/환경보호가 남는다. npmworkflow는현재defaultbranch에없어미등록이다. 기존보안·전체선언·프레임·기기수락과배포대상미지정은별도차단이다.
 7. **Git:** 브랜치 `chore/stage-09-release-readiness`. commit조회 `git log -1 --format='%H %s' --grep='^chore: verify release readiness without publishing$'`. 이전단계와이단계의PR/mergeSHA는최종실행보고서에기록한다.
 8. **다음:** 통과한개별수정만preview소스에반영하고다음단계를계속한다. 미실행·실패항목을완료로처리하지않으며npm·Release·외부호스팅은실행하지않았다.
+
+
+## 우선순위 10단계 — 10 최종 회귀·정적 데모 배포물 — 2026-10-21 KST
+
+1. **구현:** 키 없는 합성 데모의 정적 배포물 준비·해시 검증·브라우저 smoke를 추가했다. 환경 주입을 제한하고7개 허용route·CSP·31개법적고지·파일별SHA를 기록한다. [도구 검증](research/stage-10-web-deployment.md), [10단계 결과](research/ten-stage-execution.md)를 따른다.
+2. **파일:** prepare-web-deploy.mjs·web-deploy.test.mjs·단계/전체실행보고서·package/tasks 명령 연결·README와 진행/로드맵/비용 문서다. SDK runtime·의존성/lock·발행 workflow는 미변경이다.
+3. **검사:** 도구13개·독립리뷰 PASS, 실제 SDK/Next export109files/3,055,021B와7route smoke PASS다. 루트 최종 Web25/25·Docker Valhalla8/8 PASS, 5tarball재현·격리설치/Bundler/core/SSR/browser PASS. Native SDK strict2개·plugin/양OS JS export PASS지만 Web NodeNext/전체RN은 PARTIAL_PASS/exit1을 유지한다. 통합 pnpm check·13회귀 PASS, 루트 실제109files/3,054,947B·31notice·7route 외부0/pageerror0 PASS다. 최종main 배포물과staged/정적감사를추가확인한다.
+4. **실화면:** Chromium154/390px에서 합성 지도·마커선택·실제줌·종료, 허용7route와외부0/pageerror0을확인했다. Web390/768/1440·4테마·한글·터치·100/1000마커·오류복구25 E2E도최종재실행PASS다. 호스팅/CDN·실기기/iOS 화면은 미검증이다.
+5. **라이선스/보안:** Nextpolyfill정확3버전·MapLibre실제번들17의고지를포함해31notice를배포물에보존한다. 원문LICENSE/metadata/SRI증거는ignored이고 기본prepare에서자동다운로드하지않는다. 개인정보·제작자키/provider·지도/font/타일payload·유료runner·외부발행없음이다.
+6. **차단:** high2·Web/RN상위선언·p95 116.6ms>33ms·실제POI/정답·해안선/전국·Native실행·발행계정/보호환경이남는다. 배포대상미지정으로실제외부배포NOT_RUN, 현재정적배포물은origin root전용이며repository subpath는별도검증이필요하다.
+7. **Git:** 09 PR26/commitc2271334a62aa162e5aba29ab6366abecafe00ed/mergeeee4b2c3a4fa744aa2c06243a1ffda93ba816a66. 10브랜치 chore/stage-10-deployment, commit조회 `git log -1 --format='%H %s' --grep='^chore: prepare verified fixture deployment$'`. 최종 PR/merge는 사용자완료보고와원격기록으로제공한다.
+8. **다음:** 검증된preview소스와로컬정적산출물은검토/후속개발가능하다. 실제서비스배포·npm·tag·GitHub Release 및전체품질수락은미완료이며실패/미검증을통과로바꾸지않는다.

@@ -449,3 +449,12 @@ private ETL CLI가 data/raw 밖으로 이어지는 symlink/junction·일반파�
 clean 최종SHA와24h이내 완료된 감사/소비/registry 근거·5tarball·버전·검토된workflow를 검사한다. 기본은로컬만, 명시적GitHub옵션은GET만 수행하며 publicationAuthorized:false다. preflight16개 PASS, 원격main조회실패·주석처리된발행guard·Native부분성공우회3건 회귀포함. 실제실행 BLOCKED/exit1을 유지한다. SDK기본요청·제작자서비스·유료인프라·외부원본payload를추가하지않았다. 실패한수락과선택형운영비용은그대로유지한다. 상세조건은 [단계보고서](research/stage-09-release-preflight.md)를따른다.
 
 최초미발행0.1.0기준선정리는기존CHANGELOG정책과사용자요청에따라3개기록본문을보존/소비했다. package버전·lock·발행workflow·보호조건은미변경이다. preflight의pending음성검사는삭제된실파일대신독립합성frontmatter로유지한다. 현재원격/보안/소비근거가없으면여전히BLOCKED다.
+
+
+## 우선순위 10단계 — 10 최종 회귀와 정적 배포물
+
+SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 operator/public provider·NODE_OPTIONS·npm인증/proxy와실제.env주입을차단한다. 준비/검증도구 자체에는 다운로드·유료계정·원격write·자동배포가없다. 선택형브라우저 smoke는 loopback origin만허용하고7route외부요청0/pageerror0을확인했다. CSP/파일경계·크기·확장자/비밀정보·URI와실제browser증거를분리한다. 정적휴리스틱과browser관측은모든동적코드·OS트래픽·향후요금/호스팅계정정책을증명하지않는다.
+
+실제Nextpolyfill3버전의공식tarball SRI·LICENSE SHA와 MapLibre main/worker sourcemap의17개런타임정확버전/고지를검토해31notice를함께보존한다. 기존SDK MIT·MapLibre BSD·의존성권리를분리하고지도/폰트/이미지/타일/개인자료를배포하지않는다. sourceDirty=true candidate는최종clean릴리스근거가아니며최종main에서다시생성해해당SHA를기록한다. 5npm tarball재현/격리소비의부분성공은Web/RN전체선언실패를해제하지않는다. actualaudit high2/critical0·exit1을유지한다.
+
+배포대상응답이없어실제외부배포NOT_RUN이다. GitHubPages조회404는활성사이트/설정권한으로간주하지않았다. origin root전용site를후속운영자가선택한호스트에올릴때HTTPS·MIME·nosniff/CSP·캐시·권한/쿼터/비용을검증해야한다. GitHub main소스통합은외부배포가아니며npm·tag·Release·visibility·서버설정을변경하지않았다.
