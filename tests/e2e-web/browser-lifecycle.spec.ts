@@ -1,6 +1,9 @@
 import { expect, test, type CDPSession, type Page } from '@playwright/test';
+import { readFile, stat } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { themeNames } from 'korea-map-styles';
 import { pngOpaqueColors } from './png-raster';
+import { openMapDemo } from './map-startup';
 
 type LifecycleCounters = { workers: number; observers: number; createdWorkers: number };
 type LifecycleWindow = Window & { kmkExtendedLifecycle: LifecycleCounters };
@@ -64,8 +67,7 @@ for (const width of [390, 768, 1440]) {
   }, testInfo) => {
     test.setTimeout(90_000);
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('/');
-    await expect(page.getByTestId('status')).toHaveText('ready');
+    await openMapDemo(page, testInfo);
     await expect(page.locator('canvas')).toBeVisible();
     await expect(page.getByTestId('rendered')).toHaveText('화면 마커: 100');
     await page.getByRole('combobox', { name: '지도 장소 선택' }).selectOption('place-50');
@@ -159,8 +161,7 @@ test('20 mount/use/destroy cycles retain a bounded worker pool and release obser
   browserName,
 }, testInfo) => {
   test.setTimeout(180_000);
-  await page.goto('/');
-  await expect(page.getByTestId('status')).toHaveText('ready');
+  await openMapDemo(page, testInfo);
   let cdp: CDPSession | undefined;
   const heaps: number[] = [];
   const samples: Array<{ cycle: number; resources: LifecycleCounters; heap?: number }> = [];
@@ -230,5 +231,63 @@ test('20 mount/use/destroy cycles retain a bounded worker pool and release obser
     });
   } finally {
     await cdp?.detach();
+  }
+});
+
+test('a delayed actual map module attaches before the unchanged map-ready assertion starts', async ({
+  page,
+}, testInfo) => {
+  const manifest = JSON.parse(
+    await readFile('examples/web/.next/react-loadable-manifest.json', 'utf8'),
+  );
+  const files: unknown = manifest['app/map-client.tsx -> ./map-demo']?.files;
+  expect(Array.isArray(files)).toBe(true);
+  const candidates = files as string[];
+  expect(candidates.length).toBeLessThanOrEqual(8);
+  const mapChunks: string[] = [];
+  for (const file of candidates) {
+    expect(file).toMatch(/^static\/chunks\/[\w./-]+\.js$/);
+    expect(file).not.toContain('..');
+    const path = resolve('examples/web/out/_next', file);
+    expect((await stat(path)).size).toBeLessThan(10 * 1024 * 1024);
+    if ((await readFile(path, 'utf8')).includes('직접 만든 테스트 지점입니다.'))
+      mapChunks.push(`/_next/${file}`);
+  }
+  expect(mapChunks).toHaveLength(1);
+  let releaseChunk!: () => void;
+  const chunkHeld = new Promise<void>((resolve) => (releaseChunk = resolve));
+  let notifyRequest!: () => void;
+  const chunkRequested = new Promise<void>((resolve) => (notifyRequest = resolve));
+  await page.route(`**${mapChunks[0]}`, async (route) => {
+    notifyRequest();
+    await chunkHeld;
+    await route.continue();
+  });
+  const opening = openMapDemo(page, testInfo);
+  try {
+    await chunkRequested;
+    await expect(page.getByRole('status')).toHaveText('지도 모듈 준비 중');
+    const heldAt = Date.now();
+    let originalAssertionFailure: unknown;
+    try {
+      await expect(page.getByTestId('status')).toHaveText('ready');
+    } catch (error) {
+      originalAssertionFailure = error;
+    }
+    expect(originalAssertionFailure).toBeInstanceOf(Error);
+    expect((originalAssertionFailure as Error).message).toContain('5000ms');
+    await expect(page.getByTestId('status')).toHaveCount(0);
+    const heldMs = Date.now() - heldAt;
+    expect(heldMs).toBeGreaterThanOrEqual(5_000);
+    releaseChunk();
+    await opening;
+    await expect(page.locator('canvas')).toBeVisible();
+    await testInfo.attach('map-module-delay-regression', {
+      body: JSON.stringify({ diagnosticOnly: true, heldMs, chunk: mapChunks[0] }),
+      contentType: 'application/json',
+    });
+  } finally {
+    releaseChunk();
+    await opening.catch(() => {});
   }
 });
