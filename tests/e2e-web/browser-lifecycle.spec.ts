@@ -234,7 +234,7 @@ test('20 mount/use/destroy cycles retain a bounded worker pool and release obser
   }
 });
 
-test('a delayed actual map module attaches before the unchanged map-ready assertion starts', async ({
+test('a delayed actual map module shares the total initialization budget', async ({
   page,
 }, testInfo) => {
   const manifest = JSON.parse(
@@ -288,6 +288,48 @@ test('a delayed actual map module attaches before the unchanged map-ready assert
     });
   } finally {
     releaseChunk();
+    await opening.catch(() => {});
+  }
+});
+
+test('actual worker initialization can exceed five seconds within the existing total synthetic budget', async ({
+  page,
+}, testInfo) => {
+  let releaseWorker!: () => void;
+  const workerHeld = new Promise<void>((resolve) => (releaseWorker = resolve));
+  let notifyRequest!: () => void;
+  const workerRequested = new Promise<void>((resolve) => (notifyRequest = resolve));
+  await page.route('**/vendor/maplibre/maplibre-gl-worker.mjs', async (route) => {
+    notifyRequest();
+    await workerHeld;
+    await route.continue();
+  });
+  const opening = openMapDemo(page, testInfo);
+  try {
+    await workerRequested;
+    await expect(page.getByTestId('status')).toHaveText('loading');
+    const heldAt = Date.now();
+    let originalAssertionFailure: unknown;
+    try {
+      await expect(page.getByTestId('status')).toHaveText('ready');
+    } catch (error) {
+      originalAssertionFailure = error;
+    }
+    expect(originalAssertionFailure).toBeInstanceOf(Error);
+    expect((originalAssertionFailure as Error).message).toContain('5000ms');
+    await expect(page.getByTestId('status')).toHaveText('loading');
+    await new Promise((done) => setTimeout(done, Math.max(0, 6_000 - (Date.now() - heldAt))));
+    const heldMs = Date.now() - heldAt;
+    releaseWorker();
+    await opening;
+    await expect(page.locator('canvas')).toBeVisible();
+    await expect(page.getByTestId('rendered')).toHaveText('화면 마커: 100');
+    await testInfo.attach('map-worker-delay-regression', {
+      body: JSON.stringify({ diagnosticOnly: true, heldMs, legacyReadyFiveSeconds: 'FAIL' }),
+      contentType: 'application/json',
+    });
+  } finally {
+    releaseWorker();
     await opening.catch(() => {});
   }
 });
