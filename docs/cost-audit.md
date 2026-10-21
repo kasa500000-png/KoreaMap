@@ -472,3 +472,7 @@ SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 o
 기본 SDK 요청 없이 운영자가 private probe를 명시적으로 실행할 때만 기존 A 3개 공식 상세 URL을 조회한다. 기본 3회, `--retry-once`도 최대 6회이며 429/502/503/504·유효한 5초 이하 Retry-After만 재시도한다. 401/403·redirect·timeout·network/본문 정리 실패는 중단한다. 기본 metadata 검사와 원본 다운로드/저장·실제 ETL을 구분한다. 응답 본문·원시 MIME/Retry-After·오류·키를 기록하지 않으며 고정 MIME/사유만 보존한다. 실제503 원본 미확보를 성공으로 바꾸지 않는다. Provider·데이터 등급·SDK·제작자 계정·유료 경로는 추가하지 않았다.
 
 통합 첫 감사는 새 세 고정 URL을 미검토 실행 주소로 차단했다. 세 주소는 기존 A 원장의 개별 공식 상세 페이지이며, `scripts/verify-real-poi.mjs`의 명시적 metadata probe에서만 쓰이는 것을 코드/호출 경로로 검토했다. `OPERATOR_PROBE_URLS`는 해당 파일과 정확한 세 문자열에만 적용한다. 같은 주소를 SDK에 넣거나 query/다른 자료 번호로 바꾸면 계속 거부하는 black-box 회귀를 추가했다. 도메인 전체 허용·공공데이터 등급 변경·SDK 기본 endpoint 허용은 아니다.
+
+## 2026-10-21 — Android APK 고지 후보 조사
+
+기존 로컬 APK·동일 build 생성 bundle과 선택 Maven cache만 읽어 조사했다. 원문/파일을 추출·재배포·Git/npm에 포함하지 않고 후보 이름·크기·해시·제한된 UTF-8 분류만 기록한다. 256개 목록/64KiB 본문 상한 이후에도 모든 ZIP entry의 raw CRC를 유지한다. 기존 APK 19 native/3 model/5 notice 후보는 고지 적합성 증명이 아니며 MLKit 별도 약관과 완전한 resolved graph 검토가 남는다. payload PASS, licenseCompliance:NOT_EVALUATED, distributionReady:false를 분리한다. SDK·Provider·계정·요금·네트워크/업로드·CI 권한 변경 없이 기존 발행/플랫폼 차단을 유지한다.

@@ -68,6 +68,49 @@ class ApkTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.verify()
 
+    def test_binary_inventory_is_not_license_approval_even_with_a_misleading_notice(self):
+        notice = b'Authored synthetic notice fixture; not actual license permission.'
+        model = b'authored model fixture'
+        self.archive(extra=[('assets/THIRD_PARTY_NOTICES.txt', notice), ('assets/model.tflite', model), ('lib/x86_64/libanother.so', b'authored candidate, not ELF proof')])
+        result = self.verify()
+        inventory = result['binaryNoticeInventory']
+        self.assertEqual(result['status'], 'PASS')  # Payload verification only.
+        self.assertFalse(inventory['complete'])
+        self.assertFalse(inventory['distributionReady'])
+        self.assertEqual(inventory['licenseCompliance'], 'NOT_EVALUATED')
+        self.assertEqual(inventory['dependencyGraph'], 'NOT_PROVIDED')
+        self.assertEqual(inventory['candidateCounts'], {'notices': 1, 'nativeLibraries': 2, 'modelAssets': 1})
+        candidate = inventory['noticeCandidates'][0]
+        self.assertEqual(candidate, {'file': 'assets/THIRD_PARTY_NOTICES.txt', 'bytes': len(notice), 'sha256': hashlib.sha256(notice).hexdigest(), 'textStatus': 'UTF8_TEXT_CANDIDATE'})
+        self.assertNotIn(notice.decode(), str(inventory))
+        self.assertEqual(inventory['modelAssetCandidates'][0]['sha256'], hashlib.sha256(model).hexdigest())
+
+    def test_empty_binary_and_oversize_notice_candidates_do_not_become_license_text(self):
+        self.archive(extra=[('META-INF/LICENSE.empty', b''), ('META-INF/NOTICE.binary', b'\xff\x00'), ('META-INF/NOTICE.large', b'authored fixture' * 4)])
+        with patch.object(apk_verifier, 'MAX_NOTICE_TEXT', 32):
+            inventory = self.verify()['binaryNoticeInventory']
+        self.assertEqual([entry['textStatus'] for entry in inventory['noticeCandidates']], ['EMPTY', 'NON_UTF8_CANDIDATE', 'OVERSIZE_NOT_ANALYZED'])
+        self.assertFalse(inventory['distributionReady'])
+
+    def test_inventory_metadata_is_bounded_without_skipping_crc_verification(self):
+        self.archive(extra=[('assets/LICENSE.first', b'first'), ('assets/NOTICE.second', b'late-notice-payload')])
+        with patch.object(apk_verifier, 'MAX_INVENTORY_ITEMS', 1):
+            inventory = self.verify()['binaryNoticeInventory']
+            self.assertEqual(inventory['candidateCounts']['notices'], 2)
+            self.assertEqual(len(inventory['noticeCandidates']), 1)
+            self.assertTrue(inventory['metadataTruncated'])
+            self.apk.write_bytes(self.apk.read_bytes().replace(b'late-notice-payload', b'LATE-notice-payload', 1))
+            with self.assertRaisesRegex(ValueError, 'CRC'):
+                self.verify()
+
+    def test_absent_notice_candidates_and_extra_metadata_never_change_release_readiness(self):
+        self.archive()
+        inventory = self.verify()['binaryNoticeInventory']
+        self.assertEqual(inventory['noticeCandidates'], [])
+        self.assertEqual(inventory['candidateCounts']['notices'], 0)
+        self.assertEqual(inventory['licenseCompliance'], 'NOT_EVALUATED')
+        self.assertFalse(inventory['complete'])
+
     def test_duplicate_entries_and_unsafe_paths_are_rejected_without_extraction(self):
         for name in ['assets/index.android.bundle', '../escape', '/absolute', 'lib\\escape', 'C:/drive', 'a//b', 'a/./b']:
             with self.subTest(name=name):

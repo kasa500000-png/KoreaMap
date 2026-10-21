@@ -810,3 +810,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. 남은 작업: 직접 CSV·SHA·exact header·독립 기준점을 확보한 뒤 실제 validate/전용 PostGIS smoke가 필요하다. 실제 공공자료 통합은 BLOCKED/NOT_RUN이다.
 7. Git: `fix/bounded-official-poi-probes`; 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: bound official POI probe retries and cleanup$'`. 커밋/PR/main은 검사 후 실제 해시로 보고한다.
 8. 다음 단계: 보호 도구 통합과 독립 후속 작업 가능. 접근 실패를 우회하거나 실제 ETL 수락/릴리스 가능으로 처리하지 않는다. Android 실기기/iOS는 제외 범위를 유지한다.
+
+## 권장 후속 4 — 실제 Android APK 고지 후보 목록
+
+1. 구현: 기존 bounded ZIP raw CRC 검증 루프에 notice/native library/model 후보의 크기·SHA·본문 분류를 추가했다. 각 목록 256개, 본문 분류 64KiB 상한이며 cap 이후도 CRC를 검증한다. 원문은 출력하지 않고 Android build report에 inventory를 전달한다.
+2. 파일: `scripts/verify-native-apk.py`, `scripts/verify-native-android.mjs`, `tests/native-android-apk.test.py`, [실제 APK 조사](research/native-binary-notices.md), `THIRD_PARTY_NOTICES.md` 및 진행/로드맵/비용 문서. SDK·dependency·lockfile·CI 변경 없음.
+3. 검사: 담당 Python 13개 회귀와 root의 동일 파일 13개 회귀 통과. 실제 기존 APK는 SHA `219e48a5dd5030702420124ad953df65885613057448f9d5ca9ad6dce6de96b6`, 83,969,186 bytes·1,330 ZIP entry·Hermes/필수 MapLibre ELF·raw CRC PASS다. notice 후보 5개·native 19개·TFLite 3개를 확인했다. 루트 전체 `pnpm check`, `pnpm pack:check`와 실제 기존 APK 재검사를 통과했다. SDK tarball 5개 SHA는 기존과 동일하고 법적 적합성은 계속 미검증이다.
+4. 실화면 QA: 새 앱 build·실행·기기·에뮬레이터·iOS는 미실행이다. 기존 APK 바이트 재검사이며 사용자 notice 화면·OS network 수락으로 확대하지 않는다.
+5. 라이선스/보안: cached AAR의 실제 6개 entry SHA 일치만 확인했다. MLKit POM은 별도 약관을 선언하므로 SDK MIT로 덮지 않는다. inventory는 항상 complete:false, licenseCompliance:NOT_EVALUATED, distributionReady:false이며 payload PASS와 구분한다. 새 payload·본문·키·endpoint·외부 요청 없음.
+6. 남은 작업: 최종 APK variant의 완전한 resolved dependency graph·정확 버전 원문/고지·원저작권·bundle/source 의무 연결 및 실제 배포 notice 제공을 검증해야 한다. 법적 적합성은 UNKNOWN/BLOCKED다.
+7. Git: `test/native-binary-notice-inventory`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: inventory native APK notice and binary candidates$'`. 실제 커밋/PR/main은 검사 후 보고한다.
+8. 다음 단계: 검증 도구 및 자료 보존 개선은 통합 가능하다. 보안 high 2건·Web/RN 상위 선언·공공 CSV·실제 품질·플랫폼/외부 배포·발행 차단을 해제하지 않는다.
