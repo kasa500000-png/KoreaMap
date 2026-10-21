@@ -188,3 +188,5 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 권장 후속 4: [실제 APK 고지 후보 조사](research/native-binary-notices.md)는 기존 APK 5 notice/19 native/3 model의 bytes/SHA 목록을 추가했다. 목록 생성은 license approval이 아니며 최종 variant의 완전한 dependency graph·정확 라이선스/고지 연결은 계속 UNKNOWN/BLOCKED다. SDK npm payload와 개발 APK의 transitive 구성은 구분한다.
 
 권장 후속 5: [Native 새 캐시 재현성](research/native-consumer-cache.md)을 수정해 registry lock 준비와 frozen/offline 설치를 분리한다. 새 Runner의 metadata 누락을 상위 RN 선언 실패로 오분류하지 않고 실제 strict gate까지 실행한다. [권장 후속 실행 결과](research/recommended-execution.md)에 단계별 PR/commit/main 반영·통과·차단을 모았다.
+
+권장 후속 6: 병합 main의 Chromium 첫 화면 실패를 보존하고 [실제 클라이언트 부착 대기](research/browser-startup-synchronization.md)를 추가 검증한다. Next dynamic module 부착과 지도 ready 검사를 분리하되 기존 5초 ready·전체 테스트 상한·성능 gate는 유지한다. 실제 map-demo chunk 지연과 390/768/1440px·20회 생명주기 회귀를 사용하며 처음 CI 실패의 근본 원인을 단정하지 않는다.

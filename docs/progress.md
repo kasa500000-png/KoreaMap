@@ -829,6 +829,17 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 3. 검사: 담당 Native 회귀 10개 및 실제 빈 캐시 소비 검증 통과 범위를 확인했다. 공백/작은따옴표 TMPDIR의 실제 실행도 registry 준비·offline 설치·strict 앱·SDK Bundler/NodeNext·plugin·양 OS JS export PASS다. 전체 RN 선언은 동일한 TS2411/TS2344/TS2416으로 PARTIAL_PASS/exit1이다. root 비용 감사 회귀 22개 통과. 루트 전체 `pnpm check`·`pnpm pack:check` 통과 후 실제 새 캐시 소비 검증도 준비/설치·strict 앱/SDK·plugin·양 OS JS export PASS를 확인했다. 전체 종료는 기존 RN 3건만으로 PARTIAL_PASS/exit1이며 gate를 유지했다. SDK tarball 5개는 byte 동일하다.
 4. 실화면 QA: 이번 수정은 설치/검사 도구이며 앱 화면·새 APK/IPA·Android 실기기/iOS를 실행하지 않았다. Expo JS export는 Native 기기 검증이 아니다.
 5. 라이선스/보안: 기존 정확 버전/strict peers/최소 릴리스 경과시간/검토 graph/전체 선언 gate를 유지한다. 명시적 개발용 공식 npm metadata 준비를 SDK provider 요청이나 전체 offline 실행으로 표현하지 않는다. 감사 예외는 verifier/test 두 경로의 정확 registry 문자열만, SDK/다른 registry/query 거부 회귀를 유지한다. 키·기본 제작자 endpoint·유료 계정·새 payload 없음.
-6. 남은 작업: 새 Runner가 실제 RN 선언 gate에 도달하는지 수정 PR의 원격 로그로 재확인한다. 보안 high 2건·Web/RN 선언·공공 CSV·APK 법적 고지 등 공개 차단은 미해결이다.
+6. 남은 작업: PR32의 실제 새 Runner에서 RN 선언 gate에 도달했고 기존 TS2411/TS2344/TS2416만 남는 것을 확인했다. 보안 high 2건·Web/RN 선언·공공 CSV·APK 법적 고지 등 공개 차단은 미해결이다.
 7. Git: `fix/native-consumer-fresh-cache`, 통합 기준 main `a6e0923eca8cc79adeefbe44fc1ec53eddf63327`; 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: prepare Native consumer metadata before offline install$'`. 실제 commit/PR/main은 검사 후 보고한다.
 8. 다음 단계: 새 Runner 검증 도구의 안전한 수정/소스 통합은 가능하다. 전체 감사·공개 타입 수락 및 npm/Release 발행 가능으로 처리하지 않는다. 물리 Android/macOS iOS는 계속 제외 범위다.
+
+## 권장 후속 6 — 실제 지도 모듈의 부착과 준비 검사 분리
+
+1. 구현: 병합 뒤 main CI의 새 Chromium 390px 실패를 조사했다. Next 클라이언트 모듈 부착을 기존 테스트 상한 안에서 먼저 기다리고, 실제 지도 ready 검사의 기본 5초는 유지한다. 실제 map-demo chunk를 5초 이상 보류하는 회귀와 단계별 진단을 추가하며 원래 CI의 근본 원인은 로그만으로 확정하지 않는다.
+2. 파일: `tests/e2e-web/browser-lifecycle.spec.ts`, 새 `tests/e2e-web/map-startup.ts`, `tests/unit/browser-startup.test.ts`, [시작 동기화 기록](research/browser-startup-synchronization.md), 실행 결과/진행/로드맵/비용 문서. SDK·데모 runtime·dependency·lockfile·workflow는 그대로다.
+3. 검사: 최초 main CI39566617312는 Windows/macOS/Linux/Firefox/WebKit PASS, Chromium 첫 390px FAIL, 알려진 release gate 세 job FAIL이다. 작성 도중 존재하지 않는 TestInfo.startTime 참조로 로컬 5건이 실패한 뒤 공개 API만 사용하도록 수정했다. 수정본 독립 리뷰와 담당/루트 `pnpm check`가 통과했고 Vitest 193/193이다. 루트 `pnpm pack:check`·실제 Web 25/25·최종 Chromium lifecycle 5/5도 통과했다. SDK tarball 5개는 byte 동일하며 최종 staged 검사와 PR/main CI는 실제 원격 결과로 제공한다.
+4. 실화면 QA: 수정본 실제 Chromium에서 390/768/1440px의 한글·4테마·선택·줌·경로·오류복구 및 20회 생성/사용/종료가 통과했다. 루트 390px 캡처에서도 네 테마 한글·아이콘·출처를 직접 확인했다. 실제 chunk를 5008ms 보류한 검사는 이전 assertion 실패와 새 helper의 실제 지도 ready를 확인했다. 별도 never-mount 음성 탐침은 3000ms 전체 테스트가 3032ms에 의도대로 timeout됐으며 제품 QA 통과로 세지 않았다. 이 시각들은 성능 수락값이 아니다. Android 실기기/iOS는 제외 범위다.
+5. 라이선스/보안: 자체 검사 코드이며 새 원본·폰트·키·제작자 endpoint·과금 계정·유료 CI 없음. 기존 loopback 요청 제한을 유지하며 지연하는 URL도 실제 로컬 빌드에서 식별한다. 재시도·skip·ready/성능 기준 완화 없이 알려진 차단을 유지한다.
+6. 남은 작업: 수정 PR와 병합 main CI를 확인한다. 보안 high 2건·Web/RN 선언·실제 CSV/독립 정답·APK 고지·1000마커 p95 목표·전국 자료·Native 실행·발행 조건은 별개 미완료다.
+7. Git: 통합 브랜치 `test/browser-client-startup`, 기준 main `c32ffb26e72f77fd1e890eda0a1e0cba158cd796`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: synchronize actual map client startup before readiness$'`. 실제 commit/PR/main은 검사 후 사용자 보고와 원격 이력으로 제공한다.
+8. 다음 단계: 검사 통과 범위의 소스 프리뷰 개선은 통합 가능하다. 실제 서비스 배포·npm·tag·Release와 전체 품질 수락은 완료 처리하지 않는다.

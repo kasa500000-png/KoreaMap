@@ -482,3 +482,7 @@ SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 o
 새 Runner의 public software metadata 누락으로 strict 검사가 실행되지 않는 문제를 수정했다. verifier는 consumer 전용 빈 cache에서 공식 npm registry를 명시해 lock을 준비한 뒤 `--offline --frozen-lockfile --ignore-scripts`로 설치한다. 준비 단계와 offline 설치를 별도로 기록하고 전체 흐름이 offline이라고 주장하지 않는다. SDK import/설치 시 제작자 Provider에 연결하거나 새 package/version을 채택하는 변경이 아니다.
 
 `REGISTRY_METADATA_URLS`는 `scripts/verify-native-consumer.mjs`와 해당 회귀 파일의 정확한 공식 registry 문자열만 검토한다. SDK 재사용·다른 registry/path/query는 계속 차단하고 자격증명 검사는 독립 유지한다. 비용 회귀는 22개 통과했다. CLI는 원래 검토된 패키지 graph·tarball·strict 선언·hook 금지·기존 uuid override와 최소 릴리스 경과시간을 유지한다. 공백/작은따옴표/Windows 경로 직렬화도 보호한다. 과금 서비스·키·Provider·외부 배포/CI 권한은 추가하지 않았으며 보안 high 2건과 Web/RN 전체 선언 실패는 발행 차단이다.
+
+## 2026-10-21 — 실제 브라우저 모듈 시작 동기화
+
+private Playwright 검사에서 Next dynamic module의 실제 부착과 지도 ready를 분리한다. 로컬 build manifest에서 식별한 map-demo chunk만 loopback에서 보류하는 회귀를 추가하며 기존 외부 요청 차단을 유지한다. 명시적 navigation 상한과 기존 테스트 상한은 유지하고 ready 기본 5초·성능 gate·CI 권한은 완화하지 않는다. 단계별 진단은 민감 위치·원문·인증정보를 포함하지 않는다. SDK·예제 runtime·Provider·dependency·npm payload·외부 호스팅·요금 경로는 바뀌지 않는다. 실제 main의 새 실패와 작성 중 helper 오류를 보존하고 수정 뒤 실행을 별도로 기록한다. 기존 high 2건·공개 타입·데이터·라이선스·발행 차단은 해제하지 않는다.
