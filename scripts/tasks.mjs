@@ -1,7 +1,8 @@
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdirSync, rmSync } from 'node:fs';
+import { cpSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cleanBuildOutputs } from './clean-build-outputs.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const sdkNames = ['core', 'web', 'native', 'styles', 'data-adapters'];
 function pnpm(...args) {
@@ -54,6 +55,7 @@ else if (task === 'check') {
     'check:docs',
     'audit:cost',
     'test:audit',
+    'test:clean',
     'test:release',
     'test:tiles',
     'test:real-poi',
@@ -71,16 +73,5 @@ else if (task === 'check') {
   sdk();
   pnpm('--filter', `@korea-map-kit/example-${task === 'dev-web' ? 'web' : 'expo'}`, 'dev');
 } else if (task === 'clean') {
-  for (const path of [
-    ...sdkNames.map((name) => `packages/${name}/dist`),
-    ...['geo-data', 'search', 'routing', 'tiles'].map((name) => `services/${name}/dist`),
-    'examples/web/.next',
-    'examples/web/out',
-    'examples/web/tsconfig.tsbuildinfo',
-    'examples/expo/dist',
-    'artifacts',
-    'test-results',
-    'playwright-report',
-  ])
-    rmSync(resolve(root, path), { recursive: true, force: true });
+  cleanBuildOutputs(root);
 } else throw new Error('Unknown task');

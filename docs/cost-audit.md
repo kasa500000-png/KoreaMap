@@ -458,3 +458,7 @@ SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 o
 실제Nextpolyfill3버전의공식tarball SRI·LICENSE SHA와 MapLibre main/worker sourcemap의17개런타임정확버전/고지를검토해31notice를함께보존한다. 기존SDK MIT·MapLibre BSD·의존성권리를분리하고지도/폰트/이미지/타일/개인자료를배포하지않는다. sourceDirty=true candidate는최종clean릴리스근거가아니며최종main에서다시생성해해당SHA를기록한다. 5npm tarball재현/격리소비의부분성공은Web/RN전체선언실패를해제하지않는다. actualaudit high2/critical0·exit1을유지한다.
 
 배포대상응답이없어실제외부배포NOT_RUN이다. GitHubPages조회404는활성사이트/설정권한으로간주하지않았다. origin root전용site를후속운영자가선택한호스트에올릴때HTTPS·MIME·nosniff/CSP·캐시·권한/쿼터/비용을검증해야한다. GitHub main소스통합은외부배포가아니며npm·tag·Release·visibility·서버설정을변경하지않았다.
+
+## 2026-10-21 — 정리 명령의 운영자 자료 보존
+
+`pnpm clean`에서 `artifacts/` 전체 삭제를 제거했다. 운영자 타일·DB 설정·검증 기록·패키지·별도 worktree는 유지하며 명시한 SDK/service/example 생성물과 임시 브라우저 결과만 삭제한다. 모든 대상의 링크·junction 경로를 먼저 검사한다. 동시 파일시스템 변조에 대한 OS 격리를 주장하지 않는다. 새 외부 요청·의존성·키·유료 서비스·워크플로 권한은 없다. 합성 파일로 실제 정리 entrypoint와 거부 시 보존을 검증하며 실제 운영자 자료를 삭제하는 시험은 하지 않는다. 기존 보안·타입·공개 발행 차단은 유지한다.

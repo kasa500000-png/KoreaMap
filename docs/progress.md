@@ -773,3 +773,16 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. **차단:** high2·Web/RN상위선언·p95 116.6ms>33ms·실제POI/정답·해안선/전국·Native실행·발행계정/보호환경이남는다. 배포대상미지정으로실제외부배포NOT_RUN, 현재정적배포물은origin root전용이며repository subpath는별도검증이필요하다.
 7. **Git:** 09 PR26/commitc2271334a62aa162e5aba29ab6366abecafe00ed/mergeeee4b2c3a4fa744aa2c06243a1ffda93ba816a66. 10브랜치 chore/stage-10-deployment, commit조회 `git log -1 --format='%H %s' --grep='^chore: prepare verified fixture deployment$'`. 최종 PR/merge는 사용자완료보고와원격기록으로제공한다.
 8. **다음:** 검증된preview소스와로컬정적산출물은검토/후속개발가능하다. 실제서비스배포·npm·tag·GitHub Release 및전체품질수락은미완료이며실패/미검증을통과로바꾸지않는다.
+
+## 권장 후속 1 — 정리 명령의 운영자 자료 보존
+
+기준: 2026-10-21 UTC, main `ce8e8e1ad797f9a0780d6bc5e782b66505c7ab23`. 사용자의 권장 방안 진행 지시 및 기존 단계별 commit/PR/main 반영 승인을 따른다.
+
+1. 구현: `pnpm clean`이 운영자 저장소까지 삭제하던 문제를 수정했다. 고정된 빌드 출력만 정리하고 모든 대상의 링크/junction 경로를 삭제 전에 검사한다.
+2. 파일: `scripts/clean-build-outputs.mjs`, `scripts/tasks.mjs`, `tests/clean.test.mjs`, root `package.json`, `CONTRIBUTING.md` 및 진행/로드맵/비용 감사 문서. SDK·lockfile 변경 없음.
+3. 검사: 실제 정리 task를 합성 임시 workspace에서 두 번 실행해 빌드 출력 삭제, 원본·타일·설정·APK·tarball·QA 기록·worktree 보존을 확인했다. 링크 조상/출력 거부와 canonical root 별칭 포함 3개 통과. 최초 ESLint unused import 1건을 제거한 뒤 재검사 통과. 전체 `pnpm check` 통과: Vitest 188개, 새 정리 3개, strict·lint·출처·문서·Next build·양 OS Expo JS export와 기존 정책 회귀를 확인했다. 이는 별도 full audit/상위 선언 실패를 해소하지 않는다. `pnpm pack:check`와 `pnpm check:data --staged`도 통과했고 SDK tarball 5개 SHA는 기존과 동일하다.
+4. 실화면 QA: CLI 정리 수정이므로 이번 단계에서 Web/Android/iOS 화면 검사를 실행하지 않았다. 기존 화면 통과를 새 결과로 재사용하지 않는다.
+5. 라이선스/보안: 자체 MIT 코드, 새 데이터·의존성·키·외부 endpoint 없음. 검사 전후 동시 경로 변경에 대한 OS 격리 보장은 아니다. high 2건 및 상위 공개 선언 실패는 별도 차단이다.
+6. 남은 작업: 공식 보안 수정 경로·공개 선언 호환성·공공 CSV 접근 조사, 수정 커밋의 원격 CI 확인.
+7. Git: `fix/clean-preserve-operator-data`, 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: preserve operator data during workspace cleanup$'`. 실제 해시/PR/main 결과는 커밋 후 보고한다.
+8. 다음 단계: 이 수정의 검증/PR 통합과 독립 후속 조사는 가능하다. npm/Release 발행 수락은 차단 상태다.
