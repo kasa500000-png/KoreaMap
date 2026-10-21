@@ -19,6 +19,7 @@
     "format:check": "prettier --check .",
     "check": "node scripts/tasks.mjs check",
     "clean": "node scripts/tasks.mjs clean",
+    "test:clean": "node --test tests/clean.test.mjs",
     "dev:web": "node scripts/tasks.mjs dev-web",
     "dev:expo": "node scripts/tasks.mjs dev-expo",
     "test:web": "playwright test",
