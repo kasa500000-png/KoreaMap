@@ -182,3 +182,5 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 2026-10-21: `pnpm clean`이 빌드 출력 외에 운영자 저장소 `artifacts/` 전체를 삭제하는 문제를 수정했다. 명시한 생성 경로만 정리하고 링크 경로를 사전 거부한다. 실제 task를 실행하는 보존·반복 실행·링크 회귀를 CI 기본 검사에 연결한다. 보안 high 2건, Web/RN 상위 선언 오류, 실제 공공 CSV 확보는 독립 조사 중이며 이 정리 수정으로 완료 처리하지 않는다.
 
 2026-10-21 권장 후속 2: [Web 레이어 타입 계약](research/web-declaration-compatibility.md)을 실제 독립 tarball 소비 검사에 추가했다. [Native TS6/TS7 비교](research/native-types-followup.md)와 [공식 보안 수정 재조사](research/security-followup.md)에서도 안전한 수정 릴리스를 확인하지 못했다. full Web NodeNext/RN 선언과 high 2건은 계속 차단이며 검사 완화·임의 patch·API 축소로 완료 처리하지 않는다.
+
+권장 후속 3: [공식 POI 접근 검사](research/recommended-poi-acquisition.md)에 명시적 1회 재시도·취소/deadline·스트림 정리 실패 차단·MIME 분류를 추가한다. 원본 직접 URL/CSV는 여전히 확보하지 못해 실제 적재·검색 수락은 BLOCKED/NOT_RUN이며 합성 보호 회귀와 구분한다.

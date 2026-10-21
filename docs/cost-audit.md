@@ -466,3 +466,9 @@ SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 o
 ## 2026-10-21 — 공개 타입 계약 및 보안 재조사
 
 격리된 실제 Web tarball의 사용자 정의 레이어 계약을 strict/skipLibCheck:false로 검사한다. 기존 metadata 준비 이후 offline install, SSR 및 loopback Chromium smoke를 유지한다. SDK/Provider/의존성 버전·실행 endpoint·설치 hook·발행 workflow는 바꾸지 않는다. 공식 자료 재조회와 선택형 조사 compiler는 개발 조사 범위이며 SDK 기본 요청에 포함되지 않는다. 새 레이어 계약 성공은 Web NodeNext TS2834·RN 선언 세 오류·full audit high 2건을 해제하지 않는다. 근거는 [Web](research/web-declaration-compatibility.md), [Native](research/native-types-followup.md), [보안](research/security-followup.md)에 구분했다.
+
+## 2026-10-21 — 공식 공공 POI 접근 검사
+
+기본 SDK 요청 없이 운영자가 private probe를 명시적으로 실행할 때만 기존 A 3개 공식 상세 URL을 조회한다. 기본 3회, `--retry-once`도 최대 6회이며 429/502/503/504·유효한 5초 이하 Retry-After만 재시도한다. 401/403·redirect·timeout·network/본문 정리 실패는 중단한다. 기본 metadata 검사와 원본 다운로드/저장·실제 ETL을 구분한다. 응답 본문·원시 MIME/Retry-After·오류·키를 기록하지 않으며 고정 MIME/사유만 보존한다. 실제503 원본 미확보를 성공으로 바꾸지 않는다. Provider·데이터 등급·SDK·제작자 계정·유료 경로는 추가하지 않았다.
+
+통합 첫 감사는 새 세 고정 URL을 미검토 실행 주소로 차단했다. 세 주소는 기존 A 원장의 개별 공식 상세 페이지이며, `scripts/verify-real-poi.mjs`의 명시적 metadata probe에서만 쓰이는 것을 코드/호출 경로로 검토했다. `OPERATOR_PROBE_URLS`는 해당 파일과 정확한 세 문자열에만 적용한다. 같은 주소를 SDK에 넣거나 query/다른 자료 번호로 바꾸면 계속 거부하는 black-box 회귀를 추가했다. 도메인 전체 허용·공공데이터 등급 변경·SDK 기본 endpoint 허용은 아니다.

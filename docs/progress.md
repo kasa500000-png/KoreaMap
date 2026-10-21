@@ -799,3 +799,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. 남은 작업: MapLibre의 확장자 누락 선언, RN 생성 선언 세 오류, forge/braces 공식 수정 및 지원 조합 확인이 필요하다. 세 차단 모두 미해결이다.
 7. Git: `test/recommended-public-contracts`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: verify strict public layer contracts and refresh blockers$'`. 커밋/PR/main 결과는 실제 실행 후 보고한다.
 8. 다음 단계: 검증 도구의 회귀 방지 변경과 문서 통합은 가능하다. 공개 타입·보안 해결 완료나 npm/Release 발행 가능 상태로 처리하지 않는다.
+
+## 권장 후속 3 — 공식 공공 POI 접근 검사 보호
+
+1. 구현: 공식 A 원장 자료의 상세 페이지에 명시적 `probe --retry-once`를 제공한다. 기본은 각 1회, opt-in도 세 고정 URL 총 6회 이하·5초 backoff 상한이다. Retry-After·취소·25초 deadline을 유지하고 응답 스트림 정리 실패/정체에서 재시도하지 않는다. 원문 헤더 대신 고정 MIME 분류만 출력한다.
+2. 파일: `scripts/verify-real-poi.mjs`, `tests/real-poi.test.mjs`, 비용 감사기/회귀 2파일, [원본 확보 조사](research/recommended-poi-acquisition.md), 진행/로드맵/비용 문서. 원장·Provider·DB/ETL/검색 SQL·SDK·lockfile은 그대로다.
+3. 검사: 담당 회귀 14개 PASS. 리뷰에서 무기한 body.cancel·원시 MIME 노출·정리 reject 후 재시도 문제를 발견해 수정하고 실제 ReadableStream throw/reject/stall·취소 회귀를 추가했다. 실제 포털 검사 6요청은 모두 HTTP503/exit1이었으며 원본 취득 성공이 아니다. 첫 통합 `pnpm check`는 새 고정 URL 3개를 미검토 실행 주소로 차단했다. private metadata probe의 명시적 실행·정확한 세 URL·무인증·무본문·상한을 개별 검토한 뒤 해당 파일에만 적용하는 감사 항목을 추가했다. SDK 경로·다른 주소/query 거부 회귀를 포함한 비용 검사 21개 및 POI 14개 통과 후 전체 `pnpm check` 재실행과 `pnpm pack:check`를 통과했다. SDK tarball 5개는 byte 동일하다.
+4. 실화면 QA: 지도/시설 마커/실제 검색 화면은 미실행이다. 상세 페이지 metadata 접근을 지도 QA로 간주하지 않는다.
+5. 라이선스/보안: 기존 A 3개 상세 주소만 허용하고 redirect·인증 실패·network 오류는 재시도하지 않는다. 원본·본문·좌표·키·원시 오류를 Git/npm에 넣지 않는다. 기본 SDK 설치/테스트 요청·제작자 endpoint·과금 경로 추가 없음.
+6. 남은 작업: 직접 CSV·SHA·exact header·독립 기준점을 확보한 뒤 실제 validate/전용 PostGIS smoke가 필요하다. 실제 공공자료 통합은 BLOCKED/NOT_RUN이다.
+7. Git: `fix/bounded-official-poi-probes`; 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: bound official POI probe retries and cleanup$'`. 커밋/PR/main은 검사 후 실제 해시로 보고한다.
+8. 다음 단계: 보호 도구 통합과 독립 후속 작업 가능. 접근 실패를 우회하거나 실제 ETL 수락/릴리스 가능으로 처리하지 않는다. Android 실기기/iOS는 제외 범위를 유지한다.

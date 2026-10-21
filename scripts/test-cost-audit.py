@@ -91,6 +91,23 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit()
         self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
 
+    def test_official_poi_probe_review_is_exact_private_and_not_a_sdk_provider(self):
+        base = "https" + "://www.data.go.kr/data/"
+        for source_id in ["3077854", "15045050", "15088391"]:
+            url = base + source_id + "/fileData.do"
+            self.write("packages/core/src/remote.ts", '')
+            self.write("scripts/verify-real-poi.mjs", 'const url = "' + url + '";\n')
+            process, _, _ = self.run_audit()
+            self.assertEqual(process.returncode, 0)
+            self.write("packages/core/src/remote.ts", 'const url = "' + url + '";\n')
+            _, _, rules = self.run_audit()
+            self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+            self.write("packages/core/src/remote.ts", '')
+            for unreviewed in [url + '?limit=1', base + "99999999/fileData.do"]:
+                self.write("scripts/verify-real-poi.mjs", 'const url = "' + unreviewed + '";\n')
+                _, _, rules = self.run_audit()
+                self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+
     def test_attribution_anchor_exception_cannot_enable_a_sdk_endpoint(self):
         url = "https" + "://www.openstreetmap.org/copyright"
         self.write("services/tiles/src/config.ts", '<a href="' + url + '">OSM</a>')

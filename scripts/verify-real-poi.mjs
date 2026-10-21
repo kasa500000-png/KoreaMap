@@ -5,6 +5,7 @@ import { mkdir, lstat, readFile, realpath, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TextDecoder } from 'node:util';
+import { setTimeout as delay } from 'node:timers/promises';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const storage = resolve(root, 'artifacts/real-poi');
@@ -13,6 +14,11 @@ const profiles = new Map([
   ['yongsan-parking', { category: 'parking', srid: 4326 }],
   ['mois-animal-hospitals', { category: 'pet_facility', srid: 5174 }],
   ['bukgu-walking', { category: 'trail', srid: null }],
+]);
+const officialPages = new Map([
+  ['yongsan-parking', 'https://www.data.go.kr/data/3077854/fileData.do'],
+  ['mois-animal-hospitals', 'https://www.data.go.kr/data/15045050/fileData.do'],
+  ['bukgu-walking', 'https://www.data.go.kr/data/15088391/fileData.do'],
 ]);
 const serviceRequire = createRequire(new URL('../services/geo-data/package.json', import.meta.url));
 
@@ -285,47 +291,177 @@ async function smoke(input) {
   }
 }
 
-async function probe() {
+function retryDelay(header, now) {
+  if (header === null) return { milliseconds: 1000, reason: 'retry-scheduled' };
+  const value = header.trim();
+  let milliseconds;
+  if (/^\d+$/.test(value)) milliseconds = Number(value) * 1000;
+  else {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime()) || date.toUTCString() !== value)
+      return { milliseconds: null, reason: 'retry-after-invalid' };
+    milliseconds = Math.max(0, date.getTime() - now.getTime());
+  }
+  if (!Number.isFinite(milliseconds) || milliseconds > 5000)
+    return { milliseconds: null, reason: 'retry-after-over-budget' };
+  return { milliseconds: Math.max(1000, milliseconds), reason: 'retry-scheduled' };
+}
+
+function classifyProbeMime(header) {
+  const value = (header ?? '').split(';')[0].trim().toLowerCase();
+  return [
+    'text/html',
+    'text/plain',
+    'application/xhtml+xml',
+    'application/json',
+    'application/xml',
+    'text/xml',
+    'text/csv',
+    'application/octet-stream',
+  ].includes(value)
+    ? value
+    : 'UNKNOWN';
+}
+
+async function cancelProbeBody(body, signal) {
+  if (!body) return 'completed';
+  let onAbort;
+  const aborted = new Promise((resolveAbort) => {
+    onAbort = () => resolveAbort('cancelled');
+    if (signal.aborted) onAbort();
+    else signal.addEventListener('abort', onAbort, { once: true });
+  });
+  try {
+    return await Promise.race([
+      Promise.resolve()
+        .then(() => body.cancel())
+        .then(
+          () => 'completed',
+          () => 'failed',
+        ),
+      aborted,
+    ]);
+  } finally {
+    signal.removeEventListener('abort', onAbort);
+  }
+}
+
+/** Metadata only, with at most one explicitly requested retry; no response bodies are read. */
+export async function probeOfficialSourcePage(
+  source,
+  {
+    retryOnce = false,
+    fetcher = globalThis.fetch,
+    signal,
+    now = () => new Date(),
+    wait = (milliseconds, options) => delay(milliseconds, undefined, options),
+  } = {},
+) {
+  check(officialPages.get(source.id) === source.sourceUrl, 'EXACT_OFFICIAL_POI_PAGE_REQUIRED');
+  check(typeof retryOnce === 'boolean', 'EXPLICIT_RETRY_BOOLEAN_REQUIRED');
+  const attempts = [];
+  const report = {
+    source: source.id,
+    sourcePageUrl: source.sourceUrl,
+    checkedAt: now().toISOString(),
+    status: null,
+    contentType: null,
+    result: 'cancelled',
+    retryOnce,
+    attempts,
+  };
+  const limit = retryOnce ? 2 : 1;
+  for (let attempt = 1; attempt <= limit; attempt++) {
+    if (signal?.aborted) return report;
+    const controller = new globalThis.AbortController();
+    const timer = globalThis.setTimeout(() => controller.abort(), 25000);
+    const attemptSignal = signal
+      ? globalThis.AbortSignal.any([signal, controller.signal])
+      : controller.signal;
+    let response;
+    let cleanupOutcome;
+    const observation = {
+      attempt,
+      checkedAt: now().toISOString(),
+      status: null,
+      contentType: null,
+      result: 'network-timeout-or-redirect-error',
+      retryDecision: 'not-retriable',
+    };
+    let pause;
+    try {
+      response = await fetcher(source.sourceUrl, {
+        redirect: 'error',
+        credentials: 'omit',
+        signal: attemptSignal,
+        headers: { Accept: 'text/html' },
+      });
+      observation.status = response.status;
+      observation.contentType = classifyProbeMime(response.headers.get('content-type'));
+      observation.result = response.ok ? 'page-only-not-original-csv' : 'http-error';
+      if (!retryOnce) observation.retryDecision = 'not-requested';
+      else if (![429, 502, 503, 504].includes(response.status))
+        observation.retryDecision = 'not-retriable';
+      else if (attempt === limit) observation.retryDecision = 'retry-limit-reached';
+      else {
+        pause = retryDelay(response.headers.get('retry-after'), now());
+        observation.retryDecision = pause.reason;
+        if (pause.milliseconds !== null) observation.retryDelayMs = pause.milliseconds;
+      }
+    } catch {
+      if (signal?.aborted) observation.result = 'cancelled';
+    } finally {
+      try {
+        cleanupOutcome = await cancelProbeBody(response?.body, attemptSignal);
+      } finally {
+        globalThis.clearTimeout(timer);
+      }
+    }
+    if (attemptSignal.aborted) {
+      observation.result = signal?.aborted ? 'cancelled' : 'network-timeout-or-redirect-error';
+      observation.retryDecision = 'not-retriable';
+      pause = undefined;
+    } else if (cleanupOutcome === 'failed') {
+      observation.result = 'body-cleanup-failed';
+      observation.retryDecision = 'not-retriable';
+      pause = undefined;
+    }
+    attempts.push(observation);
+    Object.assign(report, {
+      checkedAt: observation.checkedAt,
+      status: observation.status,
+      contentType: observation.contentType,
+      result: signal?.aborted ? 'cancelled' : observation.result,
+    });
+    if (signal?.aborted || pause?.milliseconds === null || !pause) return report;
+    try {
+      await wait(pause.milliseconds, { signal });
+    } catch {
+      report.result = signal?.aborted ? 'cancelled' : 'retry-wait-failed';
+      return report;
+    }
+  }
+  return report;
+}
+
+async function probe(retryOnce) {
   const catalog = JSON.parse(await readFile(resolve(root, 'data/sources.json'), 'utf8'));
   const { admitSource } = await import('../services/geo-data/dist/index.js');
   const results = [];
   for (const id of profiles.keys()) {
     const source = admitSource(catalog, id, true);
-    const controller = new globalThis.AbortController();
-    const timer = globalThis.setTimeout(() => controller.abort(), 25000);
-    try {
-      const response = await globalThis.fetch(source.sourceUrl, {
-        redirect: 'error',
-        credentials: 'omit',
-        signal: controller.signal,
-        headers: { Accept: 'text/html' },
-      });
-      results.push({
-        source: id,
-        sourcePageUrl: source.sourceUrl,
-        checkedAt: new Date().toISOString(),
-        status: response.status,
-        contentType: response.headers.get('content-type'),
-        result: response.ok ? 'page-only-not-original-csv' : 'http-error',
-      });
-      await response.body?.cancel();
-    } catch {
-      results.push({
-        source: id,
-        sourcePageUrl: source.sourceUrl,
-        checkedAt: new Date().toISOString(),
-        status: null,
-        result: 'network-timeout-or-redirect-error',
-      });
-    } finally {
-      globalThis.clearTimeout(timer);
-    }
+    results.push(await probeOfficialSourcePage(source, { retryOnce }));
   }
   await writeFile(resolve(storage, 'portal-probe.json'), `${JSON.stringify(results, null, 2)}\n`, {
     mode: 0o600,
   });
   console.log(JSON.stringify({ status: 'probed-official-pages-only', results }));
-  if (results.some((result) => result.status !== 200)) process.exitCode = 1;
+  if (
+    results.some(
+      (result) => result.status !== 200 || result.result !== 'page-only-not-original-csv',
+    )
+  )
+    process.exitCode = 1;
 }
 
 export async function main(args = process.argv.slice(2)) {
@@ -335,11 +471,11 @@ export async function main(args = process.argv.slice(2)) {
     'USE_PROBE_OR_VALIDATE_SMOKE_CONFIG_PATH',
   );
   check(
-    command === 'probe' ? !configPath : Boolean(configPath),
+    command === 'probe' ? !configPath || configPath === '--retry-once' : Boolean(configPath),
     'CONFIG_PATH_REQUIRED_FOR_FILE_VERIFICATION',
   );
   await mkdir(storage, { recursive: true, mode: 0o700 });
-  if (command === 'probe') return probe();
+  if (command === 'probe') return probe(configPath === '--retry-once');
   const output = resolve(storage, 'verification.json');
   const attempt = { checkedAt: new Date().toISOString(), command, status: 'running' };
   await writeFile(output, `${JSON.stringify(attempt, null, 2)}\n`, { mode: 0o600 });
