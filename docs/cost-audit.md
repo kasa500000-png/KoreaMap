@@ -462,3 +462,7 @@ SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 o
 ## 2026-10-21 — 정리 명령의 운영자 자료 보존
 
 `pnpm clean`에서 `artifacts/` 전체 삭제를 제거했다. 운영자 타일·DB 설정·검증 기록·패키지·별도 worktree는 유지하며 명시한 SDK/service/example 생성물과 임시 브라우저 결과만 삭제한다. 모든 대상의 링크·junction 경로를 먼저 검사한다. 동시 파일시스템 변조에 대한 OS 격리를 주장하지 않는다. 새 외부 요청·의존성·키·유료 서비스·워크플로 권한은 없다. 합성 파일로 실제 정리 entrypoint와 거부 시 보존을 검증하며 실제 운영자 자료를 삭제하는 시험은 하지 않는다. 기존 보안·타입·공개 발행 차단은 유지한다.
+
+## 2026-10-21 — 공개 타입 계약 및 보안 재조사
+
+격리된 실제 Web tarball의 사용자 정의 레이어 계약을 strict/skipLibCheck:false로 검사한다. 기존 metadata 준비 이후 offline install, SSR 및 loopback Chromium smoke를 유지한다. SDK/Provider/의존성 버전·실행 endpoint·설치 hook·발행 workflow는 바꾸지 않는다. 공식 자료 재조회와 선택형 조사 compiler는 개발 조사 범위이며 SDK 기본 요청에 포함되지 않는다. 새 레이어 계약 성공은 Web NodeNext TS2834·RN 선언 세 오류·full audit high 2건을 해제하지 않는다. 근거는 [Web](research/web-declaration-compatibility.md), [Native](research/native-types-followup.md), [보안](research/security-followup.md)에 구분했다.
