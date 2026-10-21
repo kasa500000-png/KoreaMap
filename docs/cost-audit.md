@@ -486,3 +486,7 @@ SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 o
 ## 2026-10-21 — 실제 브라우저 모듈 시작 동기화
 
 private Playwright 검사에서 Next dynamic module의 실제 부착과 지도 ready를 분리한다. 로컬 build manifest에서 식별한 map-demo chunk만 loopback에서 보류하는 회귀를 추가하며 기존 외부 요청 차단을 유지한다. 명시적 navigation 상한과 기존 테스트 상한은 유지하고 ready 기본 5초·성능 gate·CI 권한은 완화하지 않는다. 단계별 진단은 민감 위치·원문·인증정보를 포함하지 않는다. SDK·예제 runtime·Provider·dependency·npm payload·외부 호스팅·요금 경로는 바뀌지 않는다. 실제 main의 새 실패와 작성 중 helper 오류를 보존하고 수정 뒤 실행을 별도로 기록한다. 기존 high 2건·공개 타입·데이터·라이선스·발행 차단은 해제하지 않는다.
+
+## 2026-10-21 — 전체 초기화 기능 상한과 실패 진단
+
+후속 7은 위의 기본 5초 assertion 정책을 기존 문서의 전체 10초 기능 상한으로 대체한다. navigation·실제 부착·ready·초기 100마커가 하나의 상한을 공유하며 SDK·실제 성능 gate는 바꾸지 않는다. 제한된 합성 상태/단계/경과시간 진단과 로컬 Worker 보류·실패 회귀만 추가한다. 실제 오류를 재시도·reload로 숨기지 않는다. 조사용 공식 Playwright browser는 명시적 개발 명령으로 ignored 저장소에만 준비했으며 SDK 설치/실행의 다운로드나 유료 서비스 요구로 추가하지 않았다. 기존 검증된 authenticated Xvfb·TCP 차단을 사용한다. 원문·키·개인정보·실제 지도/폰트 payload·제작자 Provider·새 CI 권한·배포/발행 경로는 추가하지 않는다. 원래 CI 지연의 근본 원인은 미확정이며 기능 상한 통과를 실제 성능/Native/릴리스 수락으로 표현하지 않는다.

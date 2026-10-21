@@ -840,6 +840,17 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 3. 검사: 최초 main CI39566617312는 Windows/macOS/Linux/Firefox/WebKit PASS, Chromium 첫 390px FAIL, 알려진 release gate 세 job FAIL이다. 작성 도중 존재하지 않는 TestInfo.startTime 참조로 로컬 5건이 실패한 뒤 공개 API만 사용하도록 수정했다. 수정본 독립 리뷰와 담당/루트 `pnpm check`가 통과했고 Vitest 193/193이다. 루트 `pnpm pack:check`·실제 Web 25/25·최종 Chromium lifecycle 5/5도 통과했다. SDK tarball 5개는 byte 동일하며 최종 staged 검사와 PR/main CI는 실제 원격 결과로 제공한다.
 4. 실화면 QA: 수정본 실제 Chromium에서 390/768/1440px의 한글·4테마·선택·줌·경로·오류복구 및 20회 생성/사용/종료가 통과했다. 루트 390px 캡처에서도 네 테마 한글·아이콘·출처를 직접 확인했다. 실제 chunk를 5008ms 보류한 검사는 이전 assertion 실패와 새 helper의 실제 지도 ready를 확인했다. 별도 never-mount 음성 탐침은 3000ms 전체 테스트가 3032ms에 의도대로 timeout됐으며 제품 QA 통과로 세지 않았다. 이 시각들은 성능 수락값이 아니다. Android 실기기/iOS는 제외 범위다.
 5. 라이선스/보안: 자체 검사 코드이며 새 원본·폰트·키·제작자 endpoint·과금 계정·유료 CI 없음. 기존 loopback 요청 제한을 유지하며 지연하는 URL도 실제 로컬 빌드에서 식별한다. 재시도·skip·ready/성능 기준 완화 없이 알려진 차단을 유지한다.
-6. 남은 작업: 수정 PR와 병합 main CI를 확인한다. 보안 high 2건·Web/RN 선언·실제 CSV/독립 정답·APK 고지·1000마커 p95 목표·전국 자료·Native 실행·발행 조건은 별개 미완료다.
+6. 남은 작업: PR33 기능 CI 6개 PASS 뒤 main CI39569788795는 Chromium 첫 390px에서 부착 뒤 5초 loading으로 FAIL이었다. 나머지 네 lifecycle와 OS 3종/Firefox/WebKit은 PASS다. 이 새 실패는 후속 7에서 별도 조사하며 완료로 표시하지 않는다. 보안 high 2건·Web/RN 선언·실제 CSV/독립 정답·APK 고지·1000마커 p95 목표·전국 자료·Native 실행·발행 조건은 별개 미완료다.
 7. Git: 통합 브랜치 `test/browser-client-startup`, 기준 main `c32ffb26e72f77fd1e890eda0a1e0cba158cd796`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: synchronize actual map client startup before readiness$'`. 실제 commit/PR/main은 검사 후 사용자 보고와 원격 이력으로 제공한다.
 8. 다음 단계: 검사 통과 범위의 소스 프리뷰 개선은 통합 가능하다. 실제 서비스 배포·npm·tag·Release와 전체 품질 수락은 완료 처리하지 않는다.
+
+## 권장 후속 7 — 기존 전체 초기화 상한과 실패 진단
+
+1. 구현: 후속 6의 병합 main에서 부착된 지도도 5초 loading으로 실패해 기준을 재검토했다. 기존 합성 기능 계약인 navigation→ready→실제 초기 100마커 전체 10초 미만을 명시적으로 검사한다. 기본 5초 assertion 정책을 대체하고 error/destroyed는 즉시 실패시킨다. 단계/최종 상태/기존 부착 뒤 5초 비교를 성공·실패 모두 제한된 진단으로 남긴다. SDK·실제 성능 목표는 바꾸지 않았다.
+2. 파일: 같은 private E2E/helper/unit 3파일, [전체 초기화 기록](research/browser-startup-budget.md), 이전 실행 기록과 통합 결과/진행/로드맵/비용 문서. SDK·예제 runtime·dependency·lockfile·workflow·npm payload 변경 없음.
+3. 검사: 담당 실제 공식 Chromium 156.0.8078.4 headed 6/6 PASS(51.4초), strict/lint 및 독립 부정 회귀 15/15 PASS다. 담당/루트 통합 전체 `pnpm check`는 Vitest 203/203과 모든 기존 정책/빌드 검사 PASS다. 처음 cold 화면이 여전히 첫 검사이며 실제 Worker 6초 보류 회귀를 마지막에 추가했다. 루트 pack은 기존 5 tarball byte 동일로 PASS, 실제 공식 Chromium 156 headless도 6/6 PASS(48.7초)다. staged·PR/main 결과는 검사 후 실제 원격 기록으로 제공한다. 원래 main의 실패는 보존하고 실제 원인은 미확정이다.
+4. 실화면 QA: 담당 실제 390/768/1440px·4테마·한글·선택/줌/경로/오류복구·20회 정리와 지연 Worker가 통과했다. 초기 cold 화면 nav84/부착474/ready708/100마커802ms다. Worker 6002ms 보류 시 ready6695/마커6778ms로 전체 10초 기능 상한을 만족했고 부착 뒤 이전 5초 비교는 FAIL6368ms로 명시했다. 별도 실제 Worker abort 탐침은 135ms에 error·canvas0 및 exit1이었다. 조작한 지연·단일 관측을 실제 cold p95 성능 통과로 세지 않는다. Android 실기기/iOS는 제외 범위다.
+5. 라이선스/보안: 공식 browser는 명시적 개발용 ignored 설치이며 기본 SDK 다운로드가 아니다. 기존 authenticated Xvfb·TCP 차단·loopback 요청 제한을 유지하고 키·개인정보·실제 지도/font payload·제작자 Provider·새 과금/CI 권한을 추가하지 않았다. SDK 15초 timer와 전체 기능 상한을 구분한다.
+6. 남은 작업: PR 및 병합 main의 기능 CI 확인. 실제 cold/warm p95 3초/1.5초·frame p95 33ms, 보안 high 2건·Web/RN 선언·공공 CSV/독립 정답·APK 고지·전국 자료·Native 실행·외부 배포/발행 조건은 미해결이다. 당시 Chromium 지연의 근본 원인은 아직 확정하지 못했다.
+7. Git: `test/browser-readiness-budget`, 기준 main `a9b424ba4f40876e7f91e0dc80ce676dab72ca87`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: enforce documented startup budget and retain diagnostics$'`. 실제 commit/PR/main은 검사 후 사용자 보고 및 원격 이력으로 제공한다.
+8. 다음 단계: 명시된 기능 검사와 진단의 검증/소스 프리뷰 통합은 가능하다. 단일 기능 PASS를 성능·릴리스·서비스 배포 수락으로 바꾸지 않는다. npm/tag/Release와 실제 외부 호스팅 배포는 미실행이다.

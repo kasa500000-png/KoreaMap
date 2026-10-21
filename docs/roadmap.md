@@ -190,3 +190,5 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 권장 후속 5: [Native 새 캐시 재현성](research/native-consumer-cache.md)을 수정해 registry lock 준비와 frozen/offline 설치를 분리한다. 새 Runner의 metadata 누락을 상위 RN 선언 실패로 오분류하지 않고 실제 strict gate까지 실행한다. [권장 후속 실행 결과](research/recommended-execution.md)에 단계별 PR/commit/main 반영·통과·차단을 모았다.
 
 권장 후속 6: 병합 main의 Chromium 첫 화면 실패를 보존하고 [실제 클라이언트 부착 대기](research/browser-startup-synchronization.md)를 추가 검증한다. Next dynamic module 부착과 지도 ready 검사를 분리하되 기존 5초 ready·전체 테스트 상한·성능 gate는 유지한다. 실제 map-demo chunk 지연과 390/768/1440px·20회 생명주기 회귀를 사용하며 처음 CI 실패의 근본 원인을 단정하지 않는다.
+
+권장 후속 7: PR33 기능 CI 통과 뒤 main에서 부착된 지도도 5초 loading으로 실패했다. [기존 전체 10초 기능 계약](research/browser-startup-budget.md)을 navigation→ready→실제 100마커 전체에 적용하고 terminal error 즉시 실패·제한된 진단을 추가 검증한다. 앞 단계의 기본 5초 assertion 정책을 대체하며 SDK 기본 15초와 실제 cold/warm/frame 성능 목표는 바꾸지 않는다. 당시 CI 원인은 미확정이고 재시도·사전 준비로 실패를 숨기지 않는다.

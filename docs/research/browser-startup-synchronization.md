@@ -2,6 +2,8 @@
 
 2026-10-21 UTC. 대상은 private Playwright 검증 코드이며 SDK나 데모 구현을 변경하지 않는다.
 
+이 문서는 후속 6의 실행 기록이다. PR33 기능 CI는 통과했지만 이후 main에서 부착된 상태의 5초 loading 실패가 추가 관측됐다. [후속 7](browser-startup-budget.md)이 기본 5초 assertion 정책을 기존 전체 10초 기능 상한으로 대체하며 당시 실패를 완료로 바꾸지 않는다.
+
 ## 발견한 실패와 범위
 
 main `c32ffb26e72f77fd1e890eda0a1e0cba158cd796`의 CI [39566617312](https://github.com/kasa500000-png/KoreaMap/actions/runs/39566617312)에서 Chromium 첫 390px 검사가 실패했다. `status` 요소를 5초 ready assertion 동안 찾지 못했다. 나머지 768px·1440px·20회 생명주기 검사는 통과했다. Windows/macOS/Linux/Firefox/WebKit은 통과했고, 별도 기존 audit/Web/Native 릴리스 gate는 실패했다.
