@@ -50,6 +50,18 @@ OPERATOR_DOWNLOAD_URLS = {
 OFFLINE_REFERENCE_URLS["scripts/audit-cost-security.py"].update(
     url for values in OPERATOR_DOWNLOAD_URLS.values() for url in values
 )
+# Reviewed metadata-only probes: explicit private command, fixed A-source pages,
+# no credentials/body/downloads, bounded attempts/deadlines; never SDK providers.
+OPERATOR_PROBE_URLS = {
+    "scripts/verify-real-poi.mjs": {
+        "https://www.data.go.kr/data/3077854/fileData.do",
+        "https://www.data.go.kr/data/15045050/fileData.do",
+        "https://www.data.go.kr/data/15088391/fileData.do",
+    },
+}
+OFFLINE_REFERENCE_URLS["scripts/audit-cost-security.py"].update(
+    url for values in OPERATOR_PROBE_URLS.values() for url in values
+)
 # Reviewed display-only attribution anchor in a private generated style, not a fetch.
 PUBLIC_ATTRIBUTION_LINKS = {
     "services/tiles/src/config.ts": {"https://www.openstreetmap.org/copyright"},
@@ -153,6 +165,7 @@ def scan(path, data, scope):
             add("UNREVIEWED_DOCUMENTATION_URL", pos)
         reviewed_reference = match[0] in OFFLINE_REFERENCE_URLS.get(path, set())
         reviewed_operator_download = match[0] in OPERATOR_DOWNLOAD_URLS.get(path, set())
+        reviewed_operator_probe = match[0] in OPERATOR_PROBE_URLS.get(path, set())
         reviewed_attribution_link = match[0] in PUBLIC_ATTRIBUTION_LINKS.get(path, set())
         reviewed_metadata = any(start <= match.start() < end for start, end in metadata_spans)
         namespace = "http" + "://www.topografix.com/GPX/1/1"
@@ -160,7 +173,7 @@ def scan(path, data, scope):
         reviewed_namespace = (path in {"packages/core/src/track-formats.ts", "dist/track-formats.js"}
                               and match[0] == namespace
                               and namespace_line in {f"const GPX_NAMESPACE = '{namespace}';", f'const GPX_NAMESPACE = "{namespace}";'})
-        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_operator_download and not reviewed_attribution_link and not reviewed_namespace and not reviewed_metadata:
+        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_operator_download and not reviewed_operator_probe and not reviewed_attribution_link and not reviewed_namespace and not reviewed_metadata:
             add("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", pos)
 
     if name == "package.json":
