@@ -48,6 +48,7 @@ async function verifyPackages() {
       reproducibility: 'NOT_RUN',
       offlineConsumerInstall: 'NOT_RUN',
       supportedBundlerTypes: 'NOT_RUN',
+      webLayerTypes: 'NOT_RUN',
       coreNodeNextTypes: 'NOT_RUN',
       ssrImport: 'NOT_RUN',
       browser: 'NOT_RUN',
@@ -199,6 +200,32 @@ createFixtureStyle({ mode: 'local-fixture', fixtureId: 'synthetic-v1' });
       report.checks.supportedBundlerTypes,
       'Web supported Bundler declarations',
     );
+    stage = 'webLayerTypes';
+    cpSync(
+      resolve(root, 'tests/fixtures/web-layer-consumer.ts'),
+      resolve(temp, 'web-layer-consumer.ts'),
+    );
+    const layerTypes = spawnSync(
+      process.execPath,
+      [
+        tsc,
+        '--ignoreConfig',
+        '--strict',
+        '--skipLibCheck',
+        'false',
+        '--module',
+        'ESNext',
+        '--moduleResolution',
+        'Bundler',
+        '--target',
+        'ES2022',
+        '--noEmit',
+        'web-layer-consumer.ts',
+      ],
+      { cwd: temp, encoding: 'utf8', timeout: 180000, maxBuffer: 8 * 1024 * 1024 },
+    );
+    report.checks.webLayerTypes = summarizeDeclarationProbe(layerTypes, { roots: [temp, root] });
+    assertDeclarationProbe(report.checks.webLayerTypes, 'Web custom/style layer compatibility');
     stage = 'coreNodeNextTypes';
     writeFileSync(
       resolve(temp, 'core-consumer.ts'),
@@ -246,6 +273,7 @@ createFixtureStyle({ mode: 'local-fixture', fixtureId: 'synthetic-v1' });
         'ES2022',
         '--noEmit',
         'consumer.ts',
+        'web-layer-consumer.ts',
       ],
       { cwd: temp, encoding: 'utf8', timeout: 180000, maxBuffer: 8 * 1024 * 1024 },
     );
@@ -329,11 +357,11 @@ await map.ready; document.body.dataset.ready = 'true'; window.consumerMap = map;
       destroy: 'PASS',
     };
     report.isolatedConsumer =
-      'four Web packages: explicit registry metadata preparation, frozen offline install, reviewed dependency graph, strict declaration check, Node SSR import, Chromium render/select/destroy; zero external requests';
+      'four Web packages: explicit registry metadata preparation, frozen offline install, reviewed dependency graph, strict declarations and custom/style layer compatibility, Node SSR import, Chromium render/select/destroy; zero external requests';
     report.blocked = nodeNextProbe.status !== 'PASS';
     report.status = report.blocked ? 'PARTIAL_PASS' : 'PASS';
     console.log(
-      `${report.status}: rebuilt tarballs; isolated Bundler/core/SSR/browser checks passed; public NodeNext declarations ${nodeNextProbe.status}`,
+      `${report.status}: rebuilt tarballs; isolated Bundler/custom-layer/core/SSR/browser checks passed; public NodeNext declarations ${nodeNextProbe.status}`,
     );
     console.log(JSON.stringify(packages));
   } catch (error) {

@@ -786,3 +786,16 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. 남은 작업: 공식 보안 수정 경로·공개 선언 호환성·공공 CSV 접근 조사, 수정 커밋의 원격 CI 확인.
 7. Git: `fix/clean-preserve-operator-data`, 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: preserve operator data during workspace cleanup$'`. 실제 해시/PR/main 결과는 커밋 후 보고한다.
 8. 다음 단계: 이 수정의 검증/PR 통합과 독립 후속 조사는 가능하다. npm/Release 발행 수락은 차단 상태다.
+
+## 권장 후속 2 — 공개 레이어 타입 계약과 차단 원인 재확인
+
+기준: 2026-10-21 UTC, 조사 기반 `ce8e8e1ad797f9a0780d6bc5e782b66505c7ab23`.
+
+1. 구현: 실제 tarball을 격리 설치한 Web 소비 검사에 사용자 정의 레이어·스타일 레이어·Map/WebGL callback의 strict 타입 계약과 잘못된 입력의 거부 검사를 추가했다. 전체 NodeNext 검사에도 같은 fixture를 포함하며 기존 실패 gate를 유지한다.
+2. 파일: `scripts/verify-packages.mjs`, `tests/fixtures/web-layer-consumer.ts`, [Web 선언 조사](research/web-declaration-compatibility.md), [Native 선언 조사](research/native-types-followup.md), [보안 재조사](research/security-followup.md), 진행/로드맵/비용 감사 문서. SDK·의존성·lockfile 변경 없음.
+3. 검사: 담당 격리 worktree에서 새 실제 tarball layer 계약·Bundler/core·SSR·Chromium PASS, 다섯 tarball byte 동일, release 회귀 30개 PASS. full Web NodeNext는 TS2834 9개로 PARTIAL_PASS/exit1을 유지했다. Native 최소 RN probe는 TS6.0.3 및 공식 TS7.0.2 모두 동일한 TS2411/TS2344/TS2416 FAIL이다. 전체 audit는 high 2/critical 0 및 exit1이며 공식 수정 버전 없음. 루트 통합의 전체 `pnpm check`와 `pnpm pack:check`도 통과했다. 루트 실제 소비 재검사에서 새 layer 계약·Bundler/core/SSR/Chromium PASS, 외부 요청/page error 0과 전체 NodeNext TS2834 9개 및 exit1을 다시 확인했다.
+4. 실화면 QA: 담당 Web 격리 소비 앱의 실제 Chromium 표시·선택·종료 PASS, 외부 요청 0. Native/iOS/기기 QA는 이 단계에서 미실행이다.
+5. 라이선스/보안: 새 제3자 payload·키·제작자 endpoint·유료 계정 없음. 공식 TS7 비교 compiler는 SRI/Apache-2.0 확인 후 ignored 조사 폴더에서만 실행했으며 프로젝트 버전은 유지했다. upstream 선언을 복사·수정하거나 검사 조건을 완화하지 않는다.
+6. 남은 작업: MapLibre의 확장자 누락 선언, RN 생성 선언 세 오류, forge/braces 공식 수정 및 지원 조합 확인이 필요하다. 세 차단 모두 미해결이다.
+7. Git: `test/recommended-public-contracts`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: verify strict public layer contracts and refresh blockers$'`. 커밋/PR/main 결과는 실제 실행 후 보고한다.
+8. 다음 단계: 검증 도구의 회귀 방지 변경과 문서 통합은 가능하다. 공개 타입·보안 해결 완료나 npm/Release 발행 가능 상태로 처리하지 않는다.
