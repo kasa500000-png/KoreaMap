@@ -6,6 +6,8 @@ An MIT TypeScript map SDK built on MapLibre, with shared Web and React Native AP
 
 **The source preview is available on `main`. v0.1.0 remains unpublished and blocked for release.** Source integration does not approve production deployment, npm publication, tags or a GitHub Release. Package names remain candidates, not reserved names.
 
+For the 2026-10-21 follow-up changes, executed checks and remaining release blockers, see the [execution report](docs/research/recommended-execution.md).
+
 ## Packages
 
 | Package                   | Purpose                                                                | Status                                            |

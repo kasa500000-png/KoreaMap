@@ -476,3 +476,9 @@ SDK를 바꾸지 않고 합성 정적 export의 OS필수환경만 전달하며 o
 ## 2026-10-21 — Android APK 고지 후보 조사
 
 기존 로컬 APK·동일 build 생성 bundle과 선택 Maven cache만 읽어 조사했다. 원문/파일을 추출·재배포·Git/npm에 포함하지 않고 후보 이름·크기·해시·제한된 UTF-8 분류만 기록한다. 256개 목록/64KiB 본문 상한 이후에도 모든 ZIP entry의 raw CRC를 유지한다. 기존 APK 19 native/3 model/5 notice 후보는 고지 적합성 증명이 아니며 MLKit 별도 약관과 완전한 resolved graph 검토가 남는다. payload PASS, licenseCompliance:NOT_EVALUATED, distributionReady:false를 분리한다. SDK·Provider·계정·요금·네트워크/업로드·CI 권한 변경 없이 기존 발행/플랫폼 차단을 유지한다.
+
+## 2026-10-21 — Native 소비 검사 registry 준비
+
+새 Runner의 public software metadata 누락으로 strict 검사가 실행되지 않는 문제를 수정했다. verifier는 consumer 전용 빈 cache에서 공식 npm registry를 명시해 lock을 준비한 뒤 `--offline --frozen-lockfile --ignore-scripts`로 설치한다. 준비 단계와 offline 설치를 별도로 기록하고 전체 흐름이 offline이라고 주장하지 않는다. SDK import/설치 시 제작자 Provider에 연결하거나 새 package/version을 채택하는 변경이 아니다.
+
+`REGISTRY_METADATA_URLS`는 `scripts/verify-native-consumer.mjs`와 해당 회귀 파일의 정확한 공식 registry 문자열만 검토한다. SDK 재사용·다른 registry/path/query는 계속 차단하고 자격증명 검사는 독립 유지한다. 비용 회귀는 22개 통과했다. CLI는 원래 검토된 패키지 graph·tarball·strict 선언·hook 금지·기존 uuid override와 최소 릴리스 경과시간을 유지한다. 공백/작은따옴표/Windows 경로 직렬화도 보호한다. 과금 서비스·키·Provider·외부 배포/CI 권한은 추가하지 않았으며 보안 high 2건과 Web/RN 전체 선언 실패는 발행 차단이다.

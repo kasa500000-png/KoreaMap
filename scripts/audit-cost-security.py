@@ -62,6 +62,12 @@ OPERATOR_PROBE_URLS = {
 OFFLINE_REFERENCE_URLS["scripts/audit-cost-security.py"].update(
     url for values in OPERATOR_PROBE_URLS.values() for url in values
 )
+# Reviewed software-registry preparation only, before the isolated offline install.
+# Neither path is shipped as an SDK provider; authentication and SDK URL guards remain separate.
+REGISTRY_METADATA_URLS = {
+    "scripts/verify-native-consumer.mjs": {"https://registry.npmjs.org/"},
+    "tests/native-consumer.test.mjs": {"https://registry.npmjs.org/"},
+}
 # Reviewed display-only attribution anchor in a private generated style, not a fetch.
 PUBLIC_ATTRIBUTION_LINKS = {
     "services/tiles/src/config.ts": {"https://www.openstreetmap.org/copyright"},
@@ -166,6 +172,7 @@ def scan(path, data, scope):
         reviewed_reference = match[0] in OFFLINE_REFERENCE_URLS.get(path, set())
         reviewed_operator_download = match[0] in OPERATOR_DOWNLOAD_URLS.get(path, set())
         reviewed_operator_probe = match[0] in OPERATOR_PROBE_URLS.get(path, set())
+        reviewed_registry_metadata = match[0] in REGISTRY_METADATA_URLS.get(path, set())
         reviewed_attribution_link = match[0] in PUBLIC_ATTRIBUTION_LINKS.get(path, set())
         reviewed_metadata = any(start <= match.start() < end for start, end in metadata_spans)
         namespace = "http" + "://www.topografix.com/GPX/1/1"
@@ -173,7 +180,7 @@ def scan(path, data, scope):
         reviewed_namespace = (path in {"packages/core/src/track-formats.ts", "dist/track-formats.js"}
                               and match[0] == namespace
                               and namespace_line in {f"const GPX_NAMESPACE = '{namespace}';", f'const GPX_NAMESPACE = "{namespace}";'})
-        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_operator_download and not reviewed_operator_probe and not reviewed_attribution_link and not reviewed_namespace and not reviewed_metadata:
+        if host and not documentation and name not in LOCKFILES and not local and not reserved and not reviewed_reference and not reviewed_operator_download and not reviewed_operator_probe and not reviewed_registry_metadata and not reviewed_attribution_link and not reviewed_namespace and not reviewed_metadata:
             add("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", pos)
 
     if name == "package.json":

@@ -31,10 +31,13 @@ pnpm test:native-consumer
 - React 19.3.0, React Native 0.88.0, MapLibre RN 11.5.0, Expo/Dev Client 58.0.14,
   Expo Location 58.0.17을 고정한다. TypeScript 6.0.3, React 타입 19.3.0,
   GeoJSON 타입 7946.0.16을 사용한다. 설치된 전이 버전은 기존 검토 그래프와 대조한다.
-- 패키지 매니저 캐시와 저장소 lock을 사용해 `--offline`으로 새 lock을 만들고
-  `--offline --frozen-lockfile --ignore-scripts`로 설치한다. 라이프사이클 스크립트,
-  원격 서비스, API 키, 클라우드 빌드/계정은 사용하지 않는다. 캐시가 부족하면 안전하게 실패한다.
+- 저장소 lock을 복사하고 소비 앱별 빈 metadata cache에서 공개 npm registry로 새 lock을 준비한다.
+  이후 캐시된 패키지 파일만 사용해 `--offline --frozen-lockfile --ignore-scripts`로 설치한다.
+  두 단계를 별도로 보고하고 검토 그래프 밖의 전이 버전은 거부한다.
+  라이프사이클 스크립트, 지도 서비스, API 키, 클라우드 빌드/계정은 사용하지 않는다.
+  패키지 파일 캐시가 부족하면 재시도나 온라인 설치 fallback 없이 실패한다.
   hardlink를 강제하여 대형 의존성 파일을 복제하지 않으며 pnpm 저장소 캐시 자체는 삭제하지 않는다.
+  원인·회귀 검사는 [Native 소비 앱 metadata cache 수정](native-consumer-cache.md)에 기록한다.
 - strict, ESNext/Bundler와 DOM 없는 ES2022 lib로 앱 코드/공개 API를 검사한다.
   공통 지도 명령, Native 컴포넌트/ref, 테마와 선택형 Expo Location 구조를 함께 컴파일한다.
   잘못된 좌표/마커/Native 설정의 음성 타입 검사와 컴포넌트/props의 any 유입 검사도 포함한다.
@@ -60,7 +63,7 @@ pnpm test:native-consumer
 | 의존성 전체 선언, `skipLibCheck:false` | **실패**. React Native 0.88.0 상위 선언 3건: TS2411/TS2344/TS2416 |
 | Expo config plugin / foreground 권한 설정 | 통과. 실제 plugin introspection; 네이티브 manifest/권한 UI는 별도 |
 | Android / iOS JavaScript export | 통과. APK/IPA 컴파일·설치·실화면의 증거가 아님 |
-| verifier 정책 회귀 3개 / ESLint / Prettier | 통과 |
+| verifier 정책 회귀 / ESLint / Prettier | 통과. 최신 빈 cache 검증·회귀 10건은 [cache 수정](native-consumer-cache.md) 참조 |
 
 전체 선언 오류는 `AnimatedProps.d.ts`의 style index signature, `VirtualizedList.d.ts`의
 React component constraint, `ReactNativeDocument.d.ts`의 textContent override다.
