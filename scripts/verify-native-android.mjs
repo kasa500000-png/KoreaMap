@@ -190,6 +190,7 @@ export function buildIsolatedAndroid(context, options, output) {
     },
     bundle: payload.bundle,
     libraries: payload.libraries,
+    binaryNoticeInventory: payload.binaryNoticeInventory,
     zip: payload.zip,
     commands,
     checks: {

@@ -13,6 +13,8 @@ MAX_APK = 256 * 1024**2
 MAX_ENTRY = 128 * 1024**2
 MAX_BUNDLE = 64 * 1024**2
 MAX_TOTAL = 768 * 1024**2
+MAX_INVENTORY_ITEMS = 256
+MAX_NOTICE_TEXT = 64 * 1024
 HERMES_MAGIC = bytes.fromhex('c61fbc03c103191f')
 
 
@@ -109,6 +111,10 @@ def verify_apk(apk, generated_bundle):
     generated_bytes, generated_sha = file_digest(generated_bundle, MAX_BUNDLE)
     bundle = None
     libraries = []
+    notice_candidates = []
+    native_candidates = []
+    model_candidates = []
+    candidate_counts = {'notices': 0, 'nativeLibraries': 0, 'modelAssets': 0}
     total = 0
     with zipfile.ZipFile(apk) as archive, apk.open('rb') as raw:
         entries = archive.infolist()
@@ -133,17 +139,26 @@ def verify_apk(apk, generated_bundle):
         for info in entries:
             is_bundle = info.filename == 'assets/index.android.bundle'
             is_library = bool(re.fullmatch(r'lib/x86_64/[^/]*maplibre[^/]*\.so', info.filename, re.IGNORECASE))
+            is_notice = not info.is_dir() and bool(re.search(r'(?:license|licence|notice|copyright|third[-_]party)', info.filename, re.IGNORECASE))
+            is_native = bool(re.fullmatch(r'lib/[^/]+/[^/]+\.so', info.filename))
+            is_model = info.filename.startswith('assets/') and bool(re.search(r'\.(?:tflite|onnx|pt|pth|task|model)$', info.filename, re.IGNORECASE))
+            for matched, key in [(is_notice, 'notices'), (is_native, 'nativeLibraries'), (is_model, 'modelAssets')]:
+                if matched:
+                    candidate_counts[key] += 1
             if is_bundle:
                 require(0 < info.file_size <= MAX_BUNDLE, 'BUNDLE_SIZE_INVALID')
             digest = hashlib.sha256()
             size = 0
             data = [] if is_library or is_bundle else None
+            notice_data = [] if is_notice and len(notice_candidates) < MAX_INVENTORY_ITEMS and 0 < info.file_size <= MAX_NOTICE_TEXT else None
             for chunk in entry_chunks(raw, info, limits[info.header_offset]):
                 size += len(chunk)
                 require(size <= info.file_size and size <= MAX_ENTRY, 'ZIP_DECODE_SIZE_LIMIT')
                 digest.update(chunk)
                 if data is not None:
                     data.append(chunk)
+                if notice_data is not None:
+                    notice_data.append(chunk)
             require(size == info.file_size, 'ZIP_DECODE_SIZE_MISMATCH')
             if is_bundle:
                 require(size == generated_bytes and digest.hexdigest() == generated_sha, 'BUNDLE_GENERATION_MISMATCH')
@@ -158,9 +173,32 @@ def verify_apk(apk, generated_bundle):
             if is_library:
                 require(size > 0, 'ELF_EMPTY')
                 libraries.append({'file': info.filename, 'bytes': size, 'sha256': digest.hexdigest(), **elf_identity(b''.join(data))})
+            record = {'file': info.filename, 'bytes': size, 'sha256': digest.hexdigest()}
+            if is_native and len(native_candidates) < MAX_INVENTORY_ITEMS:
+                native_candidates.append(record)
+            if is_model and len(model_candidates) < MAX_INVENTORY_ITEMS:
+                model_candidates.append(record)
+            if is_notice and len(notice_candidates) < MAX_INVENTORY_ITEMS:
+                text_status = 'EMPTY' if not size else 'OVERSIZE_NOT_ANALYZED'
+                if notice_data is not None:
+                    try:
+                        text = b''.join(notice_data).decode('utf-8-sig')
+                        text_status = 'UTF8_TEXT_CANDIDATE' if '\x00' not in text else 'BINARY_CANDIDATE'
+                    except UnicodeDecodeError:
+                        text_status = 'NON_UTF8_CANDIDATE'
+                notice_candidates.append({**record, 'textStatus': text_status})
     require(bundle is not None, 'BUNDLE_MISSING')
     require(libraries, 'MAPLIBRE_LIBRARY_MISSING')
-    return {'status': 'PASS', 'apk': {'bytes': apk_bytes, 'sha256': apk_sha}, 'bundle': bundle, 'libraries': libraries, 'zip': {'entries': len(entries), 'uncompressedBytes': total, 'crcVerified': True}}
+    inventory = {
+        'schemaVersion': 1, 'status': 'INVENTORY_ONLY', 'complete': False,
+        'scope': 'APK filename candidates and verified bytes only; not an exact dependency or license graph',
+        'dependencyGraph': 'NOT_PROVIDED', 'licenseCompliance': 'NOT_EVALUATED', 'distributionReady': False,
+        'candidateCounts': candidate_counts,
+        'noticeCandidates': notice_candidates, 'nativeLibraryCandidates': native_candidates, 'modelAssetCandidates': model_candidates,
+        'metadataTruncated': any(count > MAX_INVENTORY_ITEMS for count in candidate_counts.values()),
+        'limits': {'maxItemsPerKind': MAX_INVENTORY_ITEMS, 'maxNoticeTextBytes': MAX_NOTICE_TEXT},
+    }
+    return {'status': 'PASS', 'apk': {'bytes': apk_bytes, 'sha256': apk_sha}, 'bundle': bundle, 'libraries': libraries, 'zip': {'entries': len(entries), 'uncompressedBytes': total, 'crcVerified': True}, 'binaryNoticeInventory': inventory}
 
 
 if __name__ == '__main__':
