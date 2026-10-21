@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import test from 'node:test';
@@ -11,6 +11,7 @@ import {
   assertInstalledSdk,
   assertIntrospection,
   createNativePublicTypeConfig,
+  installNativeConsumer,
   pinnedPeers,
 } from '../scripts/verify-native-consumer.mjs';
 import { summarizeDeclarationProbe } from '../scripts/declaration-probe.mjs';
@@ -75,6 +76,124 @@ function introspection() {
     },
   };
 }
+
+test('a fresh consumer prepares public registry metadata before its frozen offline install', () => {
+  const temp = mkdtempSync(resolve(tmpdir(), 'kmk-native-consumer-install-test-'));
+  try {
+    const globalCache = resolve(temp, 'global-cache');
+    mkdirSync(globalCache);
+    writeFileSync(resolve(globalCache, 'cached-metadata'), 'must not seed the consumer');
+    const quotedTarballs = {
+      ...tarballs,
+      'korea-map-native': "file:C:\\reviewed tarballs\\package's-native.tgz",
+    };
+    const caches = [];
+    for (const name of ["first's consumer", 'second consumer']) {
+      const directory = resolve(temp, name);
+      mkdirSync(directory);
+      const checks = { registryLockPreparation: 'NOT_RUN', offlineTarballInstall: 'NOT_RUN' };
+      const commands = [];
+      installNativeConsumer({
+        directory,
+        tarballs: quotedTarballs,
+        store: '/reviewed-package-store',
+        checks,
+        pnpm(args, cwd) {
+          assert.equal(cwd, directory);
+          assert(args.includes('--ignore-scripts'));
+          assert.equal(args[args.indexOf('--store-dir') + 1], '/reviewed-package-store');
+          const config = readFileSync(resolve(directory, 'pnpm-workspace.yaml'), 'utf8');
+          const cache = JSON.parse(config.match(/^cacheDir: (.+)$/m)[1]);
+          assert.equal(cache, resolve(directory, 'empty-metadata-cache').replaceAll('\\', '/'));
+          assert.match(config, /^strictPeerDependencies: true$/m);
+          assert.match(config, /^minimumReleaseAge: 1440$/m);
+          assert.match(config, /^ {2}'xcode>uuid': 11\.1\.1$/m);
+          for (const [name, value] of Object.entries(quotedTarballs))
+            assert(
+              config.includes(
+                `  ${JSON.stringify(name)}: ${JSON.stringify(value.replaceAll('\\', '/'))}`,
+              ),
+            );
+          if (commands.length === 0) {
+            assert.deepEqual(readdirSync(cache), [], 'Global metadata must not mask a fresh cache');
+            assert(args.includes('--lockfile-only'));
+            assert(args.includes('--no-frozen-lockfile'));
+            assert(!args.includes('--offline'));
+            assert.equal(args[args.indexOf('--registry') + 1], 'https://registry.npmjs.org/');
+            assert.equal(checks.registryLockPreparation, 'FAIL');
+            assert.equal(checks.offlineTarballInstall, 'NOT_RUN');
+            writeFileSync(resolve(cache, 'prepared-metadata'), 'registry preparation completed');
+            caches.push(cache);
+          } else {
+            assert.equal(checks.registryLockPreparation, 'PASS');
+            assert.equal(checks.offlineTarballInstall, 'FAIL');
+            assert(args.includes('--offline'));
+            assert(args.includes('--frozen-lockfile'));
+            assert(!args.includes('--lockfile-only'));
+            assert(!args.includes('--no-frozen-lockfile'));
+            assert.deepEqual(readdirSync(cache), ['prepared-metadata']);
+          }
+          commands.push(args);
+        },
+      });
+      assert.equal(commands.length, 2);
+      assert.equal(checks.registryLockPreparation, 'PASS');
+      // Installation alone cannot pass before the reviewed graph and SDK provenance guards.
+      assert.notEqual(checks.offlineTarballInstall, 'PASS');
+      assert.throws(
+        () =>
+          installNativeConsumer({
+            directory,
+            tarballs,
+            store: '/reviewed-package-store',
+            checks,
+            pnpm() {
+              assert.fail('A populated metadata cache must never be reused');
+            },
+          }),
+        { code: 'EEXIST' },
+      );
+    }
+    assert.notEqual(caches[0], caches[1]);
+    assert.equal(
+      readFileSync(resolve(globalCache, 'cached-metadata'), 'utf8'),
+      'must not seed the consumer',
+    );
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('registry preparation and frozen offline installation failures stop without retry or fallback', () => {
+  const temp = mkdtempSync(resolve(tmpdir(), 'kmk-native-consumer-failure-test-'));
+  try {
+    for (const failureAt of [1, 2]) {
+      const directory = resolve(temp, `failure-${failureAt}`);
+      mkdirSync(directory);
+      const checks = { registryLockPreparation: 'NOT_RUN', offlineTarballInstall: 'NOT_RUN' };
+      const failure = new Error(`install stage ${failureAt} failed`);
+      let calls = 0;
+      assert.throws(
+        () =>
+          installNativeConsumer({
+            directory,
+            tarballs,
+            store: '/reviewed-package-store',
+            checks,
+            pnpm() {
+              if (++calls === failureAt) throw failure;
+            },
+          }),
+        (error) => error === failure,
+      );
+      assert.equal(calls, failureAt);
+      assert.equal(checks.registryLockPreparation, failureAt === 1 ? 'FAIL' : 'PASS');
+      assert.equal(checks.offlineTarballInstall, failureAt === 1 ? 'NOT_RUN' : 'FAIL');
+    }
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
 
 test('consumer rejects source aliases, unpinned peers and install hooks', () => {
   assertConsumerManifest(manifest(), tarballs);

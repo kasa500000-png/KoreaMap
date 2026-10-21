@@ -821,3 +821,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. 남은 작업: 최종 APK variant의 완전한 resolved dependency graph·정확 버전 원문/고지·원저작권·bundle/source 의무 연결 및 실제 배포 notice 제공을 검증해야 한다. 법적 적합성은 UNKNOWN/BLOCKED다.
 7. Git: `test/native-binary-notice-inventory`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: inventory native APK notice and binary candidates$'`. 실제 커밋/PR/main은 검사 후 보고한다.
 8. 다음 단계: 검증 도구 및 자료 보존 개선은 통합 가능하다. 보안 high 2건·Web/RN 상위 선언·공공 CSV·실제 품질·플랫폼/외부 배포·발행 차단을 해제하지 않는다.
+
+## 권장 후속 5 — 새 Runner의 Native 소비 검사 재현성
+
+1. 구현: 실제 CI에서 발견한 `ERR_PNPM_NO_OFFLINE_META`를 수정했다. consumer마다 비어 있는 전용 cacheDir에서 공식 registry lock 준비를 명시적으로 실행하고, 이어서 기존 frozen/offline/hook 금지 설치와 검토된 dependency graph·tarball provenance를 검사한다. 준비와 설치 결과를 별도로 기록하며 실패 시 fallback/재시도하지 않는다. YAML 경로는 공백/따옴표/Windows 구분자를 안전하게 직렬화한다.
+2. 파일: `scripts/verify-native-consumer.mjs`, `tests/native-consumer.test.mjs`, 기존 Native 소비 검증 문서와 [캐시 재현 기록](research/native-consumer-cache.md), 비용 감사기/회귀 2개, 두 README, [통합 결과](research/recommended-execution.md), 진행/로드맵/비용 문서. SDK·root dependency/lockfile·발행/CI workflow는 바꾸지 않았다.
+3. 검사: 담당 Native 회귀 10개 및 실제 빈 캐시 소비 검증 통과 범위를 확인했다. 공백/작은따옴표 TMPDIR의 실제 실행도 registry 준비·offline 설치·strict 앱·SDK Bundler/NodeNext·plugin·양 OS JS export PASS다. 전체 RN 선언은 동일한 TS2411/TS2344/TS2416으로 PARTIAL_PASS/exit1이다. root 비용 감사 회귀 22개 통과. 루트 전체 `pnpm check`·`pnpm pack:check` 통과 후 실제 새 캐시 소비 검증도 준비/설치·strict 앱/SDK·plugin·양 OS JS export PASS를 확인했다. 전체 종료는 기존 RN 3건만으로 PARTIAL_PASS/exit1이며 gate를 유지했다. SDK tarball 5개는 byte 동일하다.
+4. 실화면 QA: 이번 수정은 설치/검사 도구이며 앱 화면·새 APK/IPA·Android 실기기/iOS를 실행하지 않았다. Expo JS export는 Native 기기 검증이 아니다.
+5. 라이선스/보안: 기존 정확 버전/strict peers/최소 릴리스 경과시간/검토 graph/전체 선언 gate를 유지한다. 명시적 개발용 공식 npm metadata 준비를 SDK provider 요청이나 전체 offline 실행으로 표현하지 않는다. 감사 예외는 verifier/test 두 경로의 정확 registry 문자열만, SDK/다른 registry/query 거부 회귀를 유지한다. 키·기본 제작자 endpoint·유료 계정·새 payload 없음.
+6. 남은 작업: 새 Runner가 실제 RN 선언 gate에 도달하는지 수정 PR의 원격 로그로 재확인한다. 보안 high 2건·Web/RN 선언·공공 CSV·APK 법적 고지 등 공개 차단은 미해결이다.
+7. Git: `fix/native-consumer-fresh-cache`, 통합 기준 main `a6e0923eca8cc79adeefbe44fc1ec53eddf63327`; 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: prepare Native consumer metadata before offline install$'`. 실제 commit/PR/main은 검사 후 보고한다.
+8. 다음 단계: 새 Runner 검증 도구의 안전한 수정/소스 통합은 가능하다. 전체 감사·공개 타입 수락 및 npm/Release 발행 가능으로 처리하지 않는다. 물리 Android/macOS iOS는 계속 제외 범위다.

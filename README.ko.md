@@ -6,6 +6,8 @@ MapLibre 기반 MIT TypeScript 지도 SDK입니다. Web과 React Native가 공�
 
 **소스 프리뷰는 `main`에 통합됐습니다. v0.1.0은 미발행이며 릴리스는 차단 상태입니다.** 소스 통합은 운영 배포·npm 발행·태그·GitHub Release 승인이 아닙니다. 기본 브랜치는 여전히 `chore/project-policy`이므로 아래처럼 `main`을 명시해 clone하세요.
 
+2026-10-21 후속 변경·실행 검증·남은 릴리스 차단은 [실행 결과](docs/research/recommended-execution.md)에 정리했습니다.
+
 ## 패키지와 지원 상태
 
 | 후보 이름                 | 역할                                    | 검증 범위                         |

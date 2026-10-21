@@ -161,6 +161,49 @@ export function invokeNativeExportHook(hook, context) {
   );
 }
 
+/** Prepare registry metadata explicitly before proving a frozen, offline tarball install. */
+export function installNativeConsumer({ directory, tarballs, store, pnpm, checks }) {
+  const cache = resolve(directory, 'empty-metadata-cache');
+  // The consumer is fresh: never let pre-existing global metadata mask lock resolution failures.
+  mkdirSync(cache);
+  writeFileSync(
+    resolve(directory, 'pnpm-workspace.yaml'),
+    `ignoreScripts: true\nstrictPeerDependencies: true\nminimumReleaseAge: 1440\npackageImportMethod: hardlink\ncacheDir: ${JSON.stringify(cache.replaceAll('\\', '/'))}\noverrides:\n  'xcode>uuid': 11.1.1\n${Object.entries(
+      tarballs,
+    )
+      .map(
+        ([name, value]) =>
+          `  ${JSON.stringify(name)}: ${JSON.stringify(value.replaceAll('\\', '/'))}`,
+      )
+      .join('\n')}\n`,
+  );
+  console.log(
+    'Native consumer: preparing lock from public registry metadata; no lifecycle scripts',
+  );
+  checks.registryLockPreparation = 'FAIL';
+  pnpm(
+    [
+      'install',
+      '--lockfile-only',
+      '--no-frozen-lockfile',
+      '--ignore-scripts',
+      '--registry',
+      'https://registry.npmjs.org/',
+      '--store-dir',
+      store,
+    ],
+    directory,
+  );
+  checks.registryLockPreparation = 'PASS';
+  console.log('Native consumer: frozen offline hardlinked tarball install; no lifecycle scripts');
+  checks.offlineTarballInstall = 'FAIL';
+  pnpm(
+    ['install', '--offline', '--frozen-lockfile', '--ignore-scripts', '--store-dir', store],
+    directory,
+  );
+  // PASS is recorded only after the caller also verifies the installed reviewed dependency graph.
+}
+
 export function runVerification({ afterJavaScriptExport } = {}) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
   const cli = process.env.npm_execpath;
@@ -195,7 +238,7 @@ export function runVerification({ afterJavaScriptExport } = {}) {
     overall: 'NOT_RUN',
     releaseBlocked: true,
     packages: [],
-    checks: {},
+    checks: { registryLockPreparation: 'NOT_RUN', offlineTarballInstall: 'NOT_RUN' },
     native: {
       androidDevelopmentBuild: 'NOT_RUN',
       androidPhysicalDevice: 'NOT_RUN',
@@ -242,33 +285,9 @@ export function runVerification({ afterJavaScriptExport } = {}) {
     const json = (file, value) =>
       writeFileSync(resolve(directory, file), `${JSON.stringify(value, null, 2)}\n`);
     json('package.json', manifest);
-    writeFileSync(
-      resolve(directory, 'pnpm-workspace.yaml'),
-      `ignoreScripts: true\nstrictPeerDependencies: true\npackageImportMethod: hardlink\noverrides:\n  'xcode>uuid': 11.1.1\n${Object.entries(
-        tarballs,
-      )
-        .map(([name, value]) => `  '${name}': '${value}'`)
-        .join('\n')}\n`,
-    );
     copyFileSync(resolve(root, 'pnpm-lock.yaml'), resolve(directory, 'pnpm-lock.yaml'));
     const store = dirname(pnpm(['store', 'path']).trim());
-    console.log('Native consumer: offline lock resolution and hardlinked tarball install');
-    pnpm(
-      [
-        'install',
-        '--offline',
-        '--lockfile-only',
-        '--no-frozen-lockfile',
-        '--ignore-scripts',
-        '--store-dir',
-        store,
-      ],
-      directory,
-    );
-    pnpm(
-      ['install', '--offline', '--frozen-lockfile', '--ignore-scripts', '--store-dir', store],
-      directory,
-    );
+    installNativeConsumer({ directory, tarballs, store, pnpm, checks: report.checks });
     const reviewed = new Set(
       Object.values(
         JSON.parse(pnpm(['-r', '--include-workspace-root', 'licenses', 'list', '--json'])),

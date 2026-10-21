@@ -117,6 +117,24 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit()
         self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
 
+    def test_native_registry_preparation_review_never_authorizes_a_sdk_or_other_registry(self):
+        registry = "https" + "://registry.npmjs.org/"
+        files = ["scripts/verify-native-consumer.mjs", "tests/native-consumer.test.mjs"]
+        for file in files:
+            self.write(file, 'const registry = "' + registry + '";\n')
+        process, _, _ = self.run_audit()
+        self.assertEqual(process.returncode, 0)
+        self.write("packages/native/src/remote.ts", 'const registry = "' + registry + '";\n')
+        _, _, rules = self.run_audit()
+        self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+        self.write("packages/native/src/remote.ts", '')
+        for file in files:
+            for unreviewed in [registry + 'unreviewed-path', registry + '?token=x', 'https' + '://publisher.test-domain.org/']:
+                self.write(file, 'const registry = "' + unreviewed + '";\n')
+                _, _, rules = self.run_audit()
+                self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+            self.write(file, 'const registry = "' + registry + '";\n')
+
     def test_synthetic_token_is_detected_without_printing_value(self):
         sentinel = "gh" + "p_" + "a" * 36
         self.write("src/config.ts", 'export const value = "' + sentinel + '";\n')
