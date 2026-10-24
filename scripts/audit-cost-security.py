@@ -208,6 +208,71 @@ def scan(path, data, scope):
     return findings
 
 
+class GitBlobReader:
+    """Two persistent raw-object pipes; never run filters or read oversized bodies."""
+
+    def __init__(self, root):
+        self.processes = []
+        try:
+            for option in ("--batch-check", "--batch"):
+                self.processes.append(subprocess.Popen(
+                    ["git", "-C", str(root), "cat-file", option],
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                ))
+        except OSError:
+            self.close(abort=True)
+            raise
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, kind, value, traceback):
+        self.close(abort=kind is not None)
+
+    def close(self, abort=False):
+        failed = False
+        for process in self.processes:
+            if abort and process.poll() is None:
+                process.kill()
+            for stream in (process.stdin, process.stdout):
+                try:
+                    stream.close()
+                except OSError:
+                    failed = True
+            try:
+                failed |= process.wait(timeout=5) != 0
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+                failed = True
+        self.processes.clear()
+        if failed and not abort:
+            raise ValueError("Git object reader did not complete")
+
+    @staticmethod
+    def header(process, sha):
+        if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", sha):
+            raise ValueError("Invalid Git object identity")
+        process.stdin.write(sha.encode("ascii") + b"\n")
+        process.stdin.flush()
+        header = process.stdout.readline(256)
+        match = re.fullmatch(rb"([0-9a-f]{40}|[0-9a-f]{64}) blob ([0-9]{1,20})\n", header)
+        if not match or match[1].decode("ascii") != sha:
+            raise ValueError("Invalid Git object response")
+        return int(match[2])
+
+    def read(self, sha):
+        size = self.header(self.processes[0], sha)
+        if size > LIMIT:
+            return None
+        if self.header(self.processes[1], sha) != size:
+            raise ValueError("Git object size changed")
+        data = self.processes[1].stdout.read(size)
+        if len(data) != size or self.processes[1].stdout.read(1) != b"\n":
+            raise ValueError("Incomplete Git object response")
+        return data
+
+
 def audit(root, artifacts):
     findings, counts = [], {"worktree_files": 0, "index_blobs": 0, "history_blobs": 0, "history_commits": 0}
 
@@ -235,28 +300,30 @@ def audit(root, artifacts):
         if key in seen:
             return
         seen.add(key); counts[scope + "_blobs"] += 1
-        if int(git("cat-file", "-s", sha)) > LIMIT:
+        data = reader.read(sha)
+        if data is None:
             findings.append({"scope": scope, "path": path, "line": 1, "rule": "OVERSIZE_REQUIRES_REVIEW"})
         else:
             # History is scanned for sensitive content, not obsolete executable cost policy.
-            rows = scan(path, git("cat-file", "blob", sha), scope)
+            rows = scan(path, data, scope)
             if scope == "history":
                 rows = [r for r in rows if r["rule"] in set(SECRETS) | {"CREDENTIAL_FILE", "EMBEDDED_CREDENTIAL_OR_BILLING_ID", "URL_CREDENTIAL", "PRIVATE_ENDPOINT"}]
             findings.extend(rows)
 
-    for entry in filter(None, git("ls-files", "--stage", "-z").decode().split("\0")):
-        metadata, path = entry.split("\t", 1); mode, sha, stage = metadata.split()
-        if mode == "100644" or mode == "100755":
-            blob(path, sha, "index")
-        else:
-            findings.append({"scope": "index", "path": path, "line": 1, "rule": "NON_FILE_REQUIRES_REVIEW"})
-    commits = git("rev-list", "--all").decode().splitlines()
-    counts["history_commits"] = len(commits)
-    for commit in commits:
-        for entry in filter(None, git("ls-tree", "-rz", "-r", commit).decode().split("\0")):
-            metadata, path = entry.split("\t", 1); mode, kind, sha = metadata.split()
-            if kind == "blob":
-                blob(path, sha, "history")
+    with GitBlobReader(root) as reader:
+        for entry in filter(None, git("ls-files", "--stage", "-z").decode().split("\0")):
+            metadata, path = entry.split("\t", 1); mode, sha, stage = metadata.split()
+            if mode == "100644" or mode == "100755":
+                blob(path, sha, "index")
+            else:
+                findings.append({"scope": "index", "path": path, "line": 1, "rule": "NON_FILE_REQUIRES_REVIEW"})
+        commits = git("rev-list", "--all").decode().splitlines()
+        counts["history_commits"] = len(commits)
+        for commit in commits:
+            for entry in filter(None, git("ls-tree", "-rz", "-r", commit).decode().split("\0")):
+                metadata, path = entry.split("\t", 1); mode, kind, sha = metadata.split()
+                if kind == "blob":
+                    blob(path, sha, "history")
 
     artifact_results = []
     for path in artifacts:

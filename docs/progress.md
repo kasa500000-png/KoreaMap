@@ -899,3 +899,18 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 실제 소비 재실행: Web은 같은 호스트의 5 tarball byte 동일·Bundler/custom-layer/core/SSR/browser PASS, 외부요청0/pageerror0, 기존 TS2834로 PARTIAL_PASS/exit1이다. Native는 registry/offline 설치·SDK strict Bundler/NodeNext·plugin·Android/iOS JS export PASS, 기존 TS2411/TS2344/TS2416으로 PARTIAL_PASS/exit1이다. 두 보고서 모두 win32/x64·Node24.19.0·pnpm12.14.0과 실제 시작/종료 시각을 기록했다. 기존 gate의 실패 보고서에서도 환경 근거가 보존됨을 확인했다. 릴리스/보고서 회귀32/32 PASS. 두 실행에서 새 실패는 없다.
 
 최종 로컬 판정: `pnpm check` exit0, `pnpm pack:check` exit0. Vitest204 PASS/기존 file-symlink1 skip, 릴리스32 PASS, Native 도구7 PASS/기존 POSIX2 skip 등 전체 등록 검사를 완료했다. 기존 Windows 미실행은 통과로 세지 않는다. 문서103개/내부 링크565개 PASS, 비용 감사 worktree404/index401/history1044 blobs·73 commits findings0이며 pack의 5개 SHA256은 기존 후보와 동일하다. 실제 소비 재실행은 위의 기존 gate만으로 exit1이며 새 실패는 없다. 최종 staged 출처·diff 확인 후 commit/PR로 제공한다. 소스 변경의 검증 완료와 공개 릴리스 준비는 구분한다.
+
+## 2026-10-24 KST — Git 이력 보안 감사의 일괄 읽기
+
+1. 구현: blob마다 Git 프로세스를 반복 생성하던 비용·보안 감사를 두 raw-object 프로세스를 재사용하도록 개선했다. 검사 대상/규칙/상한/실패 판정을 유지한다.
+2. 파일: `scripts/audit-cost-security.py`, `scripts/test-cost-audit.py`, [검토 기록](research/batch-security-audit.md), 진행/로드맵/비용 문서. SDK·dependency·lockfile·workflow 변경 없음.
+3. 검사: 최신 main6478625 CI40097711761은 기능6 PASS/기존 release3 FAIL. 공식 latest graph 재조회와 새 dependency audit도 기존 high2다. 초기 회귀27 PASS 뒤 자체 감사가 테스트 표현을 탐지한 새 작성 중 실패는 별도 기록했다. 수정 후 최종 회귀·동등성·전체 검사는 아래에 기록한다.
+4. 실화면 QA: 보안 감사 도구 변경이며 새 UI QA는 NOT_RUN이다. 기존 CI 브라우저 통과를 이번 변경의 새로운 화면 QA로 재사용하지 않는다. Android/iOS 기기는 미검증이다.
+5. 라이선스/보안: 자체 코드, 공식 Git 프로토콜, 기존 Python 표준 라이브러리만 사용한다. 외부 payload·비밀정보·기본 endpoint·유료 서비스·감사 예외 없음.
+6. 남은 작업: dependency high2, Web TS2834, RN TS2411/TS2344/TS2416, 실제 CSV/독립 정답·지도 성능·Native 실행/고지·발행 조건은 그대로 차단이다. 감사 시간 단축은 보안/릴리스 수락이 아니다.
+7. Git: `codex/batch-security-audit`, 기준 `6478625e30d791c677e5b17794d7904e43bc7c8e`. 커밋 식별 `git log -1 --format='%H %s' --grep='^perf: batch Git object reads in security audit$'`. 이번 요청 범위는 commit/PR이며 main 병합은 수행하지 않는다.
+8. 다음 단계: 검증된 도구 개선의 PR 검토는 가능하며 릴리스 차단은 유지한다. 새 실패를 기존 차단으로 분류하지 않는다.
+
+실저장소 비교: 이전320.566초/수정12.878초, 모두 exit0, 전체 JSON 동일(worktree405/index404/history1053 blobs·75 commits/findings0). 같은 변경 트리/index/refs에서 직렬 실행한 단일 Windows 관측이다. 관련 회귀28/28 PASS이며 초기 테스트 표현 탐지는 수정 후 감사 findings0으로 해결했다. 기존 release 차단과 구분하며 최종 전체 check/pack/staged 결과는 아래에 기록한다.
+
+최종 로컬 검사: `pnpm check` exit0, `pnpm pack:check` exit0. Vitest204 PASS/기존 Windows file-symlink1 skip, 비용 감사28 PASS 및 전체 등록 회귀·strict/lint/format/문서·출처·라이선스·빌드 검사를 완료했다. 타일 파일 링크2 및 Android POSIX2의 기존 skip도 미검증으로 유지한다. 실제 SDK tarball5개의 SHA256은 기존 후보와 동일하고 감사 findings0이다. 최종 문서/diff/staged 검사를 통과한 뒤 commit/PR을 생성한다. 새 작성 중 실패는 해결됐으며 PR CI는 별도 결과로 보고한다. 새로운 화면/Native 기기/실자료/지도 성능 검사와 npm 발행은 수행하지 않았다.

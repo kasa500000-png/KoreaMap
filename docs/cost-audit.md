@@ -514,3 +514,11 @@ Windows 전용 manifest 키 정규화는 정확한 지도 모듈 1개만 선택�
 검증 도구가 공개 runtime 식별값과 실제 pnpm 버전만 보고서에 기록한다. OS 사용자명·hostname·환경변수·설치 경로는 수집하지 않으며 버전 명령의 임의 출력도 저장하지 않는다. 시작/종료 시각은 검증 시도 구간이며 gate 통과·cleanup 성공의 대체 증거가 아니다. SDK·Provider·dependency/lockfile·네트워크/과금/CI 권한·발행 정책과 제3자 payload는 바꾸지 않는다. 실제 독립 소비 재실행은 기존 명시적 npm metadata 준비 및 loopback smoke 범위다. 기존 high2와 공개 선언 실패는 계속 릴리스 차단이다.
 
 실제 재실행은 두 보고서 모두 win32/x64·Node24.19.0·pnpm12.14.0을 기록했고 Web 외부요청0/pageerror0이었다. 전체 check/pack의 비용·출처 감사 findings0, 5 SDK tarball hash는 기존과 동일하다. Windows 기존 skip과 Native 기기 미검증, 전체 선언 exit1을 유지한다.
+
+## 2026-10-24 KST — Git 이력 보안 감사의 일괄 읽기
+
+Git raw-object pipes 두 개를 재사용하며 네트워크·filters/textconv·새 의존성·Provider·과금/CI 권한은 추가하지 않는다. 기존 path/SHA/scope별 검사와 이력 비밀정보 규칙을 보존한다. 8MiB 초과 본문은 읽지 않고 기존 finding을 유지한다. 응답 ID/타입/크기/구분자·프로세스 종료 이상은 실패하고 원문은 출력하지 않는다. 임시 합성 fixture 외 실제 비밀·개인 위치·외부 데이터 payload를 추가하지 않았다. 초기 자체 감사의 테스트 표현 탐지는 fixture 생성만 수정했고 예외를 추가하지 않았다. 새 dependency audit는 기존 node-forge/Zod high2/exit1이다.
+
+실제 전체 저장소의 이전/수정 감사 결과 JSON과 exit0이 완전히 동일했다(worktree405/index404/history1053 blobs·75 commits/findings0). 시간만320.566초에서12.878초로 줄었다. 검사 규칙·감사 scope·history 민감정보 판정을 줄인 결과가 아니며 실제 네트워크/계정 과금·법적 적합성 수락을 의미하지 않는다.
+
+최종 전체 check/실제 pack 검사 exit0이며 5개 SDK tarball 해시는 이전 후보와 동일하다. 신규 네트워크 경로·binary·제3자 payload가 없고 감사 findings0이다. 초기 자체 감사 실패를 기록하고 수정 후 검사로 해결했으며 기존 dependency high2는 계속 별도 release 차단이다.
