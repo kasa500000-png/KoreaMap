@@ -144,7 +144,9 @@ def scan(path, data, scope):
             for field, expected in fields.items():
                 if pkg.get(field) == expected:
                     fragment = json.dumps({field: expected}, indent=2)[2:-2]
-                    metadata_spans.extend((m.start(), m.end()) for m in re.finditer("^" + re.escape(fragment), text, re.MULTILINE))
+                    # Keep offsets in the original text; Windows JSON may use CRLF.
+                    pattern = r"\r?\n".join(re.escape(line) for line in fragment.split("\n"))
+                    metadata_spans.extend((m.start(), m.end()) for m in re.finditer("^" + pattern, text, re.MULTILINE))
         except (ValueError, AttributeError):
             pass
     for match in URL.finditer(text):

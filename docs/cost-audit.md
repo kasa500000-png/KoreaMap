@@ -496,3 +496,15 @@ private Playwright 검사에서 Next dynamic module의 실제 부착과 지도 r
 인계 문서와 복사용 사용자 요청문만 추가하고 설치·정상 main 소스 병합과 운영 배포/npm/Release·공개/과금 설정의 권한을 구분한다. repo 문서 자체를 새 승인으로 해석하지 않는다. 기본 fixture에는 제작자 키·DB·tile/search/routing backend·유료 계정을 요구하지 않는다. 최초 의존성 설치는 공개 npm 네트워크를 사용하며 준비된 store의 offline 검사를 최초 전체 offline 설치로 표시하지 않는다. 새 clone에는 운영자 원본·폰트·DB·자격증명·APK·QA artifacts를 복사하지 않는다.
 
 새 전체 dependency audit는 high2/critical0/exit1이며 현재 node-forge/Zod를 보고했다. 과거 braces 결과를 최신 감사로 재사용하지 않고 현재 미보고를 수정/안전 증명으로 간주하지 않는다. 예외·suppression·override·버전/lockfile·CI 권한·배포/과금 경로를 변경하지 않았다. 인계와 clone 검사는 SDK/플랫폼/실제 데이터/라이선스의 전체 수락이 아니며 기존 발행 차단을 유지한다.
+
+## 2026-10-24 KST — Windows 개발 설치와 UTF-8 검사
+
+기존 lockfile의 `@img/sharp-win32-x64@0.35.5`에 한정해 실제 Apache LICENSE·LGPL/전이 고지·DLL/version 목록을 검토했다. [근거와 파일 해시](research/windows-license-review.md)를 보존하며 다른 이름/버전/표현식을 계속 거부한다. 메타데이터 수락은 바이너리 배포 승인이나 취약점 수락이 아니다. SDK 의존성·runtime·Provider·발행 workflow·lockfile을 변경하지 않았다.
+
+Python 실행기의 UTF-8 모드는 한국어 Windows의 문서 검사 오류를 해결하며 검사 범위나 비밀정보 규칙을 완화하지 않는다. 공식 pnpm/Playwright 및 OFL Noto CJK KR 준비는 명시적인 개발 도구 준비이며 ignored 로컬 경로에만 보관한다. Noto 글꼴은 현재 Windows 세션에 로드했고 시스템 파일/registry는 변경하지 않았다. 제작자 API·키·과금 계정·기본 외부 요청을 추가하지 않았다. 새 전체 audit는 high2(node-forge/Zod)로 기존 발행 차단을 유지한다.
+
+Windows 전용 manifest 키 정규화는 정확한 지도 모듈 1개만 선택한다. 모호한 키·위험 경로를 거부하고 기존 chunk 크기/내용·loopback 제한·시간 상한을 유지한다. 네트워크 허용 범위와 SDK 동작 변경은 없다.
+
+감사기의 CRLF 처리는 정확한 기존 package 메타데이터 fragment에만 적용한다. 같은 URL을 scripts에 넣는 부정 검사와 실제 오류 줄 번호를 LF/CRLF 모두 확인했다. 외부 호스트/실행 endpoint·비밀정보 허용 목록은 불변이다. Windows fixture 보완은 raw ZIP 위험 이름, 실제 junction, 파일 URL preload를 검증하며 파일 링크 권한을 우회하거나 OS 보안 설정을 변경하지 않는다. 미실행 파일 링크/POSIX 프로세스 검사는 별도로 남긴다.
+
+최종 전체/pack 정적 감사는 worktree401·index401·history blob1023/commit71, findings0이다. 5개 SDK tarball은 기존 main CI와 동일한 SHA256이며 새 native binary/폰트/자료를 포함하지 않는다. 실제 Web 소비 smoke 외부요청0/pageerror0과 정적 결과를 구분한다. 전체 dependency audit high2 및 플랫폼/데이터/발행 차단은 유지한다.

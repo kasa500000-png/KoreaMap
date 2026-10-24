@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { themeNames } from 'korea-map-styles';
 import { pngOpaqueColors } from './png-raster';
 import { openMapDemo } from './map-startup';
+import { mapDemoChunkCandidates } from './map-manifest';
 
 type LifecycleCounters = { workers: number; observers: number; createdWorkers: number };
 type LifecycleWindow = Window & { kmkExtendedLifecycle: LifecycleCounters };
@@ -240,10 +241,7 @@ test('a delayed actual map module shares the total initialization budget', async
   const manifest = JSON.parse(
     await readFile('examples/web/.next/react-loadable-manifest.json', 'utf8'),
   );
-  const files: unknown = manifest['app/map-client.tsx -> ./map-demo']?.files;
-  expect(Array.isArray(files)).toBe(true);
-  const candidates = files as string[];
-  expect(candidates.length).toBeLessThanOrEqual(8);
+  const candidates = mapDemoChunkCandidates(manifest);
   const mapChunks: string[] = [];
   for (const file of candidates) {
     expect(file).toMatch(/^static\/chunks\/[\w./-]+\.js$/);

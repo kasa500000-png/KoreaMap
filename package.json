@@ -52,6 +52,8 @@
     "routing:serve": "node services/routing/dist/cli.js",
     "test:routing": "pnpm build:sdk && node scripts/routing-local.mjs test",
     "check:licenses": "node scripts/check-licenses.mjs",
+    "test:licenses": "node --test tests/licenses.test.mjs",
+    "test:python": "node --test tests/python-runner.test.mjs",
     "audit:dependencies": "pnpm audit --audit-level=high",
     "verify:packages": "node scripts/verify-packages.mjs",
     "test:release": "node --test tests/release.test.mjs tests/declaration-probe.test.mjs tests/release-preflight.test.mjs",

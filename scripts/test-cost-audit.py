@@ -68,6 +68,25 @@ class AuditTests(unittest.TestCase):
         _, _, rules = self.run_audit()
         self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
 
+    def test_metadata_line_endings_preserve_runtime_url_rejection_and_line_numbers(self):
+        repo = "https:" + "//github.com/kasa500000-png/KoreaMap"
+        for newline in ["\n", "\r\n"]:
+            with self.subTest(newline=repr(newline)):
+                package = {"private": True, "bugs": {"url": repo + "/issues"}}
+                target = self.root / "package.json"
+                target.write_bytes(json.dumps(package, indent=2).replace("\n", newline).encode("utf-8"))
+                process, _, _ = self.run_audit()
+                self.assertEqual(process.returncode, 0)
+                package["scripts"] = {"demo": "curl " + repo}
+                text = json.dumps(package, indent=2)
+                target.write_bytes(text.replace("\n", newline).encode("utf-8"))
+                process, report, rules = self.run_audit()
+                self.assertEqual(process.returncode, 1)
+                self.assertIn("EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW", rules)
+                findings = [f for f in report["findings"] if f["rule"] == "EMBEDDED_EXTERNAL_URL_REQUIRES_REVIEW"]
+                self.assertEqual(len(findings), 1)
+                self.assertEqual(findings[0]["line"], text[:text.index("curl ")].count("\n") + 1)
+
     def test_official_type_reference_docs_do_not_authorize_runtime_requests(self):
         for host in ['www.typescriptlang.org', 'reactnative.dev', 'playwright.dev', 'deb.debian.org', 'docs.oracle.com', 'www.naturalearthdata.com']:
             self.write('docs/types.md', 'https://' + host + '/docs/\n')

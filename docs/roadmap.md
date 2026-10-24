@@ -194,3 +194,13 @@ Web 동일값 갱신, 독립 공개 GeoJSON 타입, 전체 workspace 오프라�
 권장 후속 7: PR33 기능 CI 통과 뒤 main에서 부착된 지도도 5초 loading으로 실패했다. [기존 전체 10초 기능 계약](research/browser-startup-budget.md)을 navigation→ready→실제 100마커 전체에 적용하고 terminal error 즉시 실패·제한된 진단을 추가 검증한다. 앞 단계의 기본 5초 assertion 정책을 대체하며 SDK 기본 15초와 실제 cold/warm/frame 성능 목표는 바꾸지 않는다. 당시 CI 원인은 미확정이고 재시도·사전 준비로 실패를 숨기지 않는다.
 
 2026-10-24 KST: [로컬 Codex 인계](handoff.md)와 [복사용 프롬프트](codex-handoff-prompt.md)를 추가한다. main을 명시한 clone·고정 도구·독립 검사·ignored 자료 부재·후속 우선순위·승인 범위를 연결한다. 새 전체 audit high2는 node-forge/Zod로 과거 forge/braces 기록과 구분하며 SDK/lockfile을 자동 갱신하거나 기존 release gate를 해제하지 않는다. 이 문서 인계는 사용자가 승인한 source merge이며 운영 배포/발행은 아니다.
+
+## 2026-10-24 KST — Windows 개발 검사 복구
+
+[검토 근거](research/windows-license-review.md)에 sharp Windows x64의 정확 버전 라이선스 검토와 환경/공식 보안 graph 확인을 기록했다. CP949 환경의 Python 공통 실행기를 UTF-8 모드로 고정하고 두 변경의 회귀를 전체 check에 연결한다. 보안 high2·Web/RN 공개 선언·실제 CSV/정답·성능·Native 실행/고지·발행 차단은 유지한다. 최종 실행 결과는 진행 기록의 해당 절을 따른다.
+
+Windows lifecycle의 Next manifest 키 구분자 차이도 재현해 실제 map chunk 식별만 보완했다. 기존 10초 기능 상한·chunk 경계/내용 검증·외부 요청 차단을 유지하며 양 OS 키와 위험 입력 회귀를 추가했다.
+
+추가 Windows 회귀는 CRLF 메타데이터 오인·ESM preload 경로·ZIP 악성 fixture 정규화를 수정한다. 실제 junction 차단을 확인하고 기존 파일 링크 권한 미충족은 NOT_RUN으로 분리한다. 릴리스 조건이나 실제 플랫폼/데이터 수락을 완화하지 않는다.
+
+최종 로컬 `pnpm check`/`pnpm pack:check`/staged 출처 검사는 exit0이며, 실제 기본 Web25개·Chromium lifecycle6개도 PASS다. Windows 환경의 기존 skip은 미검증으로 유지한다. source preview 검토는 가능하나 전체 audit와 Web/RN 공개 선언의 release 차단은 해제되지 않았다.

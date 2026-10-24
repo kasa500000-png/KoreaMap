@@ -43,7 +43,13 @@ class ApkTests(unittest.TestCase):
                 archive.writestr('assets/index.android.bundle', self.bundle if bundle is None else bundle)
                 archive.writestr('lib/x86_64/libmaplibre.so', elf() if library is None else library)
                 for name, data in extra:
-                    archive.writestr(name, data)
+                    # ZipInfo normalizes backslashes on Windows. Preserve malicious fixture
+                    # names explicitly so the verifier sees the same raw ZIP on every OS.
+                    info = zipfile.ZipInfo(name)
+                    info.filename = name
+                    info.orig_filename = name
+                    info.compress_type = compression
+                    archive.writestr(info, data)
 
     def verify(self):
         return apk_verifier.verify_apk(self.apk, self.generated)
