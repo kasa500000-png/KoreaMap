@@ -107,3 +107,5 @@ Firefox/WebKit도 공식 browser와 해당 OS/display 전제조건을 준비한 
 SDK MIT와 데이터·폰트·아이콘의 라이선스를 분리하고 A 원장만 조건부 수집한다. 기본 제작자 endpoint·공유 키·유료 클라우드 계정은 추가하지 않는다. Secret·토큰·개인 위치·인증된 원격 URL·환경변수 값을 로그에 출력하지 않는다. 보안 suppression, 무근거 patch/override, canary, 검사 완화로 release gate를 통과시키지 않는다.
 
 이번 사용자 요청은 **인계 문서의 커밋/PR/정상 main 병합**을 승인했다. 새 대화의 후속 소스 병합은 사용자가 전달한 [복사용 프롬프트](codex-handoff-prompt.md)의 명시적 지시 범위를 따른다. npm 발행·태그/GitHub Release·운영 배포·공개 설정 변경·과금 설정은 별도 승인 없이 수행하지 않는다. 각 단계는 AGENTS의 8개 항목을 기록하고 `docs/roadmap.md`, `docs/progress.md`, `docs/cost-audit.md`를 유지한다.
+
+공개 clone과 기본 빌드에는 GitHub 로그인도 필수가 아니다. **push·PR·병합에는 새 컴퓨터의 본인 GitHub 쓰기 권한이 별도로 필요**하다. 기존 cloud의 Git 커넥터 연결·인증은 clone으로 이전되지 않는다. 로컬 Codex에서 사용 가능한 GitHub 연결 또는 인증된 Git/지원되는 PR 도구를 확인한다. GitHub CLI가 설치돼 있다면 `gh auth status`로 상태를 확인할 수 있지만 토큰 출력 명령이나 환경변수 dump는 사용하지 않는다. 도구/권한이 없으면 가능한 로컬 검사·commit을 진행하고 원격 push/PR/merge는 NOT_RUN으로 보고한다. 토큰을 채팅·저장소에 붙여 넣거나 다른 계정/보호 우회로 해결하지 않는다. 이는 유지관리자의 쓰기 권한이며 SDK 사용자에게 GitHub·지도 유료 계정을 요구하는 정책이 아니다.

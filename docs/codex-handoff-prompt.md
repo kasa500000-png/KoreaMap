@@ -10,6 +10,7 @@ Korea Map Kit 개발을 이 컴퓨터의 Codex에서 이어서 진행해 줘.
 checkout이 없으면 git clone --branch main https://github.com/kasa500000-png/KoreaMap.git 으로 받고 KoreaMap 폴더에서 작업해 줘.
 이미 checkout이 있으면 사용자 변경과 ignored 운영자 자료를 보존하고 강제 reset/삭제/덮어쓰기를 하지 말아 줘.
 기본 브랜치는 이전 확인에서 chore/project-policy였으므로 최신 main과 origin을 자격증명 노출 없이 확인해 줘.
+cloud의 Git 커넥터/인증은 clone되지 않으니 새 PC의 본인 GitHub 쓰기 권한과 PR 도구를 확인하고, 없으면 로컬 검사/commit을 진행하되 원격 작업은 NOT_RUN으로 보고해 줘.
 
 가장 먼저 AGENTS.md를 읽고 적용해 줘.
 docs/handoff.md, README.ko.md, docs/quickstart.md, docs/research/recommended-execution.md를 읽어 줘.
