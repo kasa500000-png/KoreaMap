@@ -8,6 +8,8 @@ MapLibre 기반 MIT TypeScript 지도 SDK입니다. Web과 React Native가 공�
 
 2026-10-21 후속 변경·실행 검증·남은 릴리스 차단은 [실행 결과](docs/research/recommended-execution.md)에 정리했습니다.
 
+다른 컴퓨터의 Codex에서 이어서 작업하려면 [인계 안내](docs/handoff.md)와 [복사용 인계 프롬프트](docs/codex-handoff-prompt.md)를 사용하세요. 최신 main 확인·설치·검사·남은 차단과 clone되지 않는 자료를 구분했습니다.
+
 ## 패키지와 지원 상태
 
 | 후보 이름                 | 역할                                    | 검증 범위                         |
