@@ -15,6 +15,8 @@ Korea Map Kit source is MIT; see [LICENSE](LICENSE). Dependencies retain their o
 
 The Web example copies the installed MapLibre worker and its license into generated assets. Keep those notices when deploying. The Native application also links native/transitive components; a final APK/IPA dependency and notice inventory remains a release gate, especially iOS which is unbuilt here.
 
+Windows x64 development installs include `@img/sharp-win32-x64@0.35.5` under Apache-2.0 **AND** LGPL-3.0-or-later, including libvips 8.18.7 DLLs. Preserve its Apache license and bundled third-party notices; binary redistribution requires separate source/relinking and transitive-license review. This exact-version metadata review does not authorize binary distribution or relicense these components as MIT. See the [Windows review and hashes](docs/research/windows-license-review.md).
+
 `pnpm check:licenses` checks the resolved workspace graph. Reviewed special cases include libvips (LGPL-3.0-or-later), lightningcss (MPL-2.0), caniuse-lite (CC-BY-4.0), argparse (Python-2.0) and node-forge's BSD-3-Clause OR GPL-2.0 choice (use BSD). Their presence in development tools does not relicense SDK source; distributing those components may create additional obligations. See [QA limitations](docs/qa-report.md).
 
 No third-party font or icon binary is included in SDK tarballs. POI icons are project-authored procedural shapes under MIT; local Noto font QA does not authorize bundling every font. Follow [font/icon licenses](docs/font-icon-licenses.md) and [data licenses](DATA_LICENSES.md).

@@ -205,9 +205,15 @@ test('filesystem traversal, symlinks, hardlinks and missing notices fail closed 
   writeFileSync(resolve(site, 'index.html'), html());
   const report = inspectDeploymentTree(site);
   assert(report.findings.some((entry) => entry.rule === 'NOTICE_MISSING'));
-  symlinkSync(outside, resolve(site, 'linked.txt'), 'file');
+  // A real directory junction exercises the link boundary without Windows file-link privileges.
+  const linked = resolve(site, 'linked.txt');
+  symlinkSync(
+    process.platform === 'win32' ? root : outside,
+    linked,
+    process.platform === 'win32' ? 'junction' : 'file',
+  );
   assert.throws(() => inspectDeploymentTree(site), /Symlink/);
-  rmSync(resolve(site, 'linked.txt'));
+  rmSync(linked, { recursive: true, force: true });
   linkSync(outside, resolve(site, 'hardlinked.txt'));
   assert.throws(() => inspectDeploymentTree(site), /regular file/);
   rmSync(resolve(site, 'hardlinked.txt'));

@@ -41,6 +41,7 @@ else if (task === 'check') {
   for (const step of [
     'check:boundaries',
     'check:licenses',
+    'test:licenses',
     'check:data',
     'test:data',
     'check:data-docs',
@@ -53,6 +54,7 @@ else if (task === 'check') {
     'check:api-docs',
     'build',
     'check:docs',
+    'test:python',
     'audit:cost',
     'test:audit',
     'test:clean',

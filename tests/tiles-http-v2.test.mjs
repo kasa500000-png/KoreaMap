@@ -478,12 +478,12 @@ test('immutable generation mutations and symlink replacements are rejected befor
     service = undefined;
     const b = await generation(store, 'symlink fixture');
     await activateGeneration(store, 'seoul', b.id);
-    service = await startTileServer({ store, region: 'seoul' });
     const copy = resolve(store, 'same-bytes-outside-generation.mbtiles');
     copyFileSync(b.path, copy);
-    rmSync(b.path);
+    // Detect the existing host capability limitation before opening SQLite or removing its file.
+    const probe = resolve(store, 'file-link-capability-probe');
     try {
-      symlinkSync(copy, b.path, 'file');
+      symlinkSync(copy, probe, 'file');
     } catch (error) {
       if (error.code === 'EPERM') {
         t.skip('Host disallowed symlink creation; path replacement case unverified');
@@ -491,6 +491,10 @@ test('immutable generation mutations and symlink replacements are rejected befor
       }
       throw error;
     }
+    rmSync(probe);
+    service = await startTileServer({ store, region: 'seoul' });
+    rmSync(b.path);
+    symlinkSync(copy, b.path, 'file');
     assert.equal((await http(service.origin, `/datasets/${b.id}/tiles/0/0/0.pbf`)).status, 400);
   } finally {
     await service?.close();

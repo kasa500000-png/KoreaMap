@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { cp, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import test from 'node:test';
 import { evaluateServiceQuality, normalizeQualityQuery } from '../scripts/service-quality.mjs';
 
@@ -546,7 +547,12 @@ test('CLI defaults to zero-request NOT_RUN, binds actual files, preserves privac
     const run = (config) =>
       spawnSync(
         process.execPath,
-        ['--import', guard, resolve(scripts, 'service-quality.mjs'), ...(config ? [config] : [])],
+        [
+          '--import',
+          pathToFileURL(guard).href,
+          resolve(scripts, 'service-quality.mjs'),
+          ...(config ? [config] : []),
+        ],
         { cwd: directory, encoding: 'utf8', timeout: 5000 },
       );
     const reportFile = resolve(store, 'report.json');
