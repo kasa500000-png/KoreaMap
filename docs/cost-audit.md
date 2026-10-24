@@ -490,3 +490,9 @@ private Playwright 검사에서 Next dynamic module의 실제 부착과 지도 r
 ## 2026-10-21 — 전체 초기화 기능 상한과 실패 진단
 
 후속 7은 위의 기본 5초 assertion 정책을 기존 문서의 전체 10초 기능 상한으로 대체한다. navigation·실제 부착·ready·초기 100마커가 하나의 상한을 공유하며 SDK·실제 성능 gate는 바꾸지 않는다. 제한된 합성 상태/단계/경과시간 진단과 로컬 Worker 보류·실패 회귀만 추가한다. 실제 오류를 재시도·reload로 숨기지 않는다. 조사용 공식 Playwright browser는 명시적 개발 명령으로 ignored 저장소에만 준비했으며 SDK 설치/실행의 다운로드나 유료 서비스 요구로 추가하지 않았다. 기존 검증된 authenticated Xvfb·TCP 차단을 사용한다. 원문·키·개인정보·실제 지도/폰트 payload·제작자 Provider·새 CI 권한·배포/발행 경로는 추가하지 않는다. 원래 CI 지연의 근본 원인은 미확정이며 기능 상한 통과를 실제 성능/Native/릴리스 수락으로 표현하지 않는다.
+
+## 2026-10-24 KST — 다른 컴퓨터의 Codex 인계
+
+인계 문서와 복사용 사용자 요청문만 추가하고 설치·정상 main 소스 병합과 운영 배포/npm/Release·공개/과금 설정의 권한을 구분한다. repo 문서 자체를 새 승인으로 해석하지 않는다. 기본 fixture에는 제작자 키·DB·tile/search/routing backend·유료 계정을 요구하지 않는다. 최초 의존성 설치는 공개 npm 네트워크를 사용하며 준비된 store의 offline 검사를 최초 전체 offline 설치로 표시하지 않는다. 새 clone에는 운영자 원본·폰트·DB·자격증명·APK·QA artifacts를 복사하지 않는다.
+
+새 전체 dependency audit는 high2/critical0/exit1이며 현재 node-forge/Zod를 보고했다. 과거 braces 결과를 최신 감사로 재사용하지 않고 현재 미보고를 수정/안전 증명으로 간주하지 않는다. 예외·suppression·override·버전/lockfile·CI 권한·배포/과금 경로를 변경하지 않았다. 인계와 clone 검사는 SDK/플랫폼/실제 데이터/라이선스의 전체 수락이 아니며 기존 발행 차단을 유지한다.

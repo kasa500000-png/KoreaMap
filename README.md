@@ -8,6 +8,8 @@ An MIT TypeScript map SDK built on MapLibre, with shared Web and React Native AP
 
 For the 2026-10-21 follow-up changes, executed checks and remaining release blockers, see the [execution report](docs/research/recommended-execution.md).
 
+Continue on another computer with the [local handoff guide](docs/handoff.md) and [copyable Codex prompt](docs/codex-handoff-prompt.md). They distinguish the source preview, current checks, missing local artifacts and release approvals.
+
 ## Packages
 
 | Package                   | Purpose                                                                | Status                                            |

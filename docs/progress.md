@@ -854,3 +854,14 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 6. 남은 작업: PR 및 병합 main의 기능 CI 확인. 실제 cold/warm p95 3초/1.5초·frame p95 33ms, 보안 high 2건·Web/RN 선언·공공 CSV/독립 정답·APK 고지·전국 자료·Native 실행·외부 배포/발행 조건은 미해결이다. 당시 Chromium 지연의 근본 원인은 아직 확정하지 못했다.
 7. Git: `test/browser-readiness-budget`, 기준 main `a9b424ba4f40876e7f91e0dc80ce676dab72ca87`; 커밋 식별 `git log -1 --format='%H %s' --grep='^test: enforce documented startup budget and retain diagnostics$'`. 실제 commit/PR/main은 검사 후 사용자 보고 및 원격 이력으로 제공한다.
 8. 다음 단계: 명시된 기능 검사와 진단의 검증/소스 프리뷰 통합은 가능하다. 단일 기능 PASS를 성능·릴리스·서비스 배포 수락으로 바꾸지 않는다. npm/tag/Release와 실제 외부 호스팅 배포는 미실행이다.
+
+## 2026-10-24 KST — 로컬 Codex 개발 인계
+
+1. 구현: 새 컴퓨터에서 최신 main을 clone하고 Codex가 정책·검증·남은 작업을 이어받는 인계 안내와 복사용 프롬프트를 작성했다. 기본 브랜치의 main 명시, 정확한 도구, 독립 검사, 이전 cloud 자료 부재, source preview와 발행 승인 범위를 설명한다. 이번 사용자는 이 인계 변경의 main 병합을 명시 승인했다.
+2. 파일: `docs/handoff.md`, `docs/codex-handoff-prompt.md`, 두 README, `docs/quickstart.md`, 진행/로드맵/비용 감사 문서. SDK·예제 runtime·package/version·lockfile·workflow·원장은 바꾸지 않았다.
+3. 검사: 원격 기준 main a305b1113a4b397fffcb1abee12c50f6d58fd9f4와 CI39573700105의 기능 6성공/릴리스 3실패를 재확인했다. 새 전체 audit는 high2/critical0/exit1(node-forge/Zod)이며 과거 forge/braces와 구분했다. 최초 형식/비용 검사에서 인계 root 문서의 포맷/URL 분류를 차단해 포맷과 기본 docs 경로로 수정했다. 정책 예외는 추가하지 않았고 문서101개/링크557개·정적 비용 findings0을 확인했다. 별도 HTTPS main clone은 이전 운영자 자료 없이 frozen install(PASS, store645재사용/download0), 전체 check203/203 및 pack5개 PASS다. 수정된 인계 branch도 최종 전체 check203/203 PASS다. staged·PR/main은 실제 검사 후 원격 이력과 최종 보고로 제공한다.
+4. 실화면 QA: 문서 인계 단계이며 이번 변경의 새 지도/Android/iOS 화면 검사는 미실행이다. 과거 Web203/25/브라우저별6 기록을 새 PC 실행 결과로 세지 않는다. 최종 CI의 실제 재검사 범위는 원격 이력과 최종 보고로 제공한다.
+5. 라이선스/보안: 자체 인계 문서, 새 제3자 payload·원본·폰트·키·제작자 endpoint·과금 계정·배포/발행 동작 없음. 기본 install의 공개 npm 연결과 SDK 서비스 비용을 구분한다. 새 Zod 권고에 수정 범위가 있어도 지원 graph 미검토 상태로 override/update하지 않는다.
+6. 남은 작업: high2·Web/RN 선언·실제 CSV/정답·성능·Native 실행/고지·발행 조건은 유지한다. 실제 다른 물리 PC·Windows/macOS 설치는 이 Linux 호스트의 clone 검사로 대체하지 않는다. 기본 브랜치가 과거 정책 브랜치여서 clone에는 main 명시가 필요하다.
+7. Git: `docs/local-codex-handoff`, 기준 main a305b1113a4b397fffcb1abee12c50f6d58fd9f4. 커밋 조회 `git log -1 --format='%H %s' --grep='^docs: add clone-ready local Codex handoff$'`. 실제 commit/PR/merge SHA는 최종 보고와 원격 이력으로 제공한다.
+8. 다음 단계: 문서 검증과 main 소스 병합 뒤 로컬 Codex 개발을 이어갈 수 있다. 새 대화는 사용자가 직접 전달한 프롬프트의 승인 범위를 따르며 npm/태그/Release·운영 배포·공개/과금 설정은 별도 승인 없이 실행하지 않는다.

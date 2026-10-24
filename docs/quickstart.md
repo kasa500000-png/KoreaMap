@@ -2,6 +2,8 @@
 
 소스 프리뷰는 `main`에 통합됐으며 다른 PC에서 clone해 실행할 수 있습니다. v0.1.0은 미발행 후보이고 보안·공개 타입·성능·플랫폼 릴리스 게이트는 남아 있습니다. 현재 `npm install korea-map-web`이 성공한다고 주장하지 않습니다. 이름 선점 방지를 위해 공개 발행 직전 가용성과 소유권을 다시 확인해야 합니다.
 
+Codex 후속 개발은 [인계 안내](handoff.md)와 [복사할 프롬프트](codex-handoff-prompt.md)를 따릅니다. 2026-10-24 새 audit의 high2는 node-forge/Zod이며 아래의 과거 상태 설명과 최신 측정을 구분하세요.
+
 ## 다른 PC에서 Web 데모 실행
 
 Node **24.19.0**, pnpm **12.14.0**을 준비합니다. 저장소 검사에는 Python **3.12+**도 필요합니다. 기본 브랜치가 아직 `chore/project-policy`이므로 `--branch main`을 명시합니다. 아래 명령은 Windows/macOS/Linux에서 같은 순서로 실행합니다.
