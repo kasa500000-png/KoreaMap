@@ -208,3 +208,7 @@ Windows lifecycle의 Next manifest 키 구분자 차이도 재현해 실제 map 
 ## 2026-10-24 KST — 독립 검증의 실행 환경 기록
 
 병합 main f374226의 CI는 기능6 성공/기존 릴리스3 실패이며 새 실패는 없다. [실행 환경 근거](research/verification-host-evidence.md)에 따라 Windows를 Linux로 오기한 재현성 보고를 수정하고 Web/Native 보고서에 실제 OS·아키텍처·Node·pnpm 및 검사 시각을 추가한다. 기존 선언/보안·실자료·성능·플랫폼·발행 gate는 유지한다.
+
+## 2026-10-24 KST — Git 이력 보안 감사의 일괄 읽기
+
+[구현·검토 근거](research/batch-security-audit.md)에 따라 Windows에서 수분 걸리는 blob별 Git 프로세스 생성을 두 raw-object 프로세스로 줄인다. 전체 worktree/index/도달 가능한 이력·탐지 규칙·크기 상한·실패 판정은 유지하며 기존 방식과 결과를 대조한다. dependency high2·Web/RN 선언·실자료·성능·Native/고지·발행 차단을 해제하는 변경은 아니다.

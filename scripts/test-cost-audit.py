@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Black-box regression scenarios; temporary repos, synthetic secrets, no network."""
 import io
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -8,8 +9,13 @@ import sys
 import tarfile
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 AUDITOR = Path(__file__).with_name("audit-cost-security.py")
+SPEC = importlib.util.spec_from_file_location("cost_auditor", AUDITOR)
+auditor = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(auditor)
 
 
 class AuditTests(unittest.TestCase):
@@ -34,6 +40,105 @@ class AuditTests(unittest.TestCase):
         self.assertNotEqual(process.returncode, 2, process.stdout)
         report = json.loads(process.stdout)
         return process, report, {f["rule"] for f in report["findings"]}
+
+    def test_batch_reader_preserves_exact_binary_empty_and_size_boundary(self):
+        payloads = [b"", b"first\n\x00binary\xff\nlast", b"x" * auditor.LIMIT,
+                    b"x" * (auditor.LIMIT + 1)]
+        hashes = [subprocess.check_output(
+            ["git", "-C", str(self.root), "hash-object", "-w", "--stdin"], input=data,
+        ).decode().strip() for data in payloads]
+        with auditor.GitBlobReader(self.root) as reader:
+            processes = list(reader.processes)
+            self.assertEqual(len(processes), 2)
+            for sha, data in zip(hashes, payloads):
+                self.assertEqual(reader.read(sha), data if len(data) <= auditor.LIMIT else None)
+            self.assertEqual(reader.read(hashes[1]), payloads[1])
+        self.assertTrue(all(p.poll() == 0 for p in processes))
+
+    def test_batch_reader_missing_object_fails_and_reaps_children(self):
+        reader = auditor.GitBlobReader(self.root)
+        processes = list(reader.processes)
+        with self.assertRaisesRegex(ValueError, "Invalid Git object response"):
+            with reader:
+                reader.read("0" * 40)
+        self.assertTrue(all(p.poll() is not None for p in processes))
+        self.assertTrue(all(p.stdin.closed and p.stdout.closed for p in processes))
+
+    def test_batch_protocol_rejects_bad_headers_truncation_and_delimiters(self):
+        sha = "a" * 40
+        valid = sha.encode() + b" blob 3\n"
+        for header in [b"", b"private-test-value\n", b"b" * 40 + b" blob 3\n",
+                       sha.encode() + b" tree 3\n", sha.encode() + b" blob -1\n",
+                       sha.encode() + b" blob 3", b"x" * 300]:
+            with self.subTest(header_length=len(header)):
+                process = SimpleNamespace(stdin=io.BytesIO(), stdout=io.BytesIO(header))
+                with self.assertRaises(ValueError):
+                    auditor.GitBlobReader.header(process, sha)
+        for body in [valid + b"ab", valid + b"abcX", sha.encode() + b" blob 4\nabcd\n"]:
+            reader = object.__new__(auditor.GitBlobReader)
+            reader.processes = [
+                SimpleNamespace(stdin=io.BytesIO(), stdout=io.BytesIO(valid)),
+                SimpleNamespace(stdin=io.BytesIO(), stdout=io.BytesIO(body)),
+            ]
+            with self.assertRaises(ValueError):
+                reader.read(sha)
+        process = SimpleNamespace(stdin=io.BytesIO(), stdout=io.BytesIO(valid))
+        with self.assertRaises(ValueError):
+            auditor.GitBlobReader.header(process, sha + "\nHEAD")
+        self.assertEqual(process.stdin.getvalue(), b"")
+        body_process = SimpleNamespace(stdin=io.BytesIO(), stdout=io.BytesIO())
+        reader = object.__new__(auditor.GitBlobReader)
+        reader.processes = [SimpleNamespace(stdin=io.BytesIO(), stdout=io.BytesIO(
+            sha.encode() + b" blob " + str(auditor.LIMIT + 1).encode() + b"\n",
+        )), body_process]
+        self.assertIsNone(reader.read(sha))
+        self.assertEqual(body_process.stdin.getvalue(), b"")
+
+    def test_batch_reader_process_failure_cannot_report_success(self):
+        process = SimpleNamespace(stdin=io.BytesIO(), stdout=io.BytesIO(), wait=lambda timeout: 1)
+        reader = object.__new__(auditor.GitBlobReader)
+        reader.processes = [process]
+        with self.assertRaisesRegex(ValueError, "did not complete"):
+            reader.close()
+        self.assertTrue(process.stdin.closed and process.stdout.closed)
+
+    def test_batch_and_legacy_audits_match_paths_scopes_history_and_findings(self):
+        # Identical blob bytes must still be evaluated under each path and scope.
+        content = "https:" + "//maplibre.org/\n"
+        self.write("docs/reference.md", content)
+        self.write("src/provider.ts", content)
+        self.write("removed.txt", "pass" + "word=" + '"synthetic-history-value"\n')
+        self.git("add", ".")
+        self.git("commit", "-qm", "synthetic baseline")
+        self.git("rm", "removed.txt")
+        self.git("commit", "-qm", "remove synthetic value")
+        self.write("src/provider.ts", "local replacement\n")
+        root = self.root
+
+        class LegacyReader:
+            def __init__(self, directory):
+                self.directory = directory
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                pass
+
+            def read(self, sha):
+                command = ["git", "-C", str(root), "cat-file"]
+                if int(subprocess.check_output([*command, "-s", sha])) > auditor.LIMIT:
+                    return None
+                return subprocess.check_output([*command, "blob", sha])
+
+        actual = auditor.audit(self.root, [])
+        with patch.object(auditor, "GitBlobReader", LegacyReader):
+            expected = auditor.audit(self.root, [])
+        self.assertEqual(actual, expected)
+        self.assertTrue(any(f["path"] == "removed.txt" and f["scope"] == "history"
+                            for f in actual["findings"]))
+        self.assertTrue(any(f["path"] == "src/provider.ts" and f["scope"] == "index"
+                            for f in actual["findings"]))
 
     def test_clean_local_fixture_and_public_documentation(self):
         self.write("README.md", "Reference: https://" + "maplibre.org/maplibre-gl-js/docs/\n")
