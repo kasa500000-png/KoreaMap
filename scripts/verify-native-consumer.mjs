@@ -16,6 +16,7 @@ import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { assertDeclarationProbe, summarizeDeclarationProbe } from './declaration-probe.mjs';
+import { observedPnpmVersion, verificationEnvironment } from './verification-environment.mjs';
 
 const sdkNames = ['core', 'native', 'styles'];
 export const pinnedPeers = Object.freeze({
@@ -233,6 +234,9 @@ export function runVerification({ afterJavaScriptExport } = {}) {
   const directory = mkdtempSync(resolve(tmpdir(), 'kmk-native-consumer-'));
   const report = {
     schemaVersion: 1,
+    environment: verificationEnvironment(),
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
     sourceCommit: null,
     sourceDirty: null,
     overall: 'NOT_RUN',
@@ -251,6 +255,7 @@ export function runVerification({ afterJavaScriptExport } = {}) {
   };
   const target = resolve(root, 'artifacts/qa/native-consumer.json');
   try {
+    report.environment.pnpm = observedPnpmVersion(pnpm(['--version']));
     report.sourceCommit = execute('git', ['rev-parse', 'HEAD'], root).trim();
     report.sourceDirty = execute('git', ['status', '--porcelain'], root).trim().length !== 0;
     const tarballs = Object.fromEntries(
@@ -496,6 +501,7 @@ export default function PublicSdk() {
     report.failed = true;
     throw error;
   } finally {
+    report.finishedAt = new Date().toISOString();
     try {
       mkdirSync(dirname(target), { recursive: true });
       writeFileSync(target, `${JSON.stringify(report, null, 2)}\n`);

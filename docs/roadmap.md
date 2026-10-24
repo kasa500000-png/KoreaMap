@@ -204,3 +204,7 @@ Windows lifecycle의 Next manifest 키 구분자 차이도 재현해 실제 map 
 추가 Windows 회귀는 CRLF 메타데이터 오인·ESM preload 경로·ZIP 악성 fixture 정규화를 수정한다. 실제 junction 차단을 확인하고 기존 파일 링크 권한 미충족은 NOT_RUN으로 분리한다. 릴리스 조건이나 실제 플랫폼/데이터 수락을 완화하지 않는다.
 
 최종 로컬 `pnpm check`/`pnpm pack:check`/staged 출처 검사는 exit0이며, 실제 기본 Web25개·Chromium lifecycle6개도 PASS다. Windows 환경의 기존 skip은 미검증으로 유지한다. source preview 검토는 가능하나 전체 audit와 Web/RN 공개 선언의 release 차단은 해제되지 않았다.
+
+## 2026-10-24 KST — 독립 검증의 실행 환경 기록
+
+병합 main f374226의 CI는 기능6 성공/기존 릴리스3 실패이며 새 실패는 없다. [실행 환경 근거](research/verification-host-evidence.md)에 따라 Windows를 Linux로 오기한 재현성 보고를 수정하고 Web/Native 보고서에 실제 OS·아키텍처·Node·pnpm 및 검사 시각을 추가한다. 기존 선언/보안·실자료·성능·플랫폼·발행 gate는 유지한다.

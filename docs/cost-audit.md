@@ -508,3 +508,9 @@ Windows 전용 manifest 키 정규화는 정확한 지도 모듈 1개만 선택�
 감사기의 CRLF 처리는 정확한 기존 package 메타데이터 fragment에만 적용한다. 같은 URL을 scripts에 넣는 부정 검사와 실제 오류 줄 번호를 LF/CRLF 모두 확인했다. 외부 호스트/실행 endpoint·비밀정보 허용 목록은 불변이다. Windows fixture 보완은 raw ZIP 위험 이름, 실제 junction, 파일 URL preload를 검증하며 파일 링크 권한을 우회하거나 OS 보안 설정을 변경하지 않는다. 미실행 파일 링크/POSIX 프로세스 검사는 별도로 남긴다.
 
 최종 전체/pack 정적 감사는 worktree401·index401·history blob1023/commit71, findings0이다. 5개 SDK tarball은 기존 main CI와 동일한 SHA256이며 새 native binary/폰트/자료를 포함하지 않는다. 실제 Web 소비 smoke 외부요청0/pageerror0과 정적 결과를 구분한다. 전체 dependency audit high2 및 플랫폼/데이터/발행 차단은 유지한다.
+
+## 2026-10-24 KST — 독립 검증의 실행 환경 기록
+
+검증 도구가 공개 runtime 식별값과 실제 pnpm 버전만 보고서에 기록한다. OS 사용자명·hostname·환경변수·설치 경로는 수집하지 않으며 버전 명령의 임의 출력도 저장하지 않는다. 시작/종료 시각은 검증 시도 구간이며 gate 통과·cleanup 성공의 대체 증거가 아니다. SDK·Provider·dependency/lockfile·네트워크/과금/CI 권한·발행 정책과 제3자 payload는 바꾸지 않는다. 실제 독립 소비 재실행은 기존 명시적 npm metadata 준비 및 loopback smoke 범위다. 기존 high2와 공개 선언 실패는 계속 릴리스 차단이다.
+
+실제 재실행은 두 보고서 모두 win32/x64·Node24.19.0·pnpm12.14.0을 기록했고 Web 외부요청0/pageerror0이었다. 전체 check/pack의 비용·출처 감사 findings0, 5 SDK tarball hash는 기존과 동일하다. Windows 기존 skip과 Native 기기 미검증, 전체 선언 exit1을 유지한다.

@@ -884,3 +884,18 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 전체 회귀 후속: 비용 감사23/23, 배포물13/13, 서비스 품질14/14, APK Python13/13을 재검사했다. 추가 수정은 CRLF 메타데이터 span, Windows `--import` URL, ZIP 악성 fixture 원형 보존, 배포물의 실제 junction 검사다. 타일 파일 링크 사전 probe는 기존 EPERM 미실행을 삭제/DB open 전에 판정한다. 타일38 PASS/2 skip, Android 도구7 PASS/기존 POSIX2 skip, Vitest204 PASS/기존 Windows file symlink1 skip을 구분한다. 해당 미실행 항목은 통과가 아니며 권한/보안 설정은 변경하지 않았다. 수정 파일은 `scripts/audit-cost-security.py`, `scripts/test-cost-audit.py`, `tests/service-quality.test.mjs`, `tests/native-android-apk.test.py`, `tests/web-deploy.test.mjs`, `tests/tiles-http-v2.test.mjs`가 추가된다. 앞 전체 check는 비용 회귀 실패였으며 최종 재실행으로 판정한다.
 
 최종 로컬 판정(2026-10-24 KST): `pnpm check` exit0, `pnpm pack:check` exit0, `pnpm check:data --staged` exit0. 전체 check는 strict/lint/format/문서·라이선스·데이터·비용·빌드와 모든 등록 회귀를 완료했다. Vitest204 PASS/1 skip, 추가 라이선스3·Python1·비용23 PASS, 타일38 PASS/2 skip, Android 도구7 PASS/2 skip을 그대로 기록한다. Web E2E25/25 및 Chromium lifecycle6/6 PASS. 독립 소비 두 검사는 위의 기존 선언 오류로 PARTIAL_PASS/exit1이고 audit high2/exit1도 유지한다. pack의 실제 5개 tarball은 기존 main CI 해시와 모두 동일하고 정적 감사 findings0이다. 마지막 문서·staged/diff 검사 후 commit/PR을 진행하며 정확한 head/CI를 확인하기 전 병합하지 않는다. 재현 가능한 Windows 개발 검증은 진행 가능하지만 skipped 항목·실자료·Native 기기·성능·릴리스는 완료로 선언하지 않는다.
+
+## 2026-10-24 KST — 독립 검증의 실행 환경 기록
+
+1. 구현: Windows 실행을 Linux로 오기한 독립 패키지 보고서를 수정했다. Web/Native 보고서에 실제 OS·아키텍처·Node·pnpm 및 검사 시각을 추가하고 비공개 환경값을 수집하지 않는다.
+2. 파일: `scripts/verification-environment.mjs`, 두 소비 verifier, `tests/verification-environment.test.mjs`, `package.json`, [검토 기록](research/verification-host-evidence.md), 진행/로드맵/비용 문서.
+3. 검사: 기준 main f374226 CI40091649871 기능6 PASS/기존 릴리스3 FAIL. 실패 로그는 high2·TS2834·TS2411/TS2344/TS2416으로 확인했으며 새 실패는 없다. 새 runtime/비공개값·오염 버전 회귀2 PASS. 전체 검사 및 실제 소비 재실행 결과는 아래에 기록한다.
+4. 실화면 QA: 검사 도구 변경이다. 이번 실행의 Web 소비 smoke와 Native JS export 결과는 아래에서 구분한다. Android/iOS 기기 실화면은 NOT_RUN이며 JS export를 기기 검증으로 표시하지 않는다.
+5. 라이선스/보안: 자체 코드만 추가하며 payload·키·제작자 endpoint·새 의존성 없음. 공식 registry 최신 graph는 앞선 Windows 조사와 동일하고 지원되는 보안/타입 수정 조합을 확인하지 못했다.
+6. 남은 작업: high2, Web/RN 전체 선언, 실제 CSV/정답, 성능, Native 실행/고지와 발행 조건은 미해결. 보고서의 같은 호스트 재현성은 교차 OS 수락이 아니다.
+7. Git: `codex/verification-host-evidence`, 기준 main `f374226c1acb211794379f5c81a62dbc375c777a`. 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: record actual consumer verification environment$'`. 실제 SHA/PR는 사용자 보고로 제공한다.
+8. 다음 단계: 검증 소스 개선은 관련 검사 후 진행 가능하다. npm/Release·운영 배포와 전체 릴리스 수락은 계속 차단이다.
+
+실제 소비 재실행: Web은 같은 호스트의 5 tarball byte 동일·Bundler/custom-layer/core/SSR/browser PASS, 외부요청0/pageerror0, 기존 TS2834로 PARTIAL_PASS/exit1이다. Native는 registry/offline 설치·SDK strict Bundler/NodeNext·plugin·Android/iOS JS export PASS, 기존 TS2411/TS2344/TS2416으로 PARTIAL_PASS/exit1이다. 두 보고서 모두 win32/x64·Node24.19.0·pnpm12.14.0과 실제 시작/종료 시각을 기록했다. 기존 gate의 실패 보고서에서도 환경 근거가 보존됨을 확인했다. 릴리스/보고서 회귀32/32 PASS. 두 실행에서 새 실패는 없다.
+
+최종 로컬 판정: `pnpm check` exit0, `pnpm pack:check` exit0. Vitest204 PASS/기존 file-symlink1 skip, 릴리스32 PASS, Native 도구7 PASS/기존 POSIX2 skip 등 전체 등록 검사를 완료했다. 기존 Windows 미실행은 통과로 세지 않는다. 문서103개/내부 링크565개 PASS, 비용 감사 worktree404/index401/history1044 blobs·73 commits findings0이며 pack의 5개 SHA256은 기존 후보와 동일하다. 실제 소비 재실행은 위의 기존 gate만으로 exit1이며 새 실패는 없다. 최종 staged 출처·diff 확인 후 commit/PR로 제공한다. 소스 변경의 검증 완료와 공개 릴리스 준비는 구분한다.

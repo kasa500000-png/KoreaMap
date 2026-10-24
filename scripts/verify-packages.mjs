@@ -17,6 +17,7 @@ import { assertDeclarationProbe, summarizeDeclarationProbe } from './declaration
 import { createRequire } from 'node:module';
 import { chromium } from '@playwright/test';
 import { createServer } from 'vite';
+import { observedPnpmVersion, verificationEnvironment } from './verification-environment.mjs';
 
 async function verifyPackages() {
   const root = process.cwd();
@@ -39,6 +40,9 @@ async function verifyPackages() {
   mkdirSync(directory, { recursive: true });
   const report = {
     schemaVersion: 2,
+    environment: verificationEnvironment(),
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
     sourceCommit: null,
     sourceDirty: null,
     status: 'NOT_RUN',
@@ -63,6 +67,7 @@ async function verifyPackages() {
   let stage = 'reproducibility';
   try {
     assert(cli, 'Run via pnpm verify:packages after pnpm pack:check');
+    report.environment.pnpm = observedPnpmVersion(pnpm(['--version']));
     const git = (...args) => {
       const result = spawnSync('git', args, { cwd: root, encoding: 'utf8', timeout: 10000 });
       assert(!result.error && !result.signal && result.status === 0, 'Source identity unavailable');
@@ -93,7 +98,7 @@ async function verifyPackages() {
     });
     report.packages = packages;
     report.checks.reproducibility = 'PASS';
-    report.reproducibility = 'same Linux host, clean SDK rebuild, byte-identical five tarballs';
+    report.reproducibility = 'same host, clean SDK rebuild, byte-identical five tarballs';
     stage = 'offlineConsumerInstall';
     temp = mkdtempSync(resolve(tmpdir(), 'kmk-consumer-'));
     const dependencies = Object.fromEntries(
@@ -371,6 +376,7 @@ await map.ready; document.body.dataset.ready = 'true'; window.consumerMap = map;
     report.failure = { stage, code: String(error?.code ?? 'VERIFICATION_FAILED') };
     throw error;
   } finally {
+    report.finishedAt = new Date().toISOString();
     // Persist all completed and unexecuted checks even when the compiler or cleanup fails.
     try {
       writeFileSync(
