@@ -320,7 +320,7 @@ export function evaluateReleasePreflight({
         ['reproducibility', 'offlineConsumerInstall'].every(
           (key) => report.checks?.[key] === 'PASS',
         ) &&
-        ['supportedBundlerTypes', 'coreNodeNextTypes', 'ssrImport'].every((key) =>
+        ['supportedBundlerTypes', 'webLayerTypes', 'coreNodeNextTypes', 'ssrImport'].every((key) =>
           probePassed(report.checks?.[key]),
         ) &&
         report.checks?.browser?.status === 'PASS' &&
@@ -343,8 +343,13 @@ export function evaluateReleasePreflight({
         report.sourceDirty === false &&
         report.overall === 'PASS' &&
         report.releaseBlocked === false &&
-        probePassed(report.checks?.dependencyDeclarations) &&
         [
+          'dependencyDeclarations',
+          'publicSdkBundlerDeclarations',
+          'publicSdkNodeNextDeclarations',
+        ].every((key) => probePassed(report.checks?.[key])) &&
+        [
+          'registryLockPreparation',
           'offlineTarballInstall',
           'publicTypesStrictWithSkipLibCheck',
           'configPluginIntrospection',

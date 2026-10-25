@@ -101,6 +101,7 @@ function fixture() {
           reproducibility: 'PASS',
           offlineConsumerInstall: 'PASS',
           supportedBundlerTypes: probe(),
+          webLayerTypes: probe(),
           coreNodeNextTypes: probe(),
           ssrImport: probe(),
           browser: {
@@ -126,6 +127,9 @@ function fixture() {
         ),
         checks: {
           dependencyDeclarations: probe(),
+          publicSdkBundlerDeclarations: probe(),
+          publicSdkNodeNextDeclarations: probe(),
+          registryLockPreparation: 'PASS',
           offlineTarballInstall: 'PASS',
           publicTypesStrictWithSkipLibCheck: 'PASS',
           configPluginIntrospection: 'PASS',
@@ -154,6 +158,33 @@ test('synthetic complete evidence is only readiness for review, never publicatio
   assert.equal(report.publicationAuthorized, false);
   assert(report.checks.every((entry) => entry.status === 'PASS'));
   assert.match(report.scope, /not full-platform acceptance or publication approval/);
+});
+
+test('consumer readiness requires every current strict declaration probe despite an aggregate PASS', () => {
+  for (const [consumer, key] of [
+    ['web', 'webLayerTypes'],
+    ['native', 'publicSdkBundlerDeclarations'],
+    ['native', 'publicSdkNodeNextDeclarations'],
+  ]) {
+    for (const invalid of [
+      undefined,
+      null,
+      'PASS',
+      { ...probe(), status: 'NOT_RUN' },
+      { ...probe(), status: 'FAIL' },
+      { ...probe(), completed: false },
+      { ...probe(), exitCode: 2 },
+      { ...probe(), signal: 'SIGTERM' },
+      { ...probe(), executionErrorCode: 'ETIMEDOUT' },
+    ]) {
+      const value = fixture();
+      if (invalid === undefined) delete value.receipts[consumer].report.checks[key];
+      else value.receipts[consumer].report.checks[key] = invalid;
+      const report = evaluateReleasePreflight(value);
+      assert.equal(byId(report, `${consumer}-consumer`).status, 'BLOCKED', `${consumer}:${key}`);
+      assert.equal(report.publicationAuthorized, false);
+    }
+  }
 });
 
 test('five-package versions, fixed Changesets group and pinned release commands must agree', () => {
@@ -477,6 +508,7 @@ test('consumer reports must identify the same prepared tarballs without omission
 
 test('Native schema 1 scalar checks accept only the literal PASS string and reject contradictory objects', () => {
   for (const key of [
+    'registryLockPreparation',
     'offlineTarballInstall',
     'publicTypesStrictWithSkipLibCheck',
     'configPluginIntrospection',
@@ -484,6 +516,7 @@ test('Native schema 1 scalar checks accept only the literal PASS string and reje
     'iosJavaScriptExport',
   ]) {
     for (const invalid of [
+      undefined,
       'FAIL',
       'NOT_RUN',
       null,

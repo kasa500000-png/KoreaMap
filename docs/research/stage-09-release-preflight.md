@@ -1,5 +1,7 @@
 # Stage 09 — 발행 전 운영 조건 검사
 
+2026-10-25 후속: [소비 증거 완전성](complete-release-receipts.md)에 따라 Web 레이어 타입, Native SDK strict Bundler/NodeNext와 registry lock 준비 결과도 필수 검사한다. 이전 receipt의 누락을 PASS로 보완하지 않고 실제 재실행한다.
+
 확인일: 2026-10-21 KST. 조사·실행 기준은 `259d75e116a2de456f546c736014d50197774a4d`의 별도 worktree다. 이 단계는 private 개발 도구를 추가하며 npm 발행·GitHub Release·배포·계정 설정을 실행하지 않는다. 프로그램 회귀 통과와 실제 릴리스 수락을 구분한다.
 
 ## 1. 구현 완료 기능
