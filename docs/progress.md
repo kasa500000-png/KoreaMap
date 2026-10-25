@@ -927,3 +927,16 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 8. 다음 단계: 관련 검사 통과 후 PR 검토 가능하다. 실제 릴리스 준비나 npm/Release·운영 배포 승인을 뜻하지 않는다.
 
 최종 로컬 판정: `pnpm check` exit0, `pnpm pack:check` exit0. Vitest204 PASS/기존 Windows file-symlink1 skip, 릴리스33 PASS, 비용28 PASS 및 전체 등록 회귀·strict/lint/format·빌드·문서·출처·라이선스 검사를 완료했다. 타일 파일 링크2/Android POSIX2의 기존 skip은 미검증으로 유지한다. 감사 findings0, 실제 SDK tarball5개 해시는 이전과 동일하다. `docs/research/recommended-poi-acquisition.md`에도 새 HTTP200 관측을 연결했다. 최종 문서/staged/diff 검사 후 commit/PR을 제공하며 PR CI는 별도로 보고한다. 회귀가 재현한 새 preflight 누락은 해결됐고 기존 high/type 및 실제 자료·플랫폼 차단은 유지한다.
+
+## 2026-10-25 KST — 북구 산책로 실제 원본과 행 수 대조
+
+1. 구현: 공식 북구 산책로 CSV를 실제 취득해 865 bytes/EUC-KR/exact header/원본7·고유7·중복0·무좌표7행을 검증했다. private 검증기에 필수 `expectedRows`와 고유+중복 합계 대조, 무위치 보존 확인 및 요약 보고를 추가했다. [근거](research/bukgu-original-validation.md).
+2. 파일: `scripts/verify-real-poi.mjs`, `tests/real-poi.test.mjs`, `data/sources.json`, 생성된 `docs/data-sources.md`, 원본 검증/접근 기록과 신규 연구 문서, roadmap/progress/cost-audit. 원본 CSV·운영자 설정은 ignored이며 Git에 포함하지 않는다. ETL·SQL·SDK·dependency/lockfile은 불변이다.
+3. 검사: 최신 main `7c000cb345e966ef105b735bf4789c9f82a88acc`, 기준 CI40176852051 기능6 PASS/기존3 FAIL. Node24.19.0/pnpm12.14.0/Python3.12.14/Git2.53.0.windows.3을 확인하고 frozen install PASS. 관련 회귀15 PASS. 초기 합성 이름의 개행 오류는 미사용 설명 열로 옮겨 해결했다. 최종 전체/pack/staged 결과는 아래에 기록한다. 고정 pnpm 실행 경로를 처음 잘못 지정한 도구 호출은 PATH 설정 후 해결했다.
+4. 실화면 QA: 공식 포털 다운로드를 실제 브라우저에서 실행했다. 지도 화면 QA와 Android/iOS는 NOT_RUN이다. 파일 검증을 DB 적재·지도 표시로 대체하지 않는다.
+5. 라이선스/보안: 기존 A 원장의 개별 무료·이용허락 제한 없음과 기준일을 재확인했다. 자체 도구 MIT와 자료 권리를 구분한다. 원본·시설 레코드·URL query는 Git/npm에 넣지 않으며 새 provider/키/과금 경로가 없다. 자동 검사는 법적 권리·원본 진술 전체의 증명이 아니다.
+6. 차단: 북구 원본 미확보·파일 검증만 해소했다. Docker가 없어 실제 PostGIS/SDK 검색은 미검증이다. 용산·동물병원 원본/독립 기준점, 성능·전국 지도·Native 실행/고지·발행 운영 조건은 유지한다. 기존 high2·Web/RN 선언 CI 차단 해결/재실행은 사용자 지시로 보류하며 통과로 바꾸지 않는다.
+7. Git: `codex/real-poi-file-evidence`, 기준 main7c000cb. 커밋 식별 `git log -1 --format='%H %s' --grep='^feat: validate real POI row counts and record Bukgu source evidence$'`. 이번 범위는 commit/PR이며 main 병합은 수행하지 않는다.
+8. 다음 단계: 파일 검증 변경은 PR 검토 가능하며 전용 로컬 PostGIS 준비 후 실제 smoke를 실행할 수 있다. 전체 릴리스·배포·발행은 차단을 유지한다.
+
+최종 로컬 검사: `pnpm check` exit0, `pnpm pack:check` exit0, `pnpm check:data --staged` exit0(16 sources/407 files). Vitest204 PASS/기존 Windows file-symlink1 skip, POI15 PASS, 비용28 PASS, 릴리스33 PASS 및 전체 등록 회귀·strict/lint/format·Web production/Expo JS export를 완료했다. 타일 파일 링크2·Android POSIX2 기존 skip은 미검증이다. 문서106개/상대 링크581개, 데이터 문서 동기화·diff 검사 PASS, 보안 감사 findings0, SDK tarball5개는 기존 SHA와 같다. 새 작성 중 실패는 수정 후 해결했으며 현재 미해결 로컬 새 실패는 없다. PR CI는 생성 후 상태를 별도로 보고한다. 실제 북구 검증 보고서는 합성 회귀 후 보존됨을 확인했다. 변경 파일에는 `scripts/render-data-docs.py`의 초기 조사 시점 설명 갱신도 포함한다.

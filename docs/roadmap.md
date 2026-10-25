@@ -216,3 +216,7 @@ Windows lifecycle의 Next manifest 키 구분자 차이도 재현해 실제 map 
 ## 2026-10-25 KST — 릴리스 소비 증거 완전성
 
 [검토 기록](research/complete-release-receipts.md)에 따라 preflight가 누락했던 현재 소비 verifier의 Web 레이어/Native SDK strict 선언/registry 준비 결과를 필수 확인한다. 불완전한 상위 PASS를 차단하며 기존 릴리스 차단을 해제하지 않는다. 공식 POI 상세 페이지3곳은 이번 환경에서 HTTP200이지만 실제 CSV/독립 정답 수락은 여전히 미완료다.
+
+## 2026-10-25 KST — 실제 북구 산책로 파일 검증
+
+사용자 지시로 CI 차단 해결을 보류하고 [공식 북구 산책로 CSV 취득·검증](research/bukgu-original-validation.md)을 진행했다. 7행 원본과 정확 헤더·SHA를 검증하고 원본 행 수 대조·중복/무좌표 요약을 구현했다. 북구의 원본 미확보 차단만 해소했으며 Docker 부재로 DB 적재·SDK 검색은 NOT_RUN이다. 다음은 전용 PostGIS 실제 smoke와 나머지 두 자료의 원본/독립 기준점 확보다. CI 보류는 기존 보안·타입·성능·Native·발행 gate 해제가 아니다.

@@ -1,6 +1,6 @@
 # 실제 공공 POI 원본 검증 — 2026-10-20
 
-**실제 원천 파일 검증·PostGIS 적재·SDK 검색은 차단/미검증이다.** 기존 A 등급 3종의 공식 링크에 재접근했지만 원본 CSV를 확보하지 못했다. 합성 테스트 결과를 실제 자료 적재 성공으로 바꾸지 않는다.
+2026-10-25 추가: **북구 산책로 원본 CSV 7행의 파일 검증은 통과**했다. [실제 취득·행 수 검증](bukgu-original-validation.md)을 참고한다. PostGIS 적재·SDK 검색과 나머지 두 자료는 여전히 미검증이다. 아래 10-20 접근 실패는 과거 관측이다.
 
 ## 공식 접근 결과
 
@@ -50,6 +50,7 @@ node --env-file=artifacts/real-poi/database.env scripts/verify-real-poi.mjs smok
 | `snapshotUpdatedAt` | 원천 파일/데이터의 검증된 기준시각. 취득시각과 구분 |
 | `encoding` | 실제 확인한 `utf-8` 또는 `euc-kr` |
 | `expectedHeader` | 원본의 전체 헤더를 순서대로 명시한 문자열 배열. 한 열이라도 다르면 거부 |
+| `expectedRows` | 공식 파일 metadata 또는 별도 검토로 확인한 원본 데이터 행 수(헤더 제외), 1~100000 정수. 고유 행과 중복 행의 합이 다르면 거부. 다운로드한 파일에서 자동 산출해 검토를 대신하지 않음 |
 | `columns` | 기존 `CsvImportConfig`의 실제 열 매핑. 동물병원은 관리 ID·상태·X/Y 필수, 산책로는 좌표 열 없음 |
 | `controlPoints` | 좌표 제공 자료의 독립적으로 검토한 실제 시설 기준점 1개 이상. 원본 `source_id`, WGS84 `[경도, 위도]`, 허용 오차 `toleranceMeters`(최대 30m), 근거·확인 방법을 설명하는 `referenceNote`(24자 이상) |
 
@@ -59,7 +60,7 @@ node --env-file=artifacts/real-poi/database.env scripts/verify-real-poi.mjs smok
 
 ### 검증 모드와 DB 격리
 
-`validate`는 10MiB 파일 상한, exact header, 기존 A/기한/권리/CRS admission·SHA·필드 검증과 기준점 ID의 실제 행 존재를 검사한다. 기준점의 지리적 오차 및 DB·SDK 통합은 수행하지 않으며 결과에 `not-executed`로 기록한다.
+`validate`는 10MiB 파일 상한, exact header, 기존 A/기한/권리/CRS admission·SHA·필드 검증과 기준점 ID의 실제 행 존재를 검사한다. `expectedRows`와 고유 행+중복 행을 비교하며, 보고서에는 `originalRows`, `duplicateRows`, `rowsWithoutCoordinates`, 기준시각·인코딩을 기록한다. 무위치 프로파일의 모든 좌표는 null인지 확인한다. 예상 행 수 자체는 운영자 검토 전제이며 자동 독립 다운로드 증명이 아니다. 기존 운영자 설정에도 검토한 `expectedRows`를 추가해야 한다. 기준점의 지리적 오차 및 DB·SDK 통합은 수행하지 않으며 결과에 `not-executed`로 기록한다.
 
 `smoke`에는 운영자가 마련한 **전용·빈 로컬 DB**가 필요하다. `database.env`에 서버 전용 `GEO_DATABASE_URL`과 `KMK_REAL_POI_DATABASE_ACK=disposable-real-poi`를 둔다. DB 이름은 `kmk_real_poi` 또는 `kmk_real_poi_<영소문자·숫자>`여야 하고, host는 localhost/loopback만 허용한다. 기존 `kmk` schema가 있으면 수정 전에 거부한다. 기존 개발/운영 DB를 지정하거나 DB 암호를 `NEXT_PUBLIC_*`/`EXPO_PUBLIC_*`에 넣지 않는다. 도구는 Docker나 DB를 자동 생성·삭제하지 않는다.
 

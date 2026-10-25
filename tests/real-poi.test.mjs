@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtemp, mkdir, rm, writeFile, symlink } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, readFile, writeFile, symlink } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { readFileSync } from 'node:fs';
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import {
   readOperatorFile,
   validateEvidence,
@@ -24,6 +24,7 @@ function config() {
     realSourceAcknowledged: true,
     sourcePageUrl: source.sourceUrl,
     reviewedLicense: source.license,
+    expectedRows: 1,
     originalUrl: original.href,
     expectedHeader: ['합성명칭', '합성주소', '합성경도', '합성위도'],
     retrievedAt: '2026-10-19T00:00:00.000Z',
@@ -48,6 +49,7 @@ test('actual-file evidence requires exact source/license/header and independentl
     { operatorOptIn: false },
     { sourcePageUrl: catalog.sources[0].sourceUrl },
     { reviewedLicense: 'MIT' },
+    ...[undefined, null, '7', 0, -1, 1.5, 100001].map((expectedRows) => ({ expectedRows })),
     { expectedHeader: [] },
     { expectedHeader: ['name', 'name'] },
     { retrievedAt: '2026-10-21T00:00:00Z' },
@@ -406,6 +408,63 @@ test('database smoke cannot use a remote, ordinary, credential-less or unacknowl
     assert.throws(() => validateSmokeDatabase(changed.href, 'disposable-real-poi'));
   }
   assert.throws(() => validateSmokeDatabase(url.href));
+});
+
+test('file validation accounts for original rows and duplicates without inferring trail coordinates', async () => {
+  await mkdir('artifacts/real-poi', { recursive: true });
+  const directory = await mkdtemp(resolve('artifacts/real-poi/row-count-'));
+  const source = catalog.sources.find((value) => value.id === 'bukgu-walking');
+  // Authored data only; quoted newlines must count as one CSV record.
+  const bytes = Buffer.from(
+    'name,address,note\r\nauthored-trail,authored-address,"authored\nnote"\r\nauthored-trail,authored-address,"authored\nnote"\r\n',
+  );
+  const file = resolve(directory, 'authored.csv');
+  const path = resolve(directory, 'config.json');
+  const input = {
+    ...config(),
+    sourceId: source.id,
+    sourcePageUrl: source.sourceUrl,
+    expectedHeader: ['name', 'address', 'note'],
+    expectedRows: 2,
+    sourceFile: file,
+    controlPoints: [],
+    encoding: 'utf-8',
+    snapshotUpdatedAt: '2025-11-20T00:00:00.000Z',
+    sha256: createHash('sha256').update(bytes).digest('hex'),
+    columns: { name: 'name', address: 'address' },
+  };
+  const output = resolve('artifacts/real-poi/verification.json');
+  const previousReport = await readFile(output).catch((error) => {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  });
+  const originalLog = console.log;
+  const logs = [];
+  console.log = (value) => logs.push(value);
+  try {
+    await writeFile(file, bytes);
+    await writeFile(path, JSON.stringify(input));
+    await main(['validate', path]);
+    const report = JSON.parse(readFileSync(output, 'utf8'));
+    assert.equal(report.originalRows, 2);
+    assert.equal(report.rows, 1);
+    assert.equal(report.duplicateRows, 1);
+    assert.equal(report.rowsWithoutCoordinates, 1);
+    assert.equal(report.rowCount, 'exact-operator-reviewed-match');
+    assert.equal(report.database, 'not-executed');
+    assert.equal(report.sdkSearch, 'not-executed');
+    assert(!logs.join('').includes('authored-address'));
+    for (const expectedRows of [1, 3]) {
+      await writeFile(path, JSON.stringify({ ...input, expectedRows }));
+      await assert.rejects(main(['validate', path]), /ORIGINAL_ROW_COUNT_MISMATCH/);
+      assert.equal(JSON.parse(readFileSync(output, 'utf8')).status, 'failed');
+    }
+  } finally {
+    console.log = originalLog;
+    if (previousReport === null) await rm(output, { force: true });
+    else await writeFile(output, previousReport);
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 test('raw-file verifier bounds reads and refuses paths or links outside ignored operator storage', async () => {
   await mkdir('artifacts/real-poi', { recursive: true });
