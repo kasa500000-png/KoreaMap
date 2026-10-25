@@ -66,6 +66,12 @@ export function validateEvidence(config, catalog, now = new Date()) {
   check(config.sourcePageUrl === source.sourceUrl, 'EXACT_SOURCE_PAGE_REQUIRED');
   check(config.reviewedLicense === source.license, 'REVIEWED_LICENSE_REQUIRED');
   check(
+    Number.isSafeInteger(config.expectedRows) &&
+      config.expectedRows > 0 &&
+      config.expectedRows <= 100000,
+    'REVIEWED_ORIGINAL_ROW_COUNT_REQUIRED',
+  );
+  check(
     Array.isArray(config.expectedHeader) &&
       config.expectedHeader.length > 1 &&
       config.expectedHeader.length < 256,
@@ -179,11 +185,23 @@ async function inspect(configPath) {
   );
   const prepared = prepareCsv(catalog, config, bytes);
   check(prepared.synthetic === false && prepared.rows.length > 0, 'REAL_SOURCE_ROWS_REQUIRED');
+  check(
+    prepared.rows.length + prepared.duplicates === config.expectedRows,
+    'ORIGINAL_ROW_COUNT_MISMATCH',
+  );
+  const rowsWithoutCoordinates = prepared.rows.filter((row) => row.projected === null).length;
+  if (evidence.profile.srid === null) {
+    check(
+      rowsWithoutCoordinates === prepared.rows.length &&
+        prepared.rows.every((row) => row.place.location === null),
+      'UNLOCATED_SOURCE_MUST_REMAIN_UNLOCATED',
+    );
+  }
   for (const point of evidence.points) {
     const row = prepared.rows.find((candidate) => candidate.place.source_id === point.source_id);
     check(row?.projected, 'CONTROL_POINT_NOT_IN_SOURCE');
   }
-  return { config, prepared, ...evidence };
+  return { config, prepared, rowsWithoutCoordinates, ...evidence };
 }
 
 async function smoke(input) {
@@ -489,6 +507,12 @@ export async function main(args = process.argv.slice(2)) {
       license: input.source.license,
       sha256: input.prepared.sha256,
       rows: input.prepared.rows.length,
+      originalRows: input.config.expectedRows,
+      duplicateRows: input.prepared.duplicates,
+      rowsWithoutCoordinates: input.rowsWithoutCoordinates,
+      rowCount: 'exact-operator-reviewed-match',
+      snapshotUpdatedAt: input.config.snapshotUpdatedAt,
+      encoding: input.config.encoding,
       header: 'exact-operator-reviewed-match',
       provenance: 'operator-attested-original-file-not-independent-download-proof',
       fileValidation: 'passed',

@@ -528,3 +528,11 @@ Git raw-object pipes 두 개를 재사용하며 네트워크·filters/textconv·
 로컬 preflight의 증거 판정만 강화했다. 새 endpoint·의존성·SDK Provider·외부 payload·유료 서비스·workflow 권한·발행 경로는 추가하지 않았다. 기존 공식 npm metadata 재확인과 명시적 POI metadata probe3회만 수행했으며 모두 HTTP200의 상세 페이지 접근이다. 원본 CSV/레코드를 취득·배포한 결과가 아니다. 누락된 검사 결과는 실제 재실행 없이는 PASS로 보완할 수 없고 publicationAuthorized:false를 유지한다. 기존 dependency audit high2는 계속 차단이다.
 
 최종 전체 check와 pack 감사는 exit0/findings0이며 SDK tarball5개 해시도 동일하다. 릴리스 관련 회귀33개 통과와 실제 release:preflight BLOCKED/exit1을 구분한다. 새 권한·외부 실행 경로·제3자 payload는 추가하지 않았다.
+
+## 2026-10-25 KST — 실제 북구 CSV 파일 검증
+
+공식 상세 페이지의 무료·이용허락 제한 없음·기준일·전체7행을 확인하고 운영자 브라우저 다운로드로 원본865 bytes를 ignored 저장소에만 보존했다. 기존 세션을 사용했으며 비로그인 다운로드 증거로 표시하지 않는다. 원본·설정·전체 URL query·시설 레코드를 Git/npm에 넣지 않는다. 기존 A 범위를 넓히거나 자료에 SDK MIT를 적용하지 않는다. 실제 검토 기록은 [북구 원본 검증](research/bukgu-original-validation.md)을 따른다.
+
+private 검증기에 원본 행 수 대조와 무좌표 보존·요약만 추가했으며 새 외부 요청·provider·dependency·DB·유료 계정·CI 권한은 없다. 합성 회귀는 기존 운영자 보고서를 보존/복원한다. SDK import/설치/기본 실행의 네트워크 경로는 불변이다. Docker 부재로 실제 DB/검색과 Native 실행은 미검증이며 정적 감사나 파일 검증으로 대체하지 않는다. 기존 high2 및 선언 CI 차단 해결은 사용자 요청으로 보류했다.
+
+최종 전체 check/pack은 exit0, 정적 보안 감사 findings0, staged 출처 검사16 sources/407 files PASS다. 실제 SDK tarball5개 SHA는 기존과 동일하며 새 원본 payload가 포함되지 않았다. 비용 회귀28개와 POI 보호 회귀15개 통과를 실제 네트워크·계정 결제·데이터 법적 적합성 전체 검증으로 확대하지 않는다.
