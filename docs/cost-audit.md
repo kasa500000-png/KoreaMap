@@ -522,3 +522,9 @@ Git raw-object pipes 두 개를 재사용하며 네트워크·filters/textconv·
 실제 전체 저장소의 이전/수정 감사 결과 JSON과 exit0이 완전히 동일했다(worktree405/index404/history1053 blobs·75 commits/findings0). 시간만320.566초에서12.878초로 줄었다. 검사 규칙·감사 scope·history 민감정보 판정을 줄인 결과가 아니며 실제 네트워크/계정 과금·법적 적합성 수락을 의미하지 않는다.
 
 최종 전체 check/실제 pack 검사 exit0이며 5개 SDK tarball 해시는 이전 후보와 동일하다. 신규 네트워크 경로·binary·제3자 payload가 없고 감사 findings0이다. 초기 자체 감사 실패를 기록하고 수정 후 검사로 해결했으며 기존 dependency high2는 계속 별도 release 차단이다.
+
+## 2026-10-25 KST — 릴리스 소비 증거 완전성
+
+로컬 preflight의 증거 판정만 강화했다. 새 endpoint·의존성·SDK Provider·외부 payload·유료 서비스·workflow 권한·발행 경로는 추가하지 않았다. 기존 공식 npm metadata 재확인과 명시적 POI metadata probe3회만 수행했으며 모두 HTTP200의 상세 페이지 접근이다. 원본 CSV/레코드를 취득·배포한 결과가 아니다. 누락된 검사 결과는 실제 재실행 없이는 PASS로 보완할 수 없고 publicationAuthorized:false를 유지한다. 기존 dependency audit high2는 계속 차단이다.
+
+최종 전체 check와 pack 감사는 exit0/findings0이며 SDK tarball5개 해시도 동일하다. 릴리스 관련 회귀33개 통과와 실제 release:preflight BLOCKED/exit1을 구분한다. 새 권한·외부 실행 경로·제3자 payload는 추가하지 않았다.

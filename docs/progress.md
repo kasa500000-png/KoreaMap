@@ -914,3 +914,16 @@ lint/format/API/설계 검사, Next production build·Expo Android/iOS JS export
 실저장소 비교: 이전320.566초/수정12.878초, 모두 exit0, 전체 JSON 동일(worktree405/index404/history1053 blobs·75 commits/findings0). 같은 변경 트리/index/refs에서 직렬 실행한 단일 Windows 관측이다. 관련 회귀28/28 PASS이며 초기 테스트 표현 탐지는 수정 후 감사 findings0으로 해결했다. 기존 release 차단과 구분하며 최종 전체 check/pack/staged 결과는 아래에 기록한다.
 
 최종 로컬 검사: `pnpm check` exit0, `pnpm pack:check` exit0. Vitest204 PASS/기존 Windows file-symlink1 skip, 비용 감사28 PASS 및 전체 등록 회귀·strict/lint/format/문서·출처·라이선스·빌드 검사를 완료했다. 타일 파일 링크2 및 Android POSIX2의 기존 skip도 미검증으로 유지한다. 실제 SDK tarball5개의 SHA256은 기존 후보와 동일하고 감사 findings0이다. 최종 문서/diff/staged 검사를 통과한 뒤 commit/PR을 생성한다. 새 작성 중 실패는 해결됐으며 PR CI는 별도 결과로 보고한다. 새로운 화면/Native 기기/실자료/지도 성능 검사와 npm 발행은 수행하지 않았다.
+
+## 2026-10-25 KST — 릴리스 소비 증거 완전성
+
+1. 구현: preflight가 최신 소비 verifier의 Web 레이어 타입, Native SDK strict Bundler/NodeNext 및 registry lock 준비 결과를 빠뜨리던 결함을 수정했다. 상위 PASS여도 세부 결과가 누락/실패/미완료면 차단한다.
+2. 파일: `scripts/release-preflight.mjs`, `tests/release-preflight.test.mjs`, [검토 기록](research/complete-release-receipts.md), 기존 stage09 기록 및 진행/로드맵/비용 문서.
+3. 검사: 기준 main96ab2ff CI40100554083 기능6 PASS/기존 release3 FAIL. 새 audit도 high2/exit1이다. 신규 회귀는 수정 전 두 테스트가 예상대로 실패해 누락을 재현했고, 수정 후 릴리스33/33 PASS다. 실제 local preflight는 증거 부족으로 BLOCKED/exit1을 유지했다. 최종 전체 검사 결과는 아래에 기록한다.
+4. 실화면 QA: 로컬 증거 판정 변경으로 새 화면 QA는 NOT_RUN이다. Android/iOS 기기도 미검증이며 기존 브라우저 CI를 새 실행으로 대체하지 않는다.
+5. 라이선스/보안: 자체 코드만 수정했다. 새 dependency/lockfile·SDK·Provider·키·과금/CI 권한·payload 없음. 공식 POI metadata probe는3곳 HTTP200/exit0이나 원본 CSV 수락은 아니다.
+6. 남은 작업: high2·Web TS2834·Native TS2411/TS2344/TS2416, 실제 CSV/정답·성능·Native 실행/고지·발행 조건은 미해결이다. preflight 누락이라는 새 결함은 기존 차단과 구분해 수정했다.
+7. Git: `codex/complete-release-receipts`, 기준 `96ab2ff76deeb8e33f616970ab95dc059e1649d5`. 커밋 식별 `git log -1 --format='%H %s' --grep='^fix: require complete consumer evidence before release review$'`. 이번 요청 범위는 commit/PR이며 main 병합은 수행하지 않는다.
+8. 다음 단계: 관련 검사 통과 후 PR 검토 가능하다. 실제 릴리스 준비나 npm/Release·운영 배포 승인을 뜻하지 않는다.
+
+최종 로컬 판정: `pnpm check` exit0, `pnpm pack:check` exit0. Vitest204 PASS/기존 Windows file-symlink1 skip, 릴리스33 PASS, 비용28 PASS 및 전체 등록 회귀·strict/lint/format·빌드·문서·출처·라이선스 검사를 완료했다. 타일 파일 링크2/Android POSIX2의 기존 skip은 미검증으로 유지한다. 감사 findings0, 실제 SDK tarball5개 해시는 이전과 동일하다. `docs/research/recommended-poi-acquisition.md`에도 새 HTTP200 관측을 연결했다. 최종 문서/staged/diff 검사 후 commit/PR을 제공하며 PR CI는 별도로 보고한다. 회귀가 재현한 새 preflight 누락은 해결됐고 기존 high/type 및 실제 자료·플랫폼 차단은 유지한다.

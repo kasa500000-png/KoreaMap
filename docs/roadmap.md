@@ -212,3 +212,7 @@ Windows lifecycle의 Next manifest 키 구분자 차이도 재현해 실제 map 
 ## 2026-10-24 KST — Git 이력 보안 감사의 일괄 읽기
 
 [구현·검토 근거](research/batch-security-audit.md)에 따라 Windows에서 수분 걸리는 blob별 Git 프로세스 생성을 두 raw-object 프로세스로 줄인다. 전체 worktree/index/도달 가능한 이력·탐지 규칙·크기 상한·실패 판정은 유지하며 기존 방식과 결과를 대조한다. dependency high2·Web/RN 선언·실자료·성능·Native/고지·발행 차단을 해제하는 변경은 아니다.
+
+## 2026-10-25 KST — 릴리스 소비 증거 완전성
+
+[검토 기록](research/complete-release-receipts.md)에 따라 preflight가 누락했던 현재 소비 verifier의 Web 레이어/Native SDK strict 선언/registry 준비 결과를 필수 확인한다. 불완전한 상위 PASS를 차단하며 기존 릴리스 차단을 해제하지 않는다. 공식 POI 상세 페이지3곳은 이번 환경에서 HTTP200이지만 실제 CSV/독립 정답 수락은 여전히 미완료다.
